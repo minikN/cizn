@@ -1,0 +1,71 @@
+#!/bin/env bash
+
+CONFIG="$(pwd)/config.sh"
+
+while getopts c:h: flag; do
+	case "${flag}" in
+	c) CONFIG=${OPTARG} ;;
+	h) # print help
+		;;
+	*) # print help
+		;;
+	esac
+done
+
+source ./src/log.sh
+
+CONFIG="$(readlink -fm "$CONFIG")"
+CONFIG_ROOT="${CONFIG%/*}"
+STATE_ROOT="${XDG_STATE_HOME:-$CONFIG_ROOT}"
+GEN_ROOT="${STATE_ROOT}/cizn/generations"
+
+logInfo "Using ${CONFIG} as config ..."
+logInfo "Using ${STATE_ROOT}/cizn as state root ..."
+
+if [[ ! -e "${CONFIG}" ]]; then
+	logError "${CONFIG} doesn't exist. Aborting."
+	exit
+fi
+
+mkdir -p "${GEN_ROOT}"
+LAST_GEN=$(ls -At "${GEN_ROOT}" | head -n1)
+
+source ./src/main.sh
+source ./src/module.sh
+source ./src/file.sh
+
+if [[ -z "$LAST_GEN" ]]; then
+	CUR_GEN=0
+	CUR_GEN_ROOT="${GEN_ROOT}/${CUR_GEN}"
+	logInfo "No previous generation found. Creating 0 ..."
+else
+	CUR_GEN=$(("$LAST_GEN" + 1))
+	CUR_GEN_ROOT="${GEN_ROOT}/${CUR_GEN}"
+	logInfo "Moving from generation ${LAST_GEN} to $(("$LAST_GEN" + 1)) ..."
+fi
+
+mkdir -p "$CUR_GEN_ROOT"
+
+source "$CONFIG"
+
+#for i in "${!loadedModules[@]}"; do
+#	echo "$i" "${loadedModules[$i]}"
+#done
+
+#if hasModule "sway"; then
+#	echo "yes"
+#else
+#	echo "no"
+#fi
+
+#l=${#loadedModules[@]}
+#for (( i=0; i < ${l}; i++ )); do
+#	echo $i ${loadedModules[$i]}
+#done
+#for file in $(tree -aifF --noreport ./modules | grep -v '/$'); do
+#	echo "Reading file $file..."
+#	if [ -f $file ]; then
+#		source $file
+#		echo $env
+#	fi
+#done
