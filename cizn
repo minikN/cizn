@@ -2,6 +2,7 @@
 
 CONFIG="$(pwd)/config.sh"
 
+# Handling cli args
 while getopts c:h: flag; do
 	case "${flag}" in
 	c) CONFIG=${OPTARG} ;;
@@ -12,8 +13,10 @@ while getopts c:h: flag; do
 	esac
 done
 
+# setting up logging
 source ./src/log.sh
 
+# setting up state and generations
 CONFIG="$(readlink -fm "$CONFIG")"
 CONFIG_ROOT="${CONFIG%/*}"
 STATE_ROOT="${XDG_STATE_HOME:-$CONFIG_ROOT}"
@@ -30,10 +33,12 @@ fi
 mkdir -p "${GEN_ROOT}"
 LAST_GEN=$(ls -At "${GEN_ROOT}" | head -n1)
 
+# initializing main application
 source ./src/main.sh
 source ./src/module.sh
 source ./src/file.sh
 
+# Setting current generation
 if [[ -z "$LAST_GEN" ]]; then
 	CUR_GEN=0
 	CUR_GEN_ROOT="${GEN_ROOT}/${CUR_GEN}"
@@ -46,10 +51,33 @@ fi
 
 mkdir -p "$CUR_GEN_ROOT"
 
+logStep "Reading configuration file ..."
+logIn
+
+# Sourcing config file
 source "$CONFIG"
 
+logOut
+
+logSuccess "Configuration file read."
+logStep "Executing modules ..."
+
+# Executing modules
+logIn
+executeModules
+logOut
+
+# FOR TESTING
+#
+#for i in "${!loadedOptions[@]}"; do
+#	echo "$i: ${loadedOptions[$i]}"
+#done
+
 #for i in "${!loadedModules[@]}"; do
-#	echo "$i" "${loadedModules[$i]}"
+#	executeModule "${loadedModules[$i]#*:}"
+#done
+#for i in "${!loadedModules[@]}"; do
+#	echo "${loadedModules[$i]%:*}"
 #done
 
 #if hasModule "sway"; then
