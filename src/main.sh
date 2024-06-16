@@ -9,8 +9,14 @@ source ./src/file.sh
 ### and ends the process.
 ###
 function abort() {
+	local lastGen
+
 	logError "Deleting generation ${CUR_GEN} and exiting."
+
+	# Deleting borken generation and re-linking last working one
 	rm -rf "${CUR_GEN_ROOT}"
+	ln -sfnr "${GEN_ROOT}/${LAST_WORKING_GEN}" "${GEN_ROOT}/current"
+
 	exit
 }
 
@@ -25,6 +31,7 @@ function initState() {
 	STATE_ROOT="${XDG_STATE_HOME:-$CONFIG_ROOT}"
 	GEN_ROOT="${STATE_ROOT}/cizn/generations"
 	DER_ROOT="${STATE_ROOT}/cizn/derivations"
+	LAST_WORKING_GEN=""
 	CUR_GEN_ROOT=""
 	CUR_GEN=""
 
@@ -50,12 +57,15 @@ function initState() {
 function makeGeneration() {
 	local knownGen
 	local lastGen
+	local currentGen
 
 	# Finding a generation that matches the current derivation
 	knownGen=$(find "${GEN_ROOT}/" -type d -name "*${checksum}*" 2>/dev/null)
 
 	# Declaring the symlink for the currently used generation
 	CUR_GEN="${GEN_ROOT}/current"
+	currentGen=$(readlink -fm "${CUR_GEN}")
+	LAST_WORKING_GEN=${currentGen#*"${GEN_ROOT}/"}
 
 	# Getting the newest generation created, so that we know what
 	# the next generation should be in case we need one
