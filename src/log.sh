@@ -37,6 +37,8 @@ function log() {
 	repeat $CUR_LEVEL = INDENT
 	echo -e "${INDENT}> [${1}""${2}""${NC}] "${3}""
 }
-function logError() { log "$RED" "ERROR" "$1"; }
+function logError() { log "$RED" "FAIL" "$1"; }
 function logInfo() { log "$BLUE" "INFO" "$1"; }
-function logSuccess() { log "$GREEN" "SUCCESS" "$1"; }
+function logSuccess() { log "$GREEN" "DONE" "$1"; }
+function logStep() { log "$PURPLE" "STEP" "$1"; }
+function logWarn() { log "$ORANGE" "WARN" "$1"; }
