@@ -1,9 +1,14 @@
 #!/bin/env bash
 
 ###
-### Declaring the list of loaded modules
+### List of configuration-wide modules
 ###
 declare -a loadedModules=()
+
+###
+### List of configuration-wide options
+###
+declare -A loadedOptions=()
 
 ###
 ### Imports module located at `$1'
@@ -27,21 +32,55 @@ function import() {
 	local fullPath="${parentDir}/${1}"
 
 	if [ -f "$fullPath" ]; then
-		logInfo "Importing module ${1} ..."
 		local file
 		file="$(basename "$fullPath")"
 
 		local fileName="${file%.*}"
 
-		#loadedModules[$fileName]=$fullPath
-		loadedModules+=("$fileName":"$fullPath")
+		local alreadyAdded=0
+		for i in "${!loadedModules[@]}"; do
+			local moduleName="${loadedModules[$i]%:*}"
+			if [[ $fileName == "$moduleName" ]]; then
+				alreadyAdded=1
+			fi
+		done
+
+		if [[ $alreadyAdded == 0 ]]; then
+			logInfo "Importing module ${1} ..."
+			loadedModules+=("$fileName":"$fullPath")
+		fi
 
 		source "$fullPath"
+
+		for i in "${!options[@]}"; do
+			if [[ -n "${loadedOptions[$i]}" ]]; then
+				logWarn "Option $i already exists. Overwritten from $1"
+			fi
+			loadedOptions[$i]=${options[$i]}
+		done
+
 		#wait
 	else
 		logError "Can't find ${fullPath} module."
 		abort
 	fi
+}
+
+function executeModules() {
+	for i in "${!loadedModules[@]}"; do
+		local moduleName="${loadedModules[$i]%:*}"
+		local modulePath="${loadedModules[$i]#*:}"
+		executeModule "$moduleName" "$modulePath"
+	done
+}
+
+function executeModule() {
+	logInfo "Executing ${1} module ..."
+	source "$2"
+
+	logIn
+	module
+	logOut
 }
 
 ###
@@ -50,7 +89,7 @@ function import() {
 ###
 function hasModule() {
 	if [[ -z $1 ]]; then
-		logError "hasModule called with no module."
+		logWarn "hasModule called with no module name. Will return false."
 		return 1
 	fi
 
