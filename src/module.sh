@@ -66,20 +66,20 @@ function import() {
 	fi
 }
 
-function executeModules() {
+function loadModules() {
 	for i in "${!loadedModules[@]}"; do
 		local moduleName="${loadedModules[$i]%:*}"
 		local modulePath="${loadedModules[$i]#*:}"
-		executeModule "$moduleName" "$modulePath"
+		loadModule "$moduleName" "$modulePath"
 	done
 }
 
-function executeModule() {
-	logInfo "Executing ${1} module ..."
+function loadModule() {
+	logInfo "Loading ${1} module ..."
 	source "$2"
 
 	logIn
-	module
+	module # Executing modules 'module' function
 	logOut
 }
 
