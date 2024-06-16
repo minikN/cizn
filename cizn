@@ -2,70 +2,41 @@
 
 CONFIG="$(pwd)/config.sh"
 
-# Handling cli args
-while getopts c:h: flag; do
-	case "${flag}" in
-	c) CONFIG=${OPTARG} ;;
-	h) # print help
-		;;
-	*) # print help
-		;;
-	esac
-done
-
-# setting up logging
-source ./src/log.sh
-
-# setting up state and generations
-CONFIG="$(readlink -fm "$CONFIG")"
-CONFIG_ROOT="${CONFIG%/*}"
-STATE_ROOT="${XDG_STATE_HOME:-$CONFIG_ROOT}"
-GEN_ROOT="${STATE_ROOT}/cizn/generations"
-
-logInfo "Using ${CONFIG} as config ..."
-logInfo "Using ${STATE_ROOT}/cizn as state root ..."
-
-if [[ ! -e "${CONFIG}" ]]; then
-	logError "${CONFIG} doesn't exist. Aborting."
-	exit
-fi
-
-mkdir -p "${GEN_ROOT}"
-LAST_GEN=$(ls -At "${GEN_ROOT}" | head -n1)
-
-# initializing main application
 source ./src/main.sh
-source ./src/module.sh
-source ./src/file.sh
 
-# Setting current generation
-if [[ -z "$LAST_GEN" ]]; then
-	CUR_GEN=0
-	CUR_GEN_ROOT="${GEN_ROOT}/${CUR_GEN}"
-	logInfo "No previous generation found. Creating 0 ..."
-else
-	CUR_GEN=$(("$LAST_GEN" + 1))
-	CUR_GEN_ROOT="${GEN_ROOT}/${CUR_GEN}"
-	logInfo "Moving from generation ${LAST_GEN} to $(("$LAST_GEN" + 1)) ..."
-fi
+function main() {
+	while [[ $# != 0 ]]; do
+		case "$1" in
+		build | apply)
+			ACTION="$1"
+			shift
+			;;
+		-h | --help)
+			# print help
+			exit
+			;;
+		-c | --config)
+			CONFIG="$2"
+			break
+			;;
+		*)
+			logError "Unknown option: $1"
+			exit
+			;;
+		esac
+	done
 
-mkdir -p "$CUR_GEN_ROOT"
+	# Setting up state and generations
+	initState "$CONFIG"
 
-logStep "Reading configuration file ..."
-logIn
+	# Setting up current generation
+	#initGeneration
 
-# Sourcing config file
-source "$CONFIG"
+	# Executing action
+	$ACTION "$CONFIG"
+}
 
-logOut
-
-logSuccess "Configuration file read."
-logStep "Executing modules ..."
-
-# Executing modules
-logIn
-executeModules
-logOut
+main "$@"
 
 # FOR TESTING
 #
