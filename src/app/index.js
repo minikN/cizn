@@ -3,9 +3,10 @@ import G from '@lib/static.js'
 import { defineImmutableProp, defineProp } from "@lib/composition/property.js"
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import cliAdapter from "@cizn/adapter/cli/index.js"
+import logAdapter from "@cizn/adapter/log/index.js"
 import state from "@cizn/core/state.js"
 
-const { CLI, ADAPTER, API, STATE } = G
+const { CLI, ADAPTER, API, STATE, LOG, DERIVATION } = G
 
 export const APP_NAME = 'cizn'
 export const APP_VERSION = '0.0.1'
@@ -22,6 +23,7 @@ const app = async (obj) => {
 
   appComposition[ADAPTER] = {
     [CLI]: cliAdapter(appComposition),
+[LOG]: logAdapter(appComposition),
   }
   appComposition[ADAPTER][CLI][API].init()
 
