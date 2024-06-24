@@ -23,8 +23,8 @@ export const defineImmutableProp = curry((prop, value, obj) => {
  *
  * @type {(function(...[*]): (*))|*}
  */
-export const defineProp = curry((prop, obj) => {
-  let propValue
+export const defineProp = curry((prop, value, obj) => {
+  let propValue = value
   Object.defineProperty(obj, prop, {
     enumerable: true,
     configurable: false,
