@@ -1,4 +1,3 @@
-#!/usr/bin/env ./node_modules/.bin/zx
 import appComposition from '@cizn/index.js'
 import G from '@lib/static.js'
 
