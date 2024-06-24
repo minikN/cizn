@@ -1,10 +1,10 @@
-import { compose, composeAsync } from "@lib/util/index.js"
+import { compose } from "@lib/util/index.js"
 import G from '@lib/static.js'
 import { defineImmutableProp, defineProp } from "@lib/composition/property.js"
-import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import cliAdapter from "@cizn/adapter/cli/index.js"
 import logAdapter from "@cizn/adapter/log/index.js"
 import state from "@cizn/core/state.js"
+import derivationApi from "@cizn/core/derivation/api/index.js"
 
 const { CLI, ADAPTER, API, STATE, LOG, DERIVATION } = G
 
@@ -16,15 +16,18 @@ const app = async (obj) => {
 
   const appComposition = compose(
     defineImmutableProp('_name', APP_NAME),
-    defineProp(ADAPTER),
+    defineProp(ADAPTER, {}),
     defineImmutableProp(STATE, stateComposition),
   )(obj)
 
 
   appComposition[ADAPTER] = {
     [CLI]: cliAdapter(appComposition),
-[LOG]: logAdapter(appComposition),
+    [LOG]: logAdapter(appComposition),
   }
+
+  appComposition[STATE][DERIVATION][API] = derivationApi(appComposition)
+
   appComposition[ADAPTER][CLI][API].init()
 
 
