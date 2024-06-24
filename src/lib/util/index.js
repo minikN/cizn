@@ -1,12 +1,23 @@
 /**
- * Functional composition.
+ * Functional composition
  *
- * @param {Function[]} functions
+ * @param {...Function} functions
  * @returns {function(*): *}
  */
 export const compose = (...functions) => data => functions.reduce(
   (value, func) => func(value),
   data,
+)
+
+/**
+ * Asynchronous functional composition
+ *
+ * @param  {...Function} functions
+ * @returns {function(*): *}
+ */
+export const composeAsync = (...functions) => param => functions.reduce(
+  async (result, next) => next(await result),
+  param,
 )
 
 /**
