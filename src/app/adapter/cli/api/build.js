@@ -1,6 +1,6 @@
 import G from '@lib/static.js'
 import { $ } from 'execa'
-import { access, constants, lstatSync } from 'node:fs'
+import { access, constants, lstatSync, readFileSync } from 'node:fs'
 const { ADAPTER, STATE, DERIVATION, LOG, API } = G
 
 const build = app => async (options, command) => {
@@ -20,7 +20,6 @@ const build = app => async (options, command) => {
   try {
     const { config } = await import(`${configPath}`)
     await derivation[API].make({ config })
-
   } catch (e) {
     log.error({ message: `Error reading config file: ${e.message}` })
   }
