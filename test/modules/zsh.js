@@ -2,8 +2,7 @@ const options = {
   zsh: true,
 }
 
-const module = (config, options, utils) => {
-  console.log('zsh')
+const module = (config, options, utils, args) => {
 }
 
 export default args => ({

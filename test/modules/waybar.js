@@ -2,8 +2,7 @@ const options = {
   foo: 'baz',
 }
 
-const module = (config, options, utils) => {
-  console.log('waybar')
+const module = (config, options, utils, args) => {
 }
 
 export default args => ({
