@@ -5,7 +5,7 @@ import { compose } from "@lib/util/index.js"
 import G from '@lib/static.js'
 import { $ } from 'execa'
 
-const { MODULES, OPTIONS, CONFIG, GENERATION, DERIVATION, CURRENT, ROOT, API } = G
+const { MODULES, OPTIONS, CONFIG, GENERATION, DERIVATION, CURRENT, ROOT, API, STATE } = G
 
 
 const state = async (obj) => {
@@ -28,8 +28,9 @@ const state = async (obj) => {
     }),
     defineNamespace(DERIVATION),
     setNamespace(DERIVATION, {
-      [CURRENT]: derivationsRoot,
-      [ROOT]: null,
+      [CURRENT]: null,
+      [STATE]: {},
+      [ROOT]: derivationsRoot,
       [API]: null,
     }),
     defineNamespace(GENERATION),
