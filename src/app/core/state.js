@@ -29,7 +29,10 @@ const state = async (obj) => {
     defineNamespace(DERIVATION),
     setNamespace(DERIVATION, {
       [CURRENT]: null,
-      [STATE]: {},
+      [STATE]: {
+        [OPTIONS]: {},
+        [MODULES]: {},
+      },
       [ROOT]: derivationsRoot,
       [API]: null,
     }),

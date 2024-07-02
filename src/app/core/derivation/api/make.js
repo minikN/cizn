@@ -1,66 +1,80 @@
 import utils from '@cizn/utils/index.js'
 import G from '@lib/static.js'
-import { readFile } from 'node:fs/promises'
+import { writeFile, appendFile, copyFile } from 'node:fs/promises'
+import path from 'path'
 import crypto from 'crypto'
-import { locate } from 'func-loc'
-import { $ } from 'execa'
-const { ADAPTER, LOG, MODULES, OPTIONS, STATE, API, DERIVATION } = G
+import { mkTempFile } from '@lib/util/index.js'
 
-const make = app => async ({ config }) => {
-  const { [MODULES]: modules, [OPTIONS]: options, [DERIVATION]: derivation } = app[STATE]
+const { ADAPTER, LOG, MODULES, PACKAGES, CONFIG, OPTIONS, STATE, API, DERIVATION } = G
+
+const make = app => async ({ name, file, fn, args }) => {
+  const { [DERIVATION]: derivation } = app[STATE]
+  const { [OPTIONS]: options, [CONFIG]: config, [PACKAGES]: packages } = derivation[STATE]
   const { [LOG]: logAdapter } = app[ADAPTER]
 
-  await $`mkdir -p /tmp/cizn`
-  const { stdout: tempFile } = $`mktemp /tmp/cizn/derivation.XXXXX`
+  logAdapter[API].info({ message: 'Creating derivation ...' })
+  logAdapter[API].indent()
 
-  for (let i = 0; i < config.length; i++) {
-    const { name, args = {}, options: moduleOptions, module } = config[i]
-
-    const moduleFileLocation = await locate(module)
-    const moduleFile = await readFile(`${moduleFileLocation.path}`)
-
+  try {
+    // Creating a has of the module's JS file
     const moduleHash = crypto
       .createHash('md5')
-      .update(moduleFile.toString())
+      .update(file.toString())
       .digest('hex')
 
-    if (!name) {
-      logAdapter[API].error({ message: `A module has no defined name It needs to export a name property. Aborting.` })
+    // Checking if a derivation with the same hash already exists
+    const existingDerivation = await derivation[G.API].has({ hash: moduleHash, name })
+
+    // If it does, use it instead and return early
+    if (existingDerivation) {
+      derivation[G.STATE][MODULES][name].file = `${derivation[G.ROOT]}/${existingDerivation}`
+      return
     }
 
-    if (modules[name]) {
-      logAdapter[API].error({ message: `Module ${name} declared multiple times. Aborting.` })
-    }
+    // Creating a temp file for the new derivation with the appropriate hash
+    // Will be named '<module-name>-<hash>.drv'
+    const moduleTempFile = !existingDerivation
+      ? await mkTempFile({ name, hash: moduleHash, ext: 'drv' })
+      : null
 
-    modules[name] = { args, module, hash: moduleHash }
-    Object.keys(moduleOptions).forEach((key) => {
-      if (options[key]) {
-        logAdapter[API].warn({ message: `Option ${key} was already declared. Overwriting.` })
-      }
-      options[key] = moduleOptions[key]
-    })
 
-  }
+    // Writing JS code to the file so that we can execute it later on
+    // Starting with the function header
+    await writeFile(moduleTempFile, 'export default (utils) => {\n')
 
-  Object.keys(modules).forEach((key) => {
-    const { module: currentModule, args } = modules[key]
-
+    // Executing every utility function with the temp file we created above as a
+    // first argument. Utility functions are curried, so we will return
+    // another function from this. This means we can pass these functions
+    // to the module function and if the user calls e.g. 'readFile', it will
+    // have the first param (temp file) applied already
     const moduleUtils = Object.keys(utils).reduce((acc, key) => {
-      acc[key] = utils[key]?.(tempFile)
+      acc[key] = utils[key]?.(moduleTempFile)
       return acc
     }, {})
 
+    // Executing the module function and getting potential config and packages
+    // from it
     const {
       config: moduleConfig = {},
       packages: modulePackages = [],
-    } = currentModule?.(derivation[STATE]?.config || {}, options, moduleUtils, args) || {}
+    } = fn?.(config || {}, options, moduleUtils, args) || {}
 
-    derivation[STATE] = {
-      config: { ...derivation[STATE]?.config || {}, [key]: moduleConfig },
-      packages: [...derivation[STATE]?.packages || [], ...modulePackages],
-    }
-  })
+    // Writing the closing bracket to the temp file. At this point any utility
+    // function that was executed inside the module function did also write
+    // code into the temp file
+    await appendFile(moduleTempFile, '\n}')
 
+    // Copying the temp file to the derivation root. We're done
+    const moduleTempFileName = path.basename(moduleTempFile)
+    await copyFile(moduleTempFile, `${derivation[G.ROOT]}/${moduleTempFileName}`)
+
+    // Adding the {@code config} and {@code packages} the module exposes
+    // to the state of the derivation so that we can use them later on
+    derivation[STATE][CONFIG] = { ...config || {}, [name]: moduleConfig }
+    derivation[STATE][PACKAGES] = [ ...packages || [], ...modulePackages ]
+  } catch (e) {
+    logAdapter[API].error({ message: e.message })
+  }
 }
 
 export default make
