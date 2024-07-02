@@ -11,9 +11,16 @@ const { CLI, ADAPTER, API, STATE, LOG, DERIVATION } = G
 export const APP_NAME = 'cizn'
 export const APP_VERSION = '0.0.1'
 
+/**
+ * The main application
+ *
+ * @param {Object} obj the object to bootstrap the application to
+ * @returns {Cizn.Application} app
+ */
 const app = async (obj) => {
   const stateComposition = await state({})
 
+  /** @type Cizn.Application */
   const appComposition = compose(
     defineImmutableProp('_name', APP_NAME),
     defineProp(ADAPTER, {}),
