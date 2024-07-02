@@ -5,9 +5,11 @@ export default Object.freeze({
   API: Symbol('api'),
   STATE: Symbol('state'),
 
+  LEVEL: Symbol('level'),
   CONFIG: Symbol('config'),
   MODULES: Symbol('modules'),
   OPTIONS: Symbol('options'),
+  PACKAGES: Symbol('packages'),
   GENERATION: Symbol('generation'),
   DERIVATION: Symbol('derivation'),
 
