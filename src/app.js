@@ -3,6 +3,7 @@ import G from '@lib/static.js'
 
 const { ADAPTER, CLI, PROGRAM } = G
 
+/** @type {Cizn.Application} */
 const app = await appComposition({})
 
 // eslint-disable-next-line no-undef
