@@ -3,6 +3,9 @@ const options = {
 }
 
 const module = (config, options, utils, args) => {
+  utils.withFile('.config/test', `\
+foo
+`)
 }
 
 export default args => ({

@@ -1,9 +1,9 @@
 const options = {
-  foo: 'bar',
+  foo: 'babb1',
 }
 
 const module = (config, options, utils, args) => {
-  utils.createFile('.config/test', `\
+  utils.withFile('.config/test', `\
 hello
 world  
 `)
