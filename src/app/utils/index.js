@@ -1,6 +1,6 @@
-import { createFile } from '@cizn/utils/file.js'
+import { withFile } from '@cizn/utils/file.js'
 
 
 export default {
-  createFile,
+  withFile,
 }
