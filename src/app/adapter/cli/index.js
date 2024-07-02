@@ -8,7 +8,14 @@ import cliApi from "@cizn/adapter/cli/api/index.js"
 
 const { PROGRAM, API } = G
 
+/**
+ * The CLI adapter
+ *
+ * @param {Cizn.Application} app
+ * @returns {Cizn.Adapter.Cli}
+ */
 const cliAdapter = (app) => {
+  /** @type {Cizn.Adapter.Cli} */
   const adapterComposition = compose(
     defineImmutableProp('_name', APP_NAME),
     defineImmutableProp('_version', APP_VERSION),
