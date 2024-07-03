@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 import { tmpdir } from 'os'
-import { mkdir } from 'node:fs/promises'
-import Path from 'path'
+import { mkdir, writeFile } from 'node:fs/promises'
+import path from 'path'
 
 /**
  * Functional composition
@@ -49,9 +49,20 @@ export function curry (fn) {
 /**
  *
  */
-export const mkTempFile = async ({ name, hash = null, ext = null }) => {
-  const tempDir = Path.join(tmpdir(), 'cizn')
+export const mkTempFile = async ({ name, hash = null, ext = 'js' }) => {
+  const tempDir = path.join(tmpdir(), 'cizn')
   await mkdir(tempDir, { recursive: true })
 
-  return Path.join(tempDir, `${name}-${hash || crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}${ext ? `.${ext}` : ''}`)
+  const tempFile = path.join(tempDir, `${name}-${hash || crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}${ext ? `.${ext}` : ''}`)
+
+  await writeFile(tempFile, '')
+
+  return tempFile
 }
+
+/**
+ *
+ * @param {*} filePath
+ * @returns
+ */
+export const getFileName = filePath => path.basename(`${filePath}`).split('.')[0]

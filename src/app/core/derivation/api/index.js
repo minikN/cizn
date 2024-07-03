@@ -1,20 +1,14 @@
 import make from '@cizn/core/derivation/api/make.js'
-import has from '@cizn/core/derivation/api/has.js'
-import init from '@cizn/core/derivation/api/init.js'
+import get from '@cizn/core/derivation/api/get.js'
 
 const derivationApi = app => Object.create({}, {
-  init: {
-    value: init(app),
-    iterable: true,
-    enumerable: true,
-  },
   make: {
     value: make(app),
     iterable: true,
     enumerable: true,
   },
-  has: {
-    value: has(app),
+  get: {
+    value: get(app),
     iterable: true,
     enumerable: true,
   },

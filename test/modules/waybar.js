@@ -1,16 +1,15 @@
-const options = {
-  foo: 'baz',
-}
-
-const module = (config, options, utils, args) => {
+export default args => (config, utils) => {
   utils.withFile('.config/test', `\
-foo
+hello
+world  
 `)
-}
 
-export default args => ({
-  name: 'waybar',
-  args,
-  options,
-  module,
-})
+  return {
+    config: {
+      test: 2,
+    },
+    packages: [
+      'waybar',
+    ],
+  }
+}

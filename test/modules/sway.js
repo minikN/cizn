@@ -1,8 +1,5 @@
-const options = {
-  foo: 'babb1',
-}
 
-const module = (config, options, utils, args) => {
+export default args => (config, utils) => {
   utils.withFile('.config/test', `\
 hello
 world  
@@ -17,10 +14,3 @@ world
     ],
   }
 }
-
-export default args => ({
-  name: 'sway',
-  args,
-  options,
-  module,
-})

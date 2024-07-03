@@ -1,13 +1,15 @@
-const options = {
-  zsh: true,
-}
+export default args => (config, utils) => {
+  utils.withFile('.config/test', `\
+hello1
+world  
+`)
 
-const module = (config, options, utils, args) => {
+  return {
+    config: {
+      test: 3,
+    },
+    packages: [
+      'zsh',
+    ],
+  }
 }
-
-export default args => ({
-  name: 'zsh',
-  args,
-  options,
-  module,
-})

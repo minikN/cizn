@@ -1,11 +1,17 @@
 import G from '@lib/static.js'
 import { readdir } from 'node:fs/promises'
+import crypto from 'crypto'
 
 const { ADAPTER, LOG, MODULES, OPTIONS, STATE, API, DERIVATION } = G
 
-const has = app => async ({ hash, name }) => {
+const get = app => async ({ module, name }) => {
   const { [DERIVATION]: derivation } = app[STATE]
   const { [LOG]: logAdapter } = app[ADAPTER]
+
+  const hash = crypto
+    .createHash('md5')
+    .update(module.toString())
+    .digest('hex')
 
   const derivations = await readdir(derivation[G.ROOT])
 
@@ -13,9 +19,11 @@ const has = app => async ({ hash, name }) => {
 
   if (existingDerivation) {
     logAdapter[G.API].info({ message: `Existing derivation found for ${name} module. Reusing it.` })
+
+    return { derivation: existingDerivation }
   }
 
-  return existingDerivation
+  return { hash }
 }
 
-export default has
+export default get

@@ -1,7 +1,11 @@
 import { curry } from '@lib/util/index.js'
-import { appendFileSync } from 'node:fs'
+import { appendFileSync, writeFileSync } from 'node:fs'
 
 export const withFile = curry((target, path, contents) => {
-  appendFileSync(target, `\
-withRealFile('${path}', '\n${contents}')\n`)
+  writeFileSync(target, `\
+utils.withRealFile('${path}', '\n${contents}')\n`)
+})
+
+export const withRealFile = curry((target, path, contents) => {
+  console.log('withRealFile')
 })
