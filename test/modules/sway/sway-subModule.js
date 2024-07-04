@@ -1,16 +1,18 @@
+
+
 export default args => (config, utils) => {
-  console.log('zsh', args, config, utils)
+  console.log('sway-sub', args, config, utils)
   utils.withFile('.config/test', `\
-hello1
-world  
+hello
+world2  
 `)
 
   return {
     config: {
-      test: 3,
+      test: 2,
     },
     packages: [
-      'zsh',
+      'sway-subpackage',
     ],
   }
 }
