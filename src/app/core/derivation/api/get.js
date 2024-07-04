@@ -1,6 +1,6 @@
 import G from '@lib/static.js'
-import { readdir } from 'node:fs/promises'
 import crypto from 'crypto'
+import { readdir } from 'node:fs/promises'
 
 const { ADAPTER, LOG, MODULES, OPTIONS, STATE, API, DERIVATION } = G
 
@@ -10,7 +10,7 @@ const get = app => async ({ module, name }) => {
 
   const hash = crypto
     .createHash('md5')
-    .update(module.toString())
+    .update(typeof module === 'string' ? module : module.toString())
     .digest('hex')
 
   const derivations = await readdir(derivation[G.ROOT])

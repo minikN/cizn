@@ -1,12 +1,6 @@
 /* eslint-disable no-unused-vars */
 import G from '@lib/static.js'
-import { realpath, access, lstat, constants, readFile, writeFile, copyFile, appendFile } from 'node:fs/promises'
-import { mkTempFile } from '@lib/util/index.js'
-import { locate } from 'func-loc'
-import crypto from 'crypto'
-import path from 'path'
-import * as acorn from 'acorn'
-import * as walk from 'acorn-walk'
+import { access, constants, lstat, realpath } from 'node:fs/promises'
 
 const { ADAPTER, STATE, MODULES, DERIVATION, LOG, API, CURRENT } = G
 

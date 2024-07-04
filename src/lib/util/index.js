@@ -45,9 +45,18 @@ export function curry (fn) {
   }
 }
 
-
 /**
+ * Will attempt to create a temporary file with the {@param props.name},
+ * {@param props.hash} and {@param props.ext} given. If the hash is not
+ * present, it will create one.
  *
+ * Will return the path to the temporary file.
+ *
+ * @param {Object} props            props
+ * @param {string} props.name       the name to use
+ * @param {string} [props.hash]     the hash to use
+ * @param {string} [props.ext='js'] the extension to use
+ * @returns {string}
  */
 export const mkTempFile = async ({ name, hash = null, ext = 'js' }) => {
   const tempDir = path.join(tmpdir(), 'cizn')
@@ -61,8 +70,10 @@ export const mkTempFile = async ({ name, hash = null, ext = 'js' }) => {
 }
 
 /**
+ * Will parse the name of the file given by {@param filePath}
+ * and return it
  *
- * @param {*} filePath
- * @returns
+ * @param {string} filePath the path to get the filename from
+ * @returns {string}
  */
 export const getFileName = filePath => path.basename(`${filePath}`).split('.')[0]
