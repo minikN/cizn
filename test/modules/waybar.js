@@ -1,5 +1,4 @@
 export default args => (config, utils) => {
-  console.log('waybar', args, config, utils)
   utils.withFile('.config/test', `\
 hello
 world  
@@ -9,7 +8,7 @@ world
     config: {
       test: 2,
       waybar: {
-        foo: 'bar1',
+        foo: 'bar2',
       },
     },
     packages: [

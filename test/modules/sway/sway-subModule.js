@@ -1,7 +1,6 @@
 
 
 export default args => (config, utils) => {
-  console.log('sway-sub', args, config, utils)
   utils.withFile('.config/test', `\
 hello
 world2  
