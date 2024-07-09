@@ -2,26 +2,28 @@ import G from '@lib/static.js'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { internalUtils } from '@cizn/utils/index.js'
 
-const { CURRENT, ROOT, STATE, GENERATION, DERIVATION, API } = G
+const { CURRENT, ROOT, STATE, GENERATION, DERIVATION, API, LOG, ADAPTER } = G
 
 const make = app => async ({ derivation, hash: derivationHash, name }) => {
   const {
     [DERIVATION]: derivationAdapter,
     [GENERATION]: generationAdapter,
   } = app[STATE]
-  // const { [CONFIG]: config, [PACKAGES]: packages } = derivationAdapter[G.STATE]
-  // const { [LOG]: logAdapter } = app[ADAPTER]
+  const { [LOG]: logAdapter } = app[ADAPTER]
 
-  // logAdapter[API].info({ message: 'Creating derivation ...' })
-  // logAdapter[API].indent()
   try {
     const { number: generationNumber, generation, hash } = await generationAdapter[API].get({ hash: derivationHash })
 
     if (generation) {
       // Reuse generation
+      logAdapter[API].info({ message: 'Reusing generation %d ...', options: [generationNumber] })
+      generationAdapter[CURRENT] = `${generationAdapter[ROOT]}/${generation}`
+      generationAdapter[API].set()
       return
     }
-    // log creation of new generation
+
+    logAdapter[API].info({ message: 'Moving from generation %d to %d ...', options: [generationNumber - 1, generationNumber] })
+
     const newGeneration = `${generationNumber}-${hash}`
     const newGenerationPath = `${generationAdapter[ROOT]}/${newGeneration}`
 
@@ -40,6 +42,8 @@ const make = app => async ({ derivation, hash: derivationHash, name }) => {
 
     const { default: fn } = await import(`${derivationAdapter[ROOT]}/${derivation}`)
     await fn?.(configUtils)
+
+    generationAdapter[API].set()
 
   } catch (e) {
     console.error(e)
