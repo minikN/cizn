@@ -8,7 +8,7 @@
   },
   "types": "./types/index.d.ts",
   "scripts": {
-    "build": "rollup --config",
+    "build": "tsc -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --loader esm-module-alias/loader --no-warnings src/app.js build --source ./test/config.js",
     "generate:types": "tsc -p jsconfig.json --outFile ./types/index.d.ts"
@@ -32,6 +32,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@stylistic/eslint-plugin-js": "^2.2.1",
     "@stylistic/eslint-plugin-migrate": "^2.2.1",
+    "@types/node": "^20.14.10",
     "eslint": "^9.5.0",
     "eslint-plugin-jsdoc": "^48.2.12",
     "esm-module-alias": "^2.2.0",
