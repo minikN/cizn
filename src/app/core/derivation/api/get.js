@@ -2,11 +2,10 @@ import G from '@lib/static.js'
 import crypto from 'crypto'
 import { readdir } from 'node:fs/promises'
 
-const { ADAPTER, LOG, MODULES, OPTIONS, STATE, API, DERIVATION } = G
+const { STATE, DERIVATION } = G
 
 const get = app => async ({ hashParts, name }) => {
   const { [DERIVATION]: derivation } = app[STATE]
-  const { [LOG]: logAdapter } = app[ADAPTER]
 
   const { module = () => {}, args = {}, config = {} } = hashParts
   const hashString = `${JSON.stringify(args)}${JSON.stringify(config)}${typeof module === 'string' ? module : module.toString()}`
@@ -20,13 +19,9 @@ const get = app => async ({ hashParts, name }) => {
 
   const existingDerivation = derivations.find(file => file.includes(hash))
 
-  if (existingDerivation) {
-    logAdapter[G.API].info({ message: `Existing derivation found for ${name} module. Reusing it.` })
-
-    return { derivation: existingDerivation }
-  }
-
-  return { hash }
+  return existingDerivation
+    ? { derivation: existingDerivation }
+    : { hash }
 }
 
 export default get
