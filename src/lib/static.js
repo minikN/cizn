@@ -19,4 +19,6 @@ export default Object.freeze({
   ADAPTER: Symbol('adapter'),
   PROGRAM: Symbol('program'),
   COMMAND: Symbol('command'),
+
+  EXT: 'mjs',
 })
