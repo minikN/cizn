@@ -8,7 +8,7 @@ import { appendFileSync, writeFileSync } from 'node:fs'
  * with {@link contents} to {@link source}.
  */
 export const withFile = curry((source, target, contents) => {
-  writeFileSync(source, `\
+  appendFileSync(source, `\
 utils.withRealFile('${target}', '\n${contents}')\n`)
 })
 
@@ -29,5 +29,5 @@ export const include = curry((source, name, target) => {
 
   appendFileSync(source, `\
 const {default: ${fnName} } = await import('${target}')
-${fnName}?.()\n`)
+${fnName}?.(utils)\n`)
 })
