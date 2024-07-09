@@ -3,6 +3,10 @@ import { tmpdir } from 'os'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'path'
 
+import G from '@lib/static.js'
+
+const { EXT } = G
+
 /**
  * Functional composition
  *
@@ -58,7 +62,7 @@ export function curry (fn) {
  * @param {string} [props.ext='js'] the extension to use
  * @returns {string}
  */
-export const mkTempFile = async ({ name, hash = null, ext = 'js' }) => {
+export const mkTempFile = async ({ name, hash = null, ext = EXT }) => {
   const tempDir = path.join(tmpdir(), 'cizn')
   await mkdir(tempDir, { recursive: true })
 
