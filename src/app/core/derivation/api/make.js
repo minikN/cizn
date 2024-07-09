@@ -31,7 +31,7 @@ const make = app => async ({ module }) => {
 
     // Writing JS code to the file so that we can execute it later on
     // Starting with the function header
-    await writeFile(derivationTempFile, 'export default (utils) => {\n')
+    await writeFile(derivationTempFile, 'export default async (utils) => {\n')
 
     /**
      * Executing every utility function with the temp file we created above as the
