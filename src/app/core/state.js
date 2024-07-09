@@ -28,7 +28,6 @@ const state = async (obj) => {
     }),
     defineNamespace(DERIVATION),
     setNamespace(DERIVATION, {
-      [CURRENT]: null,
       [STATE]: {
         [OPTIONS]: {},
         [MODULES]: {},
@@ -38,11 +37,10 @@ const state = async (obj) => {
     }),
     defineNamespace(GENERATION),
     setNamespace(GENERATION, {
-      [CURRENT]: generationsRoot,
-      [ROOT]: null,
+      [ROOT]: generationsRoot,
+      [CURRENT]: null,
       [API]: null,
     }),
-
   )(obj)
 
   return stateComposition
