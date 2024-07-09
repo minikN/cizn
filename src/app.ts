@@ -1,5 +1,5 @@
-import appComposition from '@cizn/index.js'
-import G from '@lib/static.js'
+import appComposition from '@cizn/index'
+import G from '@lib/static'
 
 const { ADAPTER, CLI, PROGRAM } = G
 
