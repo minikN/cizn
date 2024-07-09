@@ -3,7 +3,6 @@ import { defineProp } from "@lib/composition/property.js"
 import G from '@lib/static.js'
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import logApi from "@cizn/adapter/log/api/index.js"
-import signale from 'signale'
 
 const { PROGRAM, API, LEVEL } = G
 
@@ -16,10 +15,10 @@ const { PROGRAM, API, LEVEL } = G
 const logAdapter = (app) => {
   /** @type {Cizn.Adapter.Log} */
   const adapterComposition = compose(
-    defineProp(PROGRAM, signale),
+    defineProp(PROGRAM, {}), // not using any loggin lib as of now ...
     defineNamespace(API),
     setNamespace(API, logApi(app)),
-    defineProp(LEVEL, 0),
+    defineProp(LEVEL, ''),
   )({})
 
 

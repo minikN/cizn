@@ -6,8 +6,7 @@ const init = app => () => {
   const { [CLI]: adapter } = app[ADAPTER]
   const { [PROGRAM]: program } = adapter
 
-  program.wrapAll()
-
+  // nothing to do
 }
 
 export default init

@@ -3,6 +3,8 @@ import info from "@cizn/adapter/log/api/info.js"
 import error from "@cizn/adapter/log/api/error.js"
 import warn from "@cizn/adapter/log/api/warn.js"
 import indent from "@cizn/adapter/log/api/indent.js"
+import print from "@cizn/adapter/log/api/print.js"
+import success from "@cizn/adapter/log/api/success.js"
 
 const cliApi = app => Object.create({}, {
   init: {
@@ -12,6 +14,11 @@ const cliApi = app => Object.create({}, {
   },
   info: {
     value: info(app),
+    iterable: true,
+    enumerable: true,
+  },
+  success: {
+    value: success(app),
     iterable: true,
     enumerable: true,
   },
@@ -32,6 +39,11 @@ const cliApi = app => Object.create({}, {
   },
   unindent: {
     value: indent(app, true),
+    iterable: true,
+    enumerable: true,
+  },
+  print: {
+    value: print(app),
     iterable: true,
     enumerable: true,
   },

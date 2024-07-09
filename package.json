@@ -21,9 +21,9 @@
     "@lib": "src/lib"
   },
   "dependencies": {
+    "chalk": "^5.3.0",
     "commander": "^12.1.0",
-    "execa": "^9.3.0",
-    "signale": "^1.4.0"
+    "execa": "^9.3.0"
   },
   "devDependencies": {
     "@commander-js/extra-typings": "^12.1.0",
