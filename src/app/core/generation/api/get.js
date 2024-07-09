@@ -5,7 +5,6 @@ const { ADAPTER, LOG, STATE, GENERATION } = G
 
 const get = app => async ({ hash: derivationHash }) => {
   const { [GENERATION]: generation } = app[STATE]
-  const { [LOG]: logAdapter } = app[ADAPTER]
 
   const generations = await readdir(generation[G.ROOT])
 
@@ -19,14 +18,9 @@ const get = app => async ({ hash: derivationHash }) => {
     ? Number.parseInt(existingGeneration.split('-')[0], 10)
     : latestGeneration + 1
 
-  if (existingGeneration) {
-    logAdapter[G.API].info({ message: `Existing generation found. Reusing it.` })
-
-    return { number: generationNumber, generation: existingGeneration }
-  }
-
-  // Log Moving from ... to ...
-  return { number: generationNumber, hash: derivationHash }
+  return existingGeneration
+    ? { number: generationNumber, generation: existingGeneration }
+    : { number: generationNumber, hash: derivationHash }
 }
 
 export default get
