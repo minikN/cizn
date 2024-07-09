@@ -2,9 +2,9 @@ import { internalUtils, publicUtils } from '@cizn/utils/index.js'
 import G from '@lib/static.js'
 import { getFileName, mkTempFile } from '@lib/util/index.js'
 import { locate } from 'func-loc'
-import { copyFile } from 'node:fs/promises'
+import { copyFile, writeFile, appendFile } from 'node:fs/promises'
 
-const { PACKAGES, CONFIG, STATE, API, DERIVATION, CURRENT } = G
+const { PACKAGES, CONFIG, STATE, API, DERIVATION, CURRENT, EXT } = G
 
 const make = app => async ({ module }) => {
   const { [DERIVATION]: derivationAdapter, [CONFIG]: stateConfig } = app[STATE]
@@ -28,6 +28,10 @@ const make = app => async ({ module }) => {
      * Will be named {@code <module-name>-<hash>.drv}
      */
     const derivationTempFile = await mkTempFile({ name: fnName })
+
+    // Writing JS code to the file so that we can execute it later on
+    // Starting with the function header
+    await writeFile(derivationTempFile, 'export default (utils) => {\n')
 
     /**
      * Executing every utility function with the temp file we created above as the
@@ -107,6 +111,9 @@ const make = app => async ({ module }) => {
       subDerivations.push(subDerivation)
     }
 
+    // Ending the file with a closing bracket. We're done writing to that file
+    await appendFile(derivationTempFile, '\n}')
+
     /**
      * Creating a concatenated string of all sub modules plus the hash of this
      * module. We use this to create a new hash from it. This hash will change,
@@ -137,7 +144,7 @@ const make = app => async ({ module }) => {
      * for this subtree. We just need to copy the file over with the correctn name
      * and we're done.
      */
-    const derivationFileName = `${fnName}-${accumulatedHash}.js`
+    const derivationFileName = `${fnName}-${accumulatedHash}.${EXT}`
     const derivationFilePath = `${derivationAdapter[G.ROOT]}/${derivationFileName}`
     await copyFile(derivationTempFile, derivationFilePath)
 
