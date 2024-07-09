@@ -4,9 +4,9 @@ import zsh from './modules/zsh.js'
 
 export default () => {
   const modules = [
-    sway({ wayland: true }),
+    sway({ wayland: true, bla: 2 }),
     waybar({ test: true, foo: 'bar' }),
-    zsh({ terminal: true }),
+    zsh({ terminal: false }),
   ]
 
   return {

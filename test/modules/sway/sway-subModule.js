@@ -14,5 +14,6 @@ world2
     packages: [
       'sway-subpackage',
     ],
+    args,
   }
 }

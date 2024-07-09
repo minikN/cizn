@@ -9,11 +9,12 @@ world
     config: {
       test: 2,
       waybar: {
-        foo: 'bar',
+        foo: 'bar1',
       },
     },
     packages: [
       'waybar',
     ],
+    args,
   }
 }

@@ -7,10 +7,11 @@ world
 
   return {
     config: {
-      test: 3,
+      test: 4,
     },
     packages: [
       'zsh',
     ],
+    args,
   }
 }
