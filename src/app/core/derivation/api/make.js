@@ -59,6 +59,7 @@ const make = app => async ({ module }) => {
       modules: subModules = [],
       config: moduleConfig = {},
       packages: modulePackages = [],
+      args = {},
     } = module(config || {}, moduleUtils)
 
     const configName = getFileName(`${stateConfig[CURRENT]}`)
@@ -71,13 +72,14 @@ const make = app => async ({ module }) => {
     }
     derivationAdapter[STATE][PACKAGES] = [ ...packages || [], ...modulePackages ]
 
+    const globalConfig = derivationAdapter[G.STATE][CONFIG]
 
     /**
    * Calling the {@link get} method will EITHER return a {@link derivation},
    * which we can reuse, OR, if no such derivation can be found, a
    * {@link hash} that should be used for the derivation we want to create.
    */
-    const { derivation, hash } = await derivationAdapter[API].get({ module, name: fnName })
+    const { derivation, hash } = await derivationAdapter[API].get({ hashParts: { module, args, config: globalConfig }, name: fnName })
 
     // This is a leaf module that we've already built
     if (derivation && subModules.length === 0) {
@@ -120,9 +122,11 @@ const make = app => async ({ module }) => {
      * it means we've build this exact subtree once before and can reuse it
      */
     const {
-      derivation: accumulatedDerivation,
+      derivation: accumulatedDerivation = null,
       hash: accumulatedHash,
-    } = await derivationAdapter[API].get({ module: accumulatedSubModules || module, name: fnName })
+    } = !accumulatedSubModules
+      ? { hash }
+      : await derivationAdapter[API].get({ hashParts: { module: accumulatedSubModules || module }, name: fnName })
 
     if (accumulatedDerivation) {
       return { name: fnName, derivation: accumulatedDerivation }

@@ -4,13 +4,16 @@ import { readdir } from 'node:fs/promises'
 
 const { ADAPTER, LOG, MODULES, OPTIONS, STATE, API, DERIVATION } = G
 
-const get = app => async ({ module, name }) => {
+const get = app => async ({ hashParts, name }) => {
   const { [DERIVATION]: derivation } = app[STATE]
   const { [LOG]: logAdapter } = app[ADAPTER]
 
+  const { module = () => {}, args = {}, config = {} } = hashParts
+  const hashString = `${JSON.stringify(args)}${JSON.stringify(config)}${typeof module === 'string' ? module : module.toString()}`
+
   const hash = crypto
     .createHash('md5')
-    .update(typeof module === 'string' ? module : module.toString())
+    .update(hashString)
     .digest('hex')
 
   const derivations = await readdir(derivation[G.ROOT])
