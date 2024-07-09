@@ -1,7 +1,8 @@
-/* eslint-disable no-unused-vars */
+
 import { sanitize, toCamelCase } from '@lib/util/string.js'
 import { curry } from '@lib/util/index.js'
-import { appendFileSync, writeFileSync } from 'node:fs'
+import { appendFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
+import path from 'path'
 
 /**
  * Writes instructions to create a file at {@link target}
@@ -9,14 +10,22 @@ import { appendFileSync, writeFileSync } from 'node:fs'
  */
 export const withFile = curry((source, target, contents) => {
   appendFileSync(source, `\
-utils.withRealFile('${target}', '\n${contents}')\n`)
+utils.withRealFile('${target}', \`\n${contents}\`)\n`)
 })
 
 /**
  * Writes {@link contents} to file at {@link source}.
  */
-export const withRealFile = curry((source, contents) => {
-  // TBI
+export const withRealFile = curry((source, target, contents) => {
+  const filePath = `${source}/${target}`
+  if (existsSync(filePath)) {
+    appendFileSync(filePath, contents)
+  } else {
+    const basePath = path.dirname(filePath)
+    mkdirSync(basePath, { recursive: true })
+    writeFileSync(filePath, contents)
+  }
+
 })
 
 /**
@@ -29,5 +38,5 @@ export const include = curry((source, name, target) => {
 
   appendFileSync(source, `\
 const {default: ${fnName} } = await import('${target}')
-${fnName}?.(utils)\n`)
+await ${fnName}?.(utils)\n`)
 })
