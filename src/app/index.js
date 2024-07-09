@@ -5,8 +5,9 @@ import cliAdapter from "@cizn/adapter/cli/index.js"
 import logAdapter from "@cizn/adapter/log/index.js"
 import state from "@cizn/core/state.js"
 import derivationApi from "@cizn/core/derivation/api/index.js"
+import generationApi from "@cizn/core/generation/api/index.js"
 
-const { CLI, ADAPTER, API, STATE, LOG, DERIVATION } = G
+const { CLI, ADAPTER, API, STATE, LOG, DERIVATION, GENERATION } = G
 
 export const APP_NAME = 'cizn'
 export const APP_VERSION = '0.0.1'
@@ -34,6 +35,7 @@ const app = async (obj) => {
   }
 
   appComposition[STATE][DERIVATION][API] = derivationApi(appComposition)
+  appComposition[STATE][GENERATION][API] = generationApi(appComposition)
 
   appComposition[ADAPTER][CLI][API].init()
 
