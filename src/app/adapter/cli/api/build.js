@@ -23,21 +23,22 @@ const build = app => async (options, command) => {
 
   try {
     // Reading the source file
-    log.info({ message: `Reading config file ${configPath} ...` })
     configPath = await realpath(`${source}`)
+    log.info({ message: `Reading config file %d ...`, options: [configPath] })
     await access(configPath, constants.F_OK)
 
     if (!(await lstat(configPath)).isFile()) {
       throw new Error()
     }
   } catch(e) {
-    log.error({ message: `${source} does not exist or is not readable` })
+    log.error({ message: `%d does not exist or is not readable`, options: [source] })
   }
 
   const { default: module } = await import(`${configPath}`)
 
   if (!module) {
     // error no default export
+    log.error({ message: `%d does not have a default export`, options: [configPath] })
   }
 
   // Creating (or reusing) a derivation from the current config
@@ -47,7 +48,6 @@ const build = app => async (options, command) => {
 
   // Creating (or reusing) a generation from the current derivation
   await generationAdapter.make({ derivation, hash: derivationHash, name })
-  // const { generation, hash } = await generationAdapter.get({ hashParts: { derivation }, name })
 }
 
 export default build

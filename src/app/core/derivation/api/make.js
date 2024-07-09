@@ -4,15 +4,15 @@ import { getFileName, mkTempFile } from '@lib/util/index.js'
 import { locate } from 'func-loc'
 import { copyFile, writeFile, appendFile } from 'node:fs/promises'
 
-const { PACKAGES, CONFIG, STATE, API, DERIVATION, CURRENT, EXT } = G
+const { PACKAGES, CONFIG, STATE, API, DERIVATION, CURRENT, EXT, ADAPTER, LOG } = G
 
 const make = app => async ({ module }) => {
   const { [DERIVATION]: derivationAdapter, [CONFIG]: stateConfig } = app[STATE]
   const { [CONFIG]: config, [PACKAGES]: packages } = derivationAdapter[G.STATE]
-  // const { [LOG]: logAdapter } = app[ADAPTER]
+  const { [LOG]: logAdapter } = app[ADAPTER]
 
-  // logAdapter[API].info({ message: 'Creating derivation ...' })
-  // logAdapter[API].indent()
+  logAdapter[API].indent()
+
   try {
   /**
    * We need to get the name of the module, but we only have the function
@@ -54,6 +54,8 @@ const make = app => async ({ module }) => {
       return acc
     }, {})
 
+    logAdapter[API].info({ message: 'Reading module %d ...', options: [fnPath.path] })
+
     /**
      * Executing the module's main function. Passing it the {@link moduleUtils} as
      * {@code utils}. As said above, calls to utility functions will result in code
@@ -67,6 +69,15 @@ const make = app => async ({ module }) => {
     } = module(config || {}, moduleUtils)
 
     const configName = getFileName(`${stateConfig[CURRENT]}`)
+
+    // In case a already present value in config gets overwritten by the
+    // current module, we need to inform the user about it
+    Object.keys(moduleConfig).forEach((x) => {
+      if (config[x]) {
+        logAdapter[API].warn({ message: 'Config option %d is overwritten by %d module', options: [x, fnName] })
+      }
+    })
+
     // Adding the {@code config} and {@code packages} the module exposes
     // to the state of the derivation so that we can use them later on
     derivationAdapter[STATE][CONFIG] = {
@@ -87,6 +98,9 @@ const make = app => async ({ module }) => {
 
     // This is a leaf module that we've already built
     if (derivation && subModules.length === 0) {
+      logAdapter[API].info({ message: 'Reusing derivation %d ...', options: [derivation] })
+      logAdapter[API].unindent()
+
       return { name: fnName, derivation }
     }
 
@@ -136,6 +150,7 @@ const make = app => async ({ module }) => {
       : await derivationAdapter[API].get({ hashParts: { module: accumulatedSubModules || module }, name: fnName })
 
     if (accumulatedDerivation) {
+      logAdapter[API].unindent()
       return { name: fnName, derivation: accumulatedDerivation }
     }
 
@@ -148,6 +163,8 @@ const make = app => async ({ module }) => {
     const derivationFilePath = `${derivationAdapter[G.ROOT]}/${derivationFileName}`
     await copyFile(derivationTempFile, derivationFilePath)
 
+    logAdapter[API].success({ message: 'Created derivation for %d', options: [fnName] })
+    logAdapter[API].unindent()
     return { name: fnName, derivation: `${derivationFileName}` }
   } catch (e) {
     console.error(e)
