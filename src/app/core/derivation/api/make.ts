@@ -1,17 +1,17 @@
 import { internalUtils, publicUtils } from '@cizn/utils/index.js'
-import G from '@lib/static.js'
+import G from '@cizn/global'
 import { getFileName, mkTempFile } from '@lib/util/index.js'
 import { locate } from 'func-loc'
 import { copyFile, writeFile, appendFile } from 'node:fs/promises'
 
-const { PACKAGES, CONFIG, STATE, API, DERIVATION, CURRENT, EXT, ADAPTER, LOG } = G
+const make = (app: Cizn.Application) => async (
+  module: Cizn.Application.State.Derivation.Module
+): Promise<Cizn.Application.State.Derivation> => {
+  const { [G.DERIVATION]: derivationAdapter, [G.CONFIG]: stateConfig } = app[G.STATE]
+  const { [G.CONFIG]: config, [G.PACKAGES]: packages } = derivationAdapter[G.STATE]
+  const { [G.LOG]: logAdapter } = app[G.ADAPTER]
 
-const make = app => async ({ module }) => {
-  const { [DERIVATION]: derivationAdapter, [CONFIG]: stateConfig } = app[STATE]
-  const { [CONFIG]: config, [PACKAGES]: packages } = derivationAdapter[G.STATE]
-  const { [LOG]: logAdapter } = app[ADAPTER]
-
-  logAdapter[API].indent()
+  logAdapter[G.API].indent()
 
   try {
   /**
@@ -21,7 +21,11 @@ const make = app => async ({ module }) => {
    * there. This means the file name declare the module name.
    */
     const fnPath = await locate(module)
-    const fnName = getFileName(`${fnPath.path}`) || null
+    const fnName = getFileName(`${fnPath.path}`)
+
+    if (!fnPath) {
+      logAdapter[G.API].error({message: 'Could not locate module'})
+    }
 
     /**
      * Creating a temp file for the new derivation with the appropriate hash
@@ -40,7 +44,7 @@ const make = app => async ({ module }) => {
      * function and if the user calls e.g. {@link withFile}, it will have the
      * first param (temp file) applied already.
     */
-    const moduleUtils = Object.keys(publicUtils).reduce((acc, key) => {
+    const moduleUtils = Object.keys(publicUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
       acc[key] = publicUtils[key]?.(derivationTempFile)
       return acc
     }, {})
@@ -49,12 +53,12 @@ const make = app => async ({ module }) => {
      * The same for the internal utilities that cizn will use when creating
      * the generation later on.
      */
-    const configUtils = Object.keys(internalUtils).reduce((acc, key) => {
+    const configUtils = Object.keys(internalUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
       acc[key] = internalUtils[key](derivationTempFile)
       return acc
     }, {})
 
-    logAdapter[API].info({ message: 'Reading module %d ...', options: [fnPath.path] })
+    logAdapter[G.API].info({ message: 'Reading module %d ...', options: [fnPath.path] })
 
     /**
      * Executing the module's main function. Passing it the {@link moduleUtils} as
@@ -68,40 +72,40 @@ const make = app => async ({ module }) => {
       args = {},
     } = module(config || {}, moduleUtils)
 
-    const configName = getFileName(`${stateConfig[CURRENT]}`)
+    const configName = getFileName(`${stateConfig[G.CURRENT]}`)
 
     // In case a already present value in config gets overwritten by the
     // current module, we need to inform the user about it
     Object.keys(moduleConfig).forEach((x) => {
       if (config[x]) {
-        logAdapter[API].warn({ message: 'Config option %d is overwritten by %d module', options: [x, fnName] })
+        logAdapter[G.API].warn({ message: 'Config option %d is overwritten by %d module', options: [x, fnName] })
       }
     })
 
     // Adding the {@code config} and {@code packages} the module exposes
     // to the state of the derivation so that we can use them later on
-    derivationAdapter[STATE][CONFIG] = {
+    derivationAdapter[G.STATE][G.CONFIG] = {
       ...config || {},
       ...configName !== fnName && { [fnName]: true },
       ...moduleConfig,
     }
-    derivationAdapter[STATE][PACKAGES] = [ ...packages || [], ...modulePackages ]
+    derivationAdapter[G.STATE][G.PACKAGES] = [ ...packages || [], ...modulePackages ]
 
-    const globalConfig = derivationAdapter[G.STATE][CONFIG]
+    const globalConfig = derivationAdapter[G.STATE][G.CONFIG]
 
     /**
-   * Calling the {@link get} method will EITHER return a {@link derivation},
+   * Calling the {@link get} method will EITHER return a {@link path},
    * which we can reuse, OR, if no such derivation can be found, a
    * {@link hash} that should be used for the derivation we want to create.
    */
-    const { derivation, hash } = await derivationAdapter[API].get({ hashParts: { module, args, config: globalConfig }, name: fnName })
+    const { path, hash } = await derivationAdapter[G.API].get({ hashParts: { module, args, config: globalConfig }, name: fnName })
 
     // This is a leaf module that we've already built
-    if (derivation && subModules.length === 0) {
-      logAdapter[API].info({ message: 'Reusing derivation %d ...', options: [derivation] })
-      logAdapter[API].unindent()
+    if (path && subModules.length === 0) {
+      logAdapter[G.API].info({ message: 'Reusing derivation %d ...', options: [path] })
+      logAdapter[G.API].unindent()
 
-      return { name: fnName, derivation }
+      return { name: fnName, path }
     }
 
     const subDerivations = []
@@ -112,7 +116,7 @@ const make = app => async ({ module }) => {
      * of that specific module that we can then add to this module
      */
     for (let i = 0; i < subModules.length; i++) {
-      const subDerivation = await derivationAdapter[API].make({ module: subModules[i] })
+      const subDerivation = await derivationAdapter[G.API].make(subModules[i])
 
       /**
        * Using the {@link configUtils.include} method to include the sub derivation
@@ -120,7 +124,7 @@ const make = app => async ({ module }) => {
        * file that can later be used to execute all sub modules when creating the
        * generation.
        */
-      configUtils?.include(subDerivation.name, `${derivationAdapter[G.ROOT]}/${subDerivation.derivation}`)
+      configUtils?.include(subDerivation.name, `${derivationAdapter[G.ROOT]}/${subDerivation.path}`)
 
       subDerivations.push(subDerivation)
     }
@@ -135,7 +139,7 @@ const make = app => async ({ module }) => {
      * if we need to rebuild the derivation
      */
     const accumulatedSubModules = subDerivations.length
-      ? subDerivations.reduce((acc, key) => `${acc}${key.derivation}`, hash)
+      ? subDerivations.reduce((acc, key) => `${acc}${key.path}`, hash)
       : null
 
     /**
@@ -143,15 +147,15 @@ const make = app => async ({ module }) => {
      * it means we've build this exact subtree once before and can reuse it
      */
     const {
-      derivation: accumulatedDerivation = null,
+      path: accumulatedDerivation = null,
       hash: accumulatedHash,
     } = !accumulatedSubModules
       ? { hash }
-      : await derivationAdapter[API].get({ hashParts: { module: accumulatedSubModules || module }, name: fnName })
+      : await derivationAdapter[G.API].get({ hashParts: { module: accumulatedSubModules || module }, name: fnName })
 
     if (accumulatedDerivation) {
-      logAdapter[API].unindent()
-      return { name: fnName, derivation: accumulatedDerivation }
+      logAdapter[G.API].unindent()
+      return { name: fnName, path: accumulatedDerivation }
     }
 
     /**
@@ -159,13 +163,13 @@ const make = app => async ({ module }) => {
      * for this subtree. We just need to copy the file over with the correctn name
      * and we're done.
      */
-    const derivationFileName = `${fnName}-${accumulatedHash}.${EXT}`
+    const derivationFileName = `${fnName}-${accumulatedHash}.${G.EXT}`
     const derivationFilePath = `${derivationAdapter[G.ROOT]}/${derivationFileName}`
     await copyFile(derivationTempFile, derivationFilePath)
 
-    logAdapter[API].success({ message: 'Created derivation for %d', options: [fnName] })
-    logAdapter[API].unindent()
-    return { name: fnName, derivation: `${derivationFileName}` }
+    logAdapter[G.API].success({ message: 'Created derivation for %d', options: [fnName] })
+    logAdapter[G.API].unindent()
+    return { name: fnName, path: `${derivationFileName}` }
   } catch (e) {
     console.error(e)
   }

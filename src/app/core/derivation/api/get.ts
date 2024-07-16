@@ -1,14 +1,13 @@
-import G from '@lib/static.js'
+import G from '@cizn/global'
 import crypto from 'crypto'
 import { readdir } from 'node:fs/promises'
+import { GetProps, GetType } from '.'
 
-const { STATE, DERIVATION } = G
-
-const get = app => async ({ hashParts, name }) => {
-  const { [DERIVATION]: derivation } = app[STATE]
+const get = (app: Cizn.Application) => async ({ hashParts, name }: GetProps): GetType => {
+  const { [G.DERIVATION]: derivation } = app[G.STATE]
 
   const { module = () => {}, args = {}, config = {} } = hashParts
-  const hashString = `${JSON.stringify(args)}${JSON.stringify(config)}${typeof module === 'string' ? module : module.toString()}`
+  const hashString = `${JSON.stringify(args)}${JSON.stringify(config)}${module.toString()}`
 
   const hash = crypto
     .createHash('md5')
@@ -20,7 +19,7 @@ const get = app => async ({ hashParts, name }) => {
   const existingDerivation = derivations.find(file => file.includes(hash))
 
   return existingDerivation
-    ? { derivation: existingDerivation }
+    ? { path: existingDerivation }
     : { hash }
 }
 

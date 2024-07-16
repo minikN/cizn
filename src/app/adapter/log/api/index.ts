@@ -6,45 +6,53 @@ import indent from "@cizn/adapter/log/api/indent.js"
 import print from "@cizn/adapter/log/api/print.js"
 import success from "@cizn/adapter/log/api/success.js"
 
-const cliApi = app => Object.create({}, {
+export type Props = {
+  message: string,
+  options?: (string | number | object)[],
+}
+
+export type Api = {
+  init: () => void
+  error: ({message, options}: Props) => void
+  indent: () => void
+  unindent: () => void
+  info: ({message, options}: Props) => void
+  print: ({message, options}: Props) => void
+  success: ({message, options}: Props) => void
+  warn: ({message, options}: Props) => void
+}
+
+const cliApi = (app: Cizn.Application): Cizn.Adapter.Log.Api => Object.create({}, {
   init: {
     value: init(app),
-    iterable: true,
     enumerable: true,
   },
   info: {
     value: info(app),
-    iterable: true,
     enumerable: true,
   },
   success: {
     value: success(app),
-    iterable: true,
     enumerable: true,
   },
   error: {
     value: error(app),
-    iterable: true,
     enumerable: true,
   },
   warn: {
     value: warn(app),
-    iterable: true,
     enumerable: true,
   },
   indent: {
     value: indent(app, false),
-    iterable: true,
     enumerable: true,
   },
   unindent: {
     value: indent(app, true),
-    iterable: true,
     enumerable: true,
   },
   print: {
     value: print(app),
-    iterable: true,
     enumerable: true,
   },
 })

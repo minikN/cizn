@@ -1,12 +1,11 @@
-import G from '@lib/static.js'
+import G from '@cizn/global'
 import chalk from 'chalk'
+import { Props } from '.'
 
-const { LOG, ADAPTER, API, PROGRAM } = G
+const warn = (app: Cizn.Application) => ({ message, options }: Props) => {
+  const { [G.LOG]: adapter } = app[G.ADAPTER]
 
-const warn = app => ({ message, options }) => {
-  const { [LOG]: adapter } = app[ADAPTER]
-
-  adapter[API].print({ message: `${chalk.bgYellow(' WARN ')} ${message}`, options })
+  adapter[G.API].print({ message: `${chalk.bgYellow(' WARN ')} ${message}`, options })
 }
 
 export default warn

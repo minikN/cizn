@@ -1,12 +1,10 @@
-import G from '@lib/static.js'
+import G from '@cizn/global'
 
-const { LOG, ADAPTER, API, LEVEL, PROGRAM } = G
+const indent = (app: Cizn.Application, remove: boolean) => () => {
+  const { [G.LOG]: adapter } = app[G.ADAPTER]
+  const { [G.LEVEL]: level = '' } = adapter
 
-const indent = (app, remove) => () => {
-  const { [LOG]: adapter } = app[ADAPTER]
-  const { [LEVEL]: level = '' } = adapter
-
-  adapter[LEVEL] = remove
+  adapter[G.LEVEL] = remove
     ? level.length <= 1
       ? ''
       : level.substring(0, level.length - 1)

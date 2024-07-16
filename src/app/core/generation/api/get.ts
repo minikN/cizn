@@ -1,17 +1,20 @@
-import G from '@lib/static.js'
+import G from '@cizn/global'
 import { readdir } from 'node:fs/promises'
 
-const { ADAPTER, LOG, STATE, GENERATION } = G
-
-const get = app => async ({ hash: derivationHash }) => {
-  const { [GENERATION]: generation } = app[STATE]
+const get = (app: Cizn.Application) => async (
+  { hash: derivationHash }: {hash: Cizn.Application.State.Derivation['hash']}
+): Promise<Cizn.Application.State.Generation> => {
+  const { [G.GENERATION]: generation } = app[G.STATE]
 
   const generations = await readdir(generation[G.ROOT])
 
-  const existingGeneration = generations.find(file => file.includes(derivationHash))
+  const existingGeneration = derivationHash
+    ? generations.find(file => file.includes(derivationHash))
+    : ''
+
   const latestGeneration = generations.reduce((acc, key) => {
-    const generationNumber = key.split('-')[0]
-    return generationNumber > acc ? Number.parseInt(generationNumber, 10) : acc
+    const generationNumber = Number.parseInt(key.split('-')[0], 10)
+    return generationNumber > acc ? generationNumber : acc
   }, 0)
 
   const generationNumber = existingGeneration
@@ -19,7 +22,7 @@ const get = app => async ({ hash: derivationHash }) => {
     : latestGeneration + 1
 
   return existingGeneration
-    ? { number: generationNumber, generation: existingGeneration }
+    ? { number: generationNumber, path: existingGeneration }
     : { number: generationNumber, hash: derivationHash }
 }
 

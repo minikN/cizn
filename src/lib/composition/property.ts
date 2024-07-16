@@ -5,7 +5,7 @@ import { curry } from "@lib/util/index.js"
  *
  * @type {(function(...[*]): (*))|*}
  */
-export const defineImmutableProp = curry((prop, value, obj) => {
+export const defineImmutableProp = curry((prop: string | symbol, value: any, obj: any) => {
   Object.defineProperty(obj, prop, {
     enumerable: true,
     configurable: false,
@@ -19,11 +19,11 @@ export const defineImmutableProp = curry((prop, value, obj) => {
 })
 
 /**
- * Defines mutable {@param prop} in {@obj}.
+ * Defines mutable {@param prop} in {@param obj}.
  *
  * @type {(function(...[*]): (*))|*}
  */
-export const defineProp = curry((prop, value, obj) => {
+export const defineProp = curry((prop: string | symbol, value: any, obj: any) => {
   let propValue = value
   Object.defineProperty(obj, prop, {
     enumerable: true,

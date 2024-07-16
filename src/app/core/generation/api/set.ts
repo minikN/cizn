@@ -1,16 +1,14 @@
 /* eslint-disable no-unused-vars */
-import G from '@lib/static.js'
+import G from '@cizn/global'
 import { stat, writeFile, unlink } from 'node:fs/promises'
 import path from 'path'
 
-const { CURRENT, STATE, GENERATION, ROOT } = G
+const set = (app: Cizn.Application) => async (): Promise<void> => {
+  const { [G.GENERATION]: generation } = app[G.STATE]
 
-const set = app => async () => {
-  const { [GENERATION]: generation } = app[STATE]
+  const currentGeneration = generation[G.CURRENT]
 
-  const currentGeneration = generation[CURRENT]
-
-  const currentGenerationFile = `${generation[ROOT]}/.current`
+  const currentGenerationFile = `${generation[G.ROOT]}/.current`
 
   try {
     (await stat(currentGenerationFile)).isFile()

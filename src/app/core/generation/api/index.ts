@@ -2,20 +2,23 @@ import make from '@cizn/core/generation/api/make.js'
 import get from '@cizn/core/generation/api/get.js'
 import set from '@cizn/core/generation/api/set.js'
 
-const derivationApi = app => Object.create({}, {
+export type Api = {
+  make: (props: Cizn.Application.State.Derivation) => Promise<void>
+  get: ({hash}: {hash: Cizn.Application.State.Derivation['hash']}) => Promise<Cizn.Application.State.Generation>
+  set: () => Promise<void>
+}
+
+const derivationApi = (app: Cizn.Application) => Object.create({}, {
   make: {
     value: make(app),
-    iterable: true,
     enumerable: true,
   },
   get: {
     value: get(app),
-    iterable: true,
     enumerable: true,
   },
   set: {
     value: set(app),
-    iterable: true,
     enumerable: true,
   },
 })

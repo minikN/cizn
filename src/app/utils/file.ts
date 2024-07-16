@@ -8,7 +8,7 @@ import path from 'path'
  * Writes instructions to create a file at {@link target}
  * with {@link contents} to {@link source}.
  */
-export const withFile = curry((source, target, contents) => {
+export const withFile = curry((source: string, target: string, contents: string): void => {
   appendFileSync(source, `\
 utils.withRealFile('${target}', \`\n${contents}\`)\n`)
 })
@@ -16,7 +16,7 @@ utils.withRealFile('${target}', \`\n${contents}\`)\n`)
 /**
  * Writes {@link contents} to file at {@link source}.
  */
-export const withRealFile = curry((source, target, contents) => {
+export const withRealFile = curry((source: string, target: string, contents: string) => {
   const filePath = `${source}/${target}`
   if (existsSync(filePath)) {
     appendFileSync(filePath, contents)
@@ -33,7 +33,7 @@ export const withRealFile = curry((source, target, contents) => {
  * as {@link name} to {@link source}. Will also sanitize
  * the name to avoid broken imports.
  */
-export const include = curry((source, name, target) => {
+export const include = curry((source: string, name: string, target: string) => {
   const fnName = sanitize(toCamelCase(name))
 
   appendFileSync(source, `\

@@ -1,25 +1,24 @@
 /* eslint-disable no-unused-vars */
-import G from '@lib/static.js'
+import G from '@cizn/global'
 import { access, constants, lstat, realpath } from 'node:fs/promises'
 import { getFileName } from '@lib/util/index.js'
-
-const { ADAPTER, STATE, GENERATION, DERIVATION, LOG, API, CURRENT } = G
+import {BuildProps} from '.'
 
 /**
  * Building the configuration
  *
  * @param {Cizn.Application} app the main application
- * @returns {Cizn.Adapter.Cli.Api.build}
+ * @returns {Cizn.Adapter.Cli.Api['build']}
  */
-const build = app => async (options, command) => {
-  const log = app[ADAPTER][LOG][API]
+const build = (app: Cizn.Application) => async (options: BuildProps) => {
+  const log = app[G.ADAPTER][G.LOG][G.API]
   const {
-    [DERIVATION]: { [G.API]: derivationAdapter },
-    [GENERATION]: { [G.API]: generationAdapter },
-  } = app[STATE]
+    [G.DERIVATION]: { [G.API]: derivationAdapter },
+    [G.GENERATION]: { [G.API]: generationAdapter },
+  } = app[G.STATE]
   const { source } = options
 
-  let configPath
+  let configPath: string = ''
 
   try {
     // Reading the source file
@@ -34,20 +33,20 @@ const build = app => async (options, command) => {
     log.error({ message: `%d does not exist or is not readable`, options: [source] })
   }
 
-  const { default: module } = await import(`${configPath}`)
+  const { default: module }: { default: Cizn.Application.State.Derivation.Module } = await import(`${configPath}`)
 
   if (!module) {
     // error no default export
-    log.error({ message: `%d does not have a default export`, options: [configPath] })
+    log.error({ message: `%d does not have a default export`, options: configPath ? [configPath] : [] })
   }
 
   // Creating (or reusing) a derivation from the current config
-  const { name, derivation } = await derivationAdapter.make({ module })
+  const { name, path } = await derivationAdapter.make(module)
 
-  const derivationHash = getFileName(derivation).split('-').pop()
+  const derivationHash = getFileName(path).split('-').pop()
 
   // Creating (or reusing) a generation from the current derivation
-  await generationAdapter.make({ derivation, hash: derivationHash, name })
+  await generationAdapter.make({ path, hash: derivationHash, name })
 }
 
 export default build

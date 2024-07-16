@@ -1,16 +1,13 @@
 /* global process */
-import G from '@lib/static.js'
+import G from '@cizn/global'
 import chalk from 'chalk'
+import { Props } from '.'
 
-const { LOG, ADAPTER, LEVEL } = G
+const print = (app: Cizn.Application) => ({ message, options = [] }: Props) => {
+  const { [G.LOG]: adapter } = app[G.ADAPTER]
+  const { [G.LEVEL]: level } = adapter
 
-
-const print = app => ({ message, options = [] }) => {
-  const { [LOG]: adapter } = app[ADAPTER]
-  const { [LEVEL]: level } = adapter
-
-
-  const formattedMessage = options.reduce((acc, key) => acc.replace('%d', chalk.bold(key)), message)
+  const formattedMessage = options.reduce((acc: string, key) => acc.replace('%d', chalk.bold(key)), message)
   console.log(`${level}${formattedMessage}`)
 }
 

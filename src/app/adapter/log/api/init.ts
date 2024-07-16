@@ -1,10 +1,8 @@
-import G from '@lib/static.js'
+import G from '@cizn/global'
 
-const { CLI, ADAPTER, API, PROGRAM } = G
-
-const init = app => () => {
-  const { [CLI]: adapter } = app[ADAPTER]
-  const { [PROGRAM]: program } = adapter
+const init = (app: Cizn.Application) => () => {
+  const { [G.CLI]: adapter } = app[G.ADAPTER]
+  const { [G.PROGRAM]: program } = adapter
 
   // nothing to do
 }

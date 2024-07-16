@@ -1,19 +1,19 @@
 import { curry } from "@lib/util/index.js"
 
-export const defineNamespace = curry((namespace, obj) => {
+export const defineNamespace = curry((namespace: PropertyKey, obj: any) => {
   const ns = {}
 
   Object.defineProperty(obj, namespace, {
     get () {
       return ns
     },
-    iterable: true,
+    enumerable: true,
   })
 
   return obj
 })
 
-export const setNamespace = curry((symbol, value, obj) => {
+export const setNamespace = curry((symbol: PropertyKey, value: Object, obj: any) => {
   Object.assign(obj[symbol], { ...value })
   return obj
 })
