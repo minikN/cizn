@@ -2,10 +2,10 @@ import G from '@cizn/global'
 import chalk from 'chalk'
 import { Props } from '.'
 
-const warn = (app: Cizn.Application) => ({ message, options }: Props) => {
-  const { [G.LOG]: adapter } = app[G.ADAPTER]
+const warn = (App: Cizn.Application) => ({ message, options }: Props) => {
+  const { Log } = App.Adapter
 
-  adapter[G.API].print({ message: `${chalk.bgYellow(' WARN ')} ${message}`, options })
+  Log.Api.print({ message: `${chalk.bgYellow(' WARN ')} ${message}`, options })
 }
 
 export default warn

@@ -4,14 +4,14 @@ import { getFileName, mkTempFile } from '@lib/util/index.js'
 import { locate } from 'func-loc'
 import { copyFile, writeFile, appendFile } from 'node:fs/promises'
 
-const make = (app: Cizn.Application) => async (
+const make = (App: Cizn.Application) => async (
   module: Cizn.Application.State.Derivation.Module
 ): Promise<Cizn.Application.State.Derivation> => {
-  const { [G.DERIVATION]: derivationAdapter, [G.CONFIG]: stateConfig } = app[G.STATE]
-  const { [G.CONFIG]: config, [G.PACKAGES]: packages } = derivationAdapter[G.STATE]
-  const { [G.LOG]: logAdapter } = app[G.ADAPTER]
+  const { Derivation, Config: stateConfig } = App.State
+  const { Config: derivationConfig, Packages: derivationPackages } = Derivation.State
+  const { Log } = App.Adapter
 
-  logAdapter[G.API].indent()
+  Log.Api.indent()
 
   try {
   /**
@@ -24,7 +24,7 @@ const make = (app: Cizn.Application) => async (
     const fnName = getFileName(`${fnPath.path}`)
 
     if (!fnPath) {
-      logAdapter[G.API].error({message: 'Could not locate module'})
+      Log.Api.error({message: 'Could not locate module'})
     }
 
     /**
@@ -58,7 +58,7 @@ const make = (app: Cizn.Application) => async (
       return acc
     }, {})
 
-    logAdapter[G.API].info({ message: 'Reading module %d ...', options: [fnPath.path] })
+    Log.Api.info({ message: 'Reading module %d ...', options: [fnPath.path] })
 
     /**
      * Executing the module's main function. Passing it the {@link moduleUtils} as
@@ -70,40 +70,40 @@ const make = (app: Cizn.Application) => async (
       config: moduleConfig = {},
       packages: modulePackages = [],
       args = {},
-    } = module(config || {}, moduleUtils)
+    } = module(derivationConfig || {}, moduleUtils)
 
-    const configName = getFileName(`${stateConfig[G.CURRENT]}`)
+    const configName = getFileName(`${stateConfig.Current}`)
 
     // In case a already present value in config gets overwritten by the
     // current module, we need to inform the user about it
     Object.keys(moduleConfig).forEach((x) => {
-      if (config[x]) {
-        logAdapter[G.API].warn({ message: 'Config option %d is overwritten by %d module', options: [x, fnName] })
+      if (derivationConfig[x]) {
+        Log.Api.warn({ message: 'Config option %d is overwritten by %d module', options: [x, fnName] })
       }
     })
 
     // Adding the {@code config} and {@code packages} the module exposes
     // to the state of the derivation so that we can use them later on
-    derivationAdapter[G.STATE][G.CONFIG] = {
-      ...config || {},
+    Derivation.State.Config = {
+      ...derivationConfig || {},
       ...configName !== fnName && { [fnName]: true },
       ...moduleConfig,
     }
-    derivationAdapter[G.STATE][G.PACKAGES] = [ ...packages || [], ...modulePackages ]
+    Derivation.State.Packages = [ ...derivationPackages || [], ...modulePackages ]
 
-    const globalConfig = derivationAdapter[G.STATE][G.CONFIG]
+    const globalConfig = Derivation.State.Config
 
     /**
    * Calling the {@link get} method will EITHER return a {@link path},
    * which we can reuse, OR, if no such derivation can be found, a
    * {@link hash} that should be used for the derivation we want to create.
    */
-    const { path, hash } = await derivationAdapter[G.API].get({ hashParts: { module, args, config: globalConfig }, name: fnName })
+    const { path, hash } = await Derivation.Api.get({ hashParts: { module, args, config: globalConfig }, name: fnName })
 
     // This is a leaf module that we've already built
     if (path && subModules.length === 0) {
-      logAdapter[G.API].info({ message: 'Reusing derivation %d ...', options: [path] })
-      logAdapter[G.API].unindent()
+      Log.Api.info({ message: 'Reusing derivation %d ...', options: [path] })
+      Log.Api.unindent()
 
       return { name: fnName, path }
     }
@@ -116,7 +116,7 @@ const make = (app: Cizn.Application) => async (
      * of that specific module that we can then add to this module
      */
     for (let i = 0; i < subModules.length; i++) {
-      const subDerivation = await derivationAdapter[G.API].make(subModules[i])
+      const subDerivation = await Derivation.Api.make(subModules[i])
 
       /**
        * Using the {@link configUtils.include} method to include the sub derivation
@@ -124,7 +124,7 @@ const make = (app: Cizn.Application) => async (
        * file that can later be used to execute all sub modules when creating the
        * generation.
        */
-      configUtils?.include(subDerivation.name, `${derivationAdapter[G.ROOT]}/${subDerivation.path}`)
+      configUtils?.include(subDerivation.name, `${Derivation.Root}/${subDerivation.path}`)
 
       subDerivations.push(subDerivation)
     }
@@ -151,10 +151,10 @@ const make = (app: Cizn.Application) => async (
       hash: accumulatedHash,
     } = !accumulatedSubModules
       ? { hash }
-      : await derivationAdapter[G.API].get({ hashParts: { module: accumulatedSubModules || module }, name: fnName })
+      : await Derivation.Api.get({ hashParts: { module: accumulatedSubModules || module }, name: fnName })
 
     if (accumulatedDerivation) {
-      logAdapter[G.API].unindent()
+      Log.Api.unindent()
       return { name: fnName, path: accumulatedDerivation }
     }
 
@@ -164,11 +164,11 @@ const make = (app: Cizn.Application) => async (
      * and we're done.
      */
     const derivationFileName = `${fnName}-${accumulatedHash}.${G.EXT}`
-    const derivationFilePath = `${derivationAdapter[G.ROOT]}/${derivationFileName}`
+    const derivationFilePath = `${Derivation.Root}/${derivationFileName}`
     await copyFile(derivationTempFile, derivationFilePath)
 
-    logAdapter[G.API].success({ message: 'Created derivation for %d', options: [fnName] })
-    logAdapter[G.API].unindent()
+    Log.Api.success({ message: 'Created derivation for %d', options: [fnName] })
+    Log.Api.unindent()
     return { name: fnName, path: `${derivationFileName}` }
   } catch (e) {
     console.error(e)

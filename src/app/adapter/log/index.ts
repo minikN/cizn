@@ -5,9 +5,9 @@ import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import logApi from "@cizn/adapter/log/api/index.js"
 
 export type Log = {
-  [G.PROGRAM]: Object
-  [G.API]: Cizn.Adapter.Log.Api
-  [G.LEVEL]: string,
+  Program: Object
+  Api: Cizn.Adapter.Log.Api
+  Level: string,
 }
 
 /**
@@ -18,10 +18,10 @@ export type Log = {
  */
 const logAdapter = (app: Cizn.Application): Cizn.Adapter.Log => {
   const adapterComposition = pipe<Cizn.Adapter.Log>(
-    defineProp(G.PROGRAM, {}), // not using any loggin lib as of now ...
-    defineNamespace(G.API),
-    setNamespace(G.API, logApi(app)),
-    defineProp(G.LEVEL, ''),
+    defineProp('Program', {}), // not using any loggin lib as of now ...
+    defineNamespace('Api'),
+    setNamespace('Api', logApi(app)),
+    defineProp('Level', ''),
   )(<Cizn.Adapter.Log>{})
 
 

@@ -8,17 +8,17 @@ export type Api = {
   set: () => Promise<void>
 }
 
-const derivationApi = (app: Cizn.Application) => Object.create({}, {
+const derivationApi = (App: Cizn.Application) => Object.create({}, {
   make: {
-    value: make(app),
+    value: make(App),
     enumerable: true,
   },
   get: {
-    value: get(app),
+    value: get(App),
     enumerable: true,
   },
   set: {
-    value: set(app),
+    value: set(App),
     enumerable: true,
   },
 })

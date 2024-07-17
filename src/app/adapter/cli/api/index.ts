@@ -10,13 +10,13 @@ export type Api = {
   init: (app: Cizn.Application) => Promise<void>
 }
 
-const cliApi = (app: Cizn.Application): Cizn.Adapter.Cli.Api => Object.create({}, {
+const cliApi = (App: Cizn.Application): Cizn.Adapter.Cli.Api => Object.create({}, {
   build: {
-    value: build(app),
+    value: build(App),
     enumerable: true,
   },
   init: {
-    value: init(app),
+    value: init(App),
     enumerable: true,
   },
 })

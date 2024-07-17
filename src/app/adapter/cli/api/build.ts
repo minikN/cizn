@@ -7,15 +7,15 @@ import {BuildProps} from '.'
 /**
  * Building the configuration
  *
- * @param {Cizn.Application} app the main application
+ * @param {Cizn.Application} App the main application
  * @returns {Cizn.Adapter.Cli.Api['build']}
  */
-const build = (app: Cizn.Application) => async (options: BuildProps) => {
-  const log = app[G.ADAPTER][G.LOG][G.API]
+const build = (App: Cizn.Application) => async (options: BuildProps) => {
+  const log = App.Adapter.Log.Api
   const {
-    [G.DERIVATION]: { [G.API]: derivationAdapter },
-    [G.GENERATION]: { [G.API]: generationAdapter },
-  } = app[G.STATE]
+    Derivation: { Api: derivationAdapter },
+    Generation: { Api: generationAdapter },
+  } = App.State
   const { source } = options
 
   let configPath: string = ''

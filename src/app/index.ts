@@ -13,13 +13,13 @@ export const APP_VERSION = '0.0.1'
 
 
 export type Application = {
-  [G.ADAPTER]: Cizn.Adapter
-  [G.STATE]: Cizn.Application.State
+  Adapter: Cizn.Adapter,
+  State: Cizn.Application.State
 }
 
 export type Adapter = {
-  [G.CLI]: Cizn.Adapter.Cli
-  [G.LOG]: Cizn.Adapter.Log
+  Cli: Cizn.Adapter.Cli
+  Log: Cizn.Adapter.Log
 }
 
 /**
@@ -34,20 +34,20 @@ const app = async (obj: Cizn.Application): Promise<Cizn.Application> => {
   /** @type Cizn.Application */
   const appComposition = pipe<Cizn.Application>(
     defineImmutableProp('_name', APP_NAME),
-    defineProp(G.ADAPTER, {}),
-    defineImmutableProp(G.STATE, stateComposition),
+    defineProp('Api', {}),
+    defineImmutableProp('State', stateComposition),
   )(obj)
   
   
-  appComposition[G.ADAPTER] = {
-    [G.CLI]: cliAdapter(appComposition),
-    [G.LOG]: logAdapter(appComposition),
+  appComposition.Adapter = {
+    Cli: cliAdapter(appComposition),
+    Log: logAdapter(appComposition),
   }
   
-  appComposition[G.STATE][G.DERIVATION][G.API] = derivationApi(appComposition)
-  appComposition[G.STATE][G.GENERATION][G.API] = generationApi(appComposition)
+  appComposition.State.Derivation.Api = derivationApi(appComposition)
+  appComposition.State.Generation.Api = generationApi(appComposition)
   
-  appComposition[G.ADAPTER][G.CLI][G.API].init()
+  appComposition.Adapter.Cli.Api.init(appComposition)
   
   return appComposition
 }

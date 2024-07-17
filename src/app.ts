@@ -3,4 +3,4 @@ import G from '@cizn/global'
 
 const app = await appComposition(<Cizn.Application>{})
 
-await app[G.ADAPTER][G.CLI][G.PROGRAM].parseAsync(process.argv)
+await app.Adapter.Cli.Program.parseAsync(process.argv)

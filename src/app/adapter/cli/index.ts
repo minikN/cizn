@@ -10,8 +10,8 @@ import { Command } from "commander"
 export type Cli = {
   readonly _name: string,
   readonly _version: string,
-  [G.PROGRAM]: Command
-  [G.API]: Cizn.Adapter.Cli.Api
+  Program: Command
+  Api: Cizn.Adapter.Cli.Api
 }
 
 /**
@@ -24,9 +24,9 @@ const cliAdapter = (app: Cizn.Application): Cizn.Adapter.Cli => {
   const adapterComposition = pipe<Cizn.Adapter.Cli>(
     defineImmutableProp('_name', APP_NAME),
     defineImmutableProp('_version', APP_VERSION),
-    defineImmutableProp(G.PROGRAM, program),
-    defineNamespace(G.API),
-    setNamespace(G.API, cliApi(app)),
+    defineImmutableProp('Program', program),
+    defineNamespace('Api'),
+    setNamespace('Api', cliApi(app)),
   )(<Cizn.Adapter.Cli>{})
 
 

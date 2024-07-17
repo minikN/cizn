@@ -22,37 +22,37 @@ export type Api = {
   warn: ({message, options}: Props) => void
 }
 
-const cliApi = (app: Cizn.Application): Cizn.Adapter.Log.Api => Object.create({}, {
+const cliApi = (App: Cizn.Application): Cizn.Adapter.Log.Api => Object.create({}, {
   init: {
-    value: init(app),
+    value: init(App),
     enumerable: true,
   },
   info: {
-    value: info(app),
+    value: info(App),
     enumerable: true,
   },
   success: {
-    value: success(app),
+    value: success(App),
     enumerable: true,
   },
   error: {
-    value: error(app),
+    value: error(App),
     enumerable: true,
   },
   warn: {
-    value: warn(app),
+    value: warn(App),
     enumerable: true,
   },
   indent: {
-    value: indent(app, false),
+    value: indent(App, false),
     enumerable: true,
   },
   unindent: {
-    value: indent(app, true),
+    value: indent(App, true),
     enumerable: true,
   },
   print: {
-    value: print(app),
+    value: print(App),
     enumerable: true,
   },
 })

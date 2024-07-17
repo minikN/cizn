@@ -1,16 +1,16 @@
 import G from '@cizn/global'
 
-const init = (app: Cizn.Application) => () => {
-  const { [G.CLI]: adapter } = app[G.ADAPTER]
-  const { _name, _version, [G.API]: api, [G.PROGRAM]: program } = adapter
+const init = (App: Cizn.Application) => () => {
+  const { Cli } = App.Adapter
+  const { _name, _version, Api, Program } = Cli
 
-  program.version(_version)
-  program.description(_name)
+  Program.version(_version)
+  Program.description(_name)
 
-  program.command('build')
+  Program.command('build')
     .description('Build a given configuration')
     .option('-s, --source <string>', 'path to the source file', './config.js')
-    .action(api.build)
+    .action(Api.build)
 }
 
 export default init

@@ -1,10 +1,10 @@
 import G from '@cizn/global'
 
-const indent = (app: Cizn.Application, remove: boolean) => () => {
-  const { [G.LOG]: adapter } = app[G.ADAPTER]
-  const { [G.LEVEL]: level = '' } = adapter
+const indent = (App: Cizn.Application, remove: boolean) => () => {
+  const { Log } = App.Adapter
+  const { Level: level } = Log
 
-  adapter[G.LEVEL] = remove
+  Log.Level = remove
     ? level.length <= 1
       ? ''
       : level.substring(0, level.length - 1)

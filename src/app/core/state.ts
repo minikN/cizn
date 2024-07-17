@@ -18,22 +18,22 @@ export type Generation = {
 }
 
 export type State = {
-  [G.CONFIG]: {
-    [G.CURRENT]: string,
-    [G.ROOT]: string,
+  Config: {
+    Current: string,
+    Root: string,
   }
-  [G.DERIVATION]: {
-    [G.STATE]: {
-      [G.CONFIG]: object,
-      [G.PACKAGES]: string[]
+  Derivation: {
+    State: {
+      Config: object,
+      Packages: string[]
     }
-    [G.ROOT]: string,
-    [G.API]: Cizn.Application.State.Derivation.Api
+    Root: string,
+    Api: Cizn.Application.State.Derivation.Api
   }
-  [G.GENERATION]: {
-    [G.CURRENT]: string,
-    [G.ROOT]: string,
-    [G.API]: Cizn.Application.State.Generation.Api
+  Generation: {
+    Current: string,
+    Root: string,
+    Api: Cizn.Application.State.Generation.Api
   }
 }
 
@@ -48,27 +48,27 @@ const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.Stat
   await $`mkdir -p ${stateRoot}/cizn/derivations`
 
   const stateComposition = pipe<Cizn.Application.State>(
-    defineNamespace(G.CONFIG),
-    setNamespace(G.CONFIG, {
-      [G.CURRENT]: currentConfig,
-      [G.ROOT]: configRoot,
+    defineNamespace('Config'),
+    setNamespace('Config', {
+      Current: currentConfig,
+      Root: configRoot,
     }),
-    defineNamespace(G.DERIVATION),
-    setNamespace(G.DERIVATION, {
-      [G.STATE]: {
-        [G.CONFIG]: {},
-        [G.PACKAGES]: [],
+    defineNamespace('Derivation'),
+    setNamespace('Derivation', {
+      State: {
+        Config: {},
+        Packages: [],
         // [G.OPTIONS]: {}, // TODO: Not needed?
         // [G.MODULES]: {}, // TODO: Not needed?
       },
-      [G.ROOT]: derivationsRoot,
-      [G.API]: null,
+      Root: derivationsRoot,
+      Api: null,
     }),
-    defineNamespace(G.GENERATION),
-    setNamespace(G.GENERATION, {
-      [G.ROOT]: generationsRoot,
-      [G.CURRENT]: null,
-      [G.API]: null,
+    defineNamespace('Generation'),
+    setNamespace('Generation', {
+      Root: generationsRoot,
+      Current: null,
+      Api: null,
     }),
   )(obj)
 

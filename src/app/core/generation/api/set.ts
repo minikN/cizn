@@ -3,12 +3,12 @@ import G from '@cizn/global'
 import { stat, writeFile, unlink } from 'node:fs/promises'
 import path from 'path'
 
-const set = (app: Cizn.Application) => async (): Promise<void> => {
-  const { [G.GENERATION]: generation } = app[G.STATE]
+const set = (App: Cizn.Application) => async (): Promise<void> => {
+  const { Generation } = App.State
 
-  const currentGeneration = generation[G.CURRENT]
+  const currentGeneration = Generation.Current
 
-  const currentGenerationFile = `${generation[G.ROOT]}/.current`
+  const currentGenerationFile = `${Generation.Root}/.current`
 
   try {
     (await stat(currentGenerationFile)).isFile()

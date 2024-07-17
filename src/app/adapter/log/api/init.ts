@@ -1,9 +1,6 @@
 import G from '@cizn/global'
 
-const init = (app: Cizn.Application) => () => {
-  const { [G.CLI]: adapter } = app[G.ADAPTER]
-  const { [G.PROGRAM]: program } = adapter
-
+const init = (App: Cizn.Application) => () => {
   // nothing to do
 }
 

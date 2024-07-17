@@ -3,10 +3,10 @@ import G from '@cizn/global'
 import chalk from 'chalk'
 import { Props } from '.'
 
-const info = (app: Cizn.Application) => ({ message, options = [] }: Props) => {
-  const { [G.LOG]: adapter } = app[G.ADAPTER]
+const info = (App: Cizn.Application) => ({ message, options = [] }: Props) => {
+  const { Log } = App.Adapter
 
-  adapter[G.API].print({ message: `${chalk.bgRed(' FAIL ')} ${message}. Aborting.`, options })
+  Log.Api.print({ message: `${chalk.bgRed(' FAIL ')} ${message}. Aborting.`, options })
   process.exit(1)
 }
 
