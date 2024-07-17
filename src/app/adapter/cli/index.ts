@@ -21,14 +21,13 @@ export type Cli = {
  * @returns {Cizn.Adapter.Cli}
  */
 const cliAdapter = (app: Cizn.Application): Cizn.Adapter.Cli => {
-  /** @type {Cizn.Adapter.Cli} */
-  const adapterComposition = pipe(
+  const adapterComposition = pipe<Cizn.Adapter.Cli>(
     defineImmutableProp('_name', APP_NAME),
     defineImmutableProp('_version', APP_VERSION),
     defineImmutableProp(G.PROGRAM, program),
     defineNamespace(G.API),
     setNamespace(G.API, cliApi(app)),
-  )({})
+  )(<Cizn.Adapter.Cli>{})
 
 
   return adapterComposition

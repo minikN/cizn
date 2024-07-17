@@ -37,7 +37,7 @@ export type State = {
   }
 }
 
-const state = async (obj: any): Promise<Cizn.Application.State> => {
+const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.State> => {
   const configRoot = await process.cwd()
   const currentConfig = `${configRoot}/config.js`
   const stateRoot = process.env?.XDG_STATE_HOME || `${process?.env.HOME}/.local/state`

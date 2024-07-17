@@ -13,7 +13,7 @@ export const defineNamespace = curry((namespace: PropertyKey, obj: any) => {
   return obj
 })
 
-export const setNamespace = curry((symbol: PropertyKey, value: Object, obj: any) => {
+export const setNamespace = curry((symbol: PropertyKey, value: any, obj: any) => {
   Object.assign(obj[symbol], { ...value })
   return obj
 })

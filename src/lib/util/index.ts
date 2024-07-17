@@ -5,7 +5,7 @@ import path from 'path'
 import G from '@cizn/global'
 
 /**
- * Functional composition
+ * Functional composition from left to right
  *
  * @param {...Function} functions
  * @returns {function(*): *}
@@ -16,12 +16,12 @@ export const pipe = <T>(...functions: Array<(a: T) => T>) => (data: ReturnType<(
 )
 
 /**
- * Asynchronous functional composition
+ * Asynchronous functional composition from left to right
  *
  * @param  {...Function} functions
  * @returns {function(*): *}
  */
-export const composeAsync = (...functions: Function[]) => (param: any) => functions.reduce(
+export const pipeAsync = <T>(...functions: Array<(a: T) => T>) => (param: ReturnType<(a: T) => Promise<T>>) => functions.reduce(
   async (result, next) => next(await result),
   param,
 )
@@ -55,7 +55,6 @@ type RemainingParameters<PROVIDED extends any[], EXPECTED extends any[]> =
     : EXPECTED
   // else there are no more arguments
   : []
-
 
 type CurriedFunctionOrReturnValue<PROVIDED extends any[], FN extends (...args: any[]) => any> =
   RemainingParameters<PROVIDED, Parameters<FN>> extends [any, ...any[]]

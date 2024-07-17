@@ -38,7 +38,7 @@ const make = (app: Cizn.Application) => async ({ path: derivationPath, hash: der
       return acc
     }, {})
 
-    const { default: fn } = await import(`${derivationAdapter[G.ROOT]}/${derivationPath}`)
+    const { default: fn }: {default: Function } = await import(`${derivationAdapter[G.ROOT]}/${derivationPath}`)
     await fn?.(configUtils)
 
     generationAdapter[G.API].set()

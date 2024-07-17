@@ -17,13 +17,12 @@ export type Log = {
  * @returns {Cizn.Adapter.Log}
  */
 const logAdapter = (app: Cizn.Application): Cizn.Adapter.Log => {
-  /** @type {Cizn.Adapter.Log} */
-  const adapterComposition = pipe(
+  const adapterComposition = pipe<Cizn.Adapter.Log>(
     defineProp(G.PROGRAM, {}), // not using any loggin lib as of now ...
     defineNamespace(G.API),
     setNamespace(G.API, logApi(app)),
     defineProp(G.LEVEL, ''),
-  )({})
+  )(<Cizn.Adapter.Log>{})
 
 
   return adapterComposition

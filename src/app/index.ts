@@ -28,8 +28,8 @@ export type Adapter = {
 * @param {Object} obj the object to bootstrap the application to
 * @returns {Cizn.Application} app
 */
-const app = async (obj: any): Promise<Cizn.Application> => {
-  const stateComposition = await state({})
+const app = async (obj: Cizn.Application): Promise<Cizn.Application> => {
+  const stateComposition = await state(<Cizn.Application.State>{})
   
   /** @type Cizn.Application */
   const appComposition = pipe<Cizn.Application>(
