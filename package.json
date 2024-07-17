@@ -9,6 +9,7 @@
   "types": "./types/index.d.ts",
   "scripts": {
     "build": "rollup --config",
+    "type-coverage": "type-coverage --detail",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Demis Balbach",
