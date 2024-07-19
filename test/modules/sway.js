@@ -1,7 +1,7 @@
 import swaySubModule from './sway/sway-subModule.js'
 
 export default args => (config, utils) => {
-  utils.withFile('.config/test', `\
+  utils.file.write('.config/test', `\
 hello
 world1 2 
 `)

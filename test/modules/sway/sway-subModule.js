@@ -1,7 +1,7 @@
 
 
 export default args => (config, utils) => {
-  utils.withFile('.config/test', `\
+  utils.file.write('.config/test', `\
 hello
 world2  
 `)

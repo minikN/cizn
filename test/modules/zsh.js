@@ -1,5 +1,5 @@
 export default args => (config, utils) => {
-  utils.withFile('.config/zsh', `\
+  utils.file.write('.config/zsh', `\
 hello1
 world  
 `)
