@@ -6,10 +6,10 @@ import { copyFile, writeFile, appendFile } from 'node:fs/promises'
 
 const make = (App: Cizn.Application) => async (
   module: Cizn.Application.State.Derivation.Module
-): Promise<Cizn.Application.State.Derivation> => {
+): Promise<Cizn.Application.State.Derivation | undefined> => {
   const { Derivation, Config: stateConfig } = App.State
   const { Config: derivationConfig, Packages: derivationPackages } = Derivation.State
-  const { Log } = App.Adapter
+  const { Log, File } = App.Adapter
 
   Log.Api.indent()
 
@@ -44,33 +44,45 @@ const make = (App: Cizn.Application) => async (
      * function and if the user calls e.g. {@link withFile}, it will have the
      * first param (temp file) applied already.
     */
-    const moduleUtils = Object.keys(publicUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
-      acc[key] = publicUtils[key]?.(derivationTempFile)
-      return acc
-    }, {})
+    // const moduleUtils = Object.keys(publicUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
+    //   acc[key] = publicUtils[key]?.(derivationTempFile)
+    //   return acc
+    // }, {})
 
+    const publicFileApi = Object.entries(File.Public).reduce((acc, [key, fn]) => {
+      acc[key] = fn?.(derivationTempFile)
+      return acc
+    }, <{[key: string]: Function}>{})
     /**
      * The same for the internal utilities that cizn will use when creating
      * the generation later on.
      */
-    const configUtils = Object.keys(internalUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
-      acc[key] = internalUtils[key](derivationTempFile)
+    // const configUtils = Object.keys(internalUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
+    //   acc[key] = internalUtils[key](derivationTempFile)
+    //   return acc
+    // }, {})
+    const configUtils = Object.entries(File.Internal).reduce((acc, [key, fn]) => {
+      acc[key] = fn?.(derivationTempFile)
       return acc
-    }, {})
+    }, <{[key: string]: Function}>{})
 
     Log.Api.info({ message: 'Reading module %d ...', options: [fnPath.path] })
 
     /**
-     * Executing the module's main function. Passing it the {@link moduleUtils} as
+     * Executing the module's main function. Passing it the {@link publicFileApi} as
      * {@code utils}. As said above, calls to utility functions will result in code
      * being written into the {@link derivationTempFile}.
     */
+
+    const publicUtils = {
+      file: publicFileApi
+    }
     const {
       modules: subModules = [],
       config: moduleConfig = {},
       packages: modulePackages = [],
       args = {},
-    } = module(derivationConfig || {}, moduleUtils)
+    } = module(derivationConfig || {}, <Cizn.Utils.Public>publicUtils)
 
     const configName = getFileName(`${stateConfig.Current}`)
 

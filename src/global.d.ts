@@ -1,4 +1,9 @@
 declare namespace Cizn {
+  namespace Utils {
+    export type Public = {
+      file: Cizn.Adapter.File.PublicApi
+    }
+  }
   namespace Application {
     export type State = import('@cizn/core/state').State
 
@@ -9,7 +14,10 @@ declare namespace Cizn {
       namespace Derivation {
         export type Api = import('@cizn/core/derivation/api').Api
 
-        type Module = (config: Cizn.Application.State['config']) => ModuleOptions
+        type Module = (
+          config: object,
+          utils: Cizn.Utils.Public
+        ) => ModuleOptions
         type ModuleOptions = {
           modules: Module[],
           packages: string[],
@@ -29,12 +37,18 @@ declare namespace Cizn {
     namespace Adapter {
       export type Cli = import('@cizn/adapter/cli').Cli
       export type Log = import('@cizn/adapter/log').Log
+      export type File = import('@cizn/adapter/file').File
 
       namespace Cli {
         export type Api = import('@cizn/adapter/cli/api').Api
       }
       namespace Log {
         export type Api = import('@cizn/adapter/log/api').Api
+      }
+
+      namespace File {
+        export type PublicApi = import('@cizn/adapter/file/api/public').Api
+        export type InternalApi = import('@cizn/adapter/file/api/internal').Api
       }
     }
 

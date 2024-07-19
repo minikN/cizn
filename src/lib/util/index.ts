@@ -61,7 +61,7 @@ type CurriedFunctionOrReturnValue<PROVIDED extends any[], FN extends (...args: a
     ? CurriedFunction<PROVIDED, FN>
     : ReturnType<FN>
 
-type CurriedFunction<PROVIDED extends any[], FN extends (...args: any[]) => any> =
+export type CurriedFunction<PROVIDED extends any[], FN extends (...args: any[]) => any> =
 <NEW_ARGS extends PartialTuple<RemainingParameters<PROVIDED, Parameters<FN>>>>(...args: NEW_ARGS) =>
     CurriedFunctionOrReturnValue<[...PROVIDED, ...NEW_ARGS], FN>
 

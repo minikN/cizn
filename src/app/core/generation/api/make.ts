@@ -8,7 +8,7 @@ const make = (App: Cizn.Application) => async ({ path: derivationPath, hash: der
     Generation,
   } = App.State
 
-  const {Log} = App.Adapter
+  const { Log, File } = App.Adapter
 
   try {
     const { number: generationNumber, path, hash } = await Generation.Api.get({ hash: derivationHash || '' })
@@ -34,13 +34,21 @@ const make = (App: Cizn.Application) => async ({ path: derivationPath, hash: der
     /**
      * Creating the utility functions for the derivation to execute
      */
-    const configUtils = Object.keys(internalUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
-      acc[key] = internalUtils[key](`${newGenerationPath}/files`)
+    // const configUtils = Object.keys(internalUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
+    //   acc[key] = internalUtils[key](`${newGenerationPath}/files`)
+    //   return acc
+    // }, {})
+    const configUtils = Object.entries(File.Internal).reduce((acc, [key, fn]) => {
+      acc[key] = fn?.(`${newGenerationPath}/files`)
       return acc
-    }, {})
+    }, <{[key: string]: Function}>{})
+
+    const internalUtils = {
+      file: configUtils
+    }
 
     const { default: fn }: {default: Function } = await import(`${Derivation.Root}/${derivationPath}`)
-    await fn?.(configUtils)
+    await fn?.(internalUtils)
 
     Generation.Api.set()
 

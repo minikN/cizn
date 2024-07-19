@@ -6,11 +6,10 @@ import logAdapter from "@cizn/adapter/log/index.js"
 import state from "@cizn/core/state.js"
 import derivationApi from "@cizn/core/derivation/api/index.js"
 import generationApi from "@cizn/core/generation/api/index.js"
-
+import fileAdapter from "./adapter/file"
 
 export const APP_NAME = 'cizn'
 export const APP_VERSION = '0.0.1'
-
 
 export type Application = {
   Adapter: Cizn.Adapter,
@@ -20,6 +19,7 @@ export type Application = {
 export type Adapter = {
   Cli: Cizn.Adapter.Cli
   Log: Cizn.Adapter.Log
+  File: Cizn.Adapter.File
 }
 
 /**
@@ -42,6 +42,7 @@ const app = async (obj: Cizn.Application): Promise<Cizn.Application> => {
   appComposition.Adapter = {
     Cli: cliAdapter(appComposition),
     Log: logAdapter(appComposition),
+    File: fileAdapter(appComposition)
   }
   
   appComposition.State.Derivation.Api = derivationApi(appComposition)
