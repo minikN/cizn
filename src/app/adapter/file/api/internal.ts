@@ -5,7 +5,7 @@ import { CurriedFunction } from '@lib/util'
 export type Props = {
     source: string,
     target: string,
-    content: string,
+    content: string | object,
     name: string,
   }
   
