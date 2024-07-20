@@ -1,6 +1,5 @@
 import { pipe } from "@lib/util/index.js"
 import { defineProp } from "@lib/composition/property.js"
-import G from '@cizn/global'
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import logApi from "@cizn/adapter/log/api/index.js"
 

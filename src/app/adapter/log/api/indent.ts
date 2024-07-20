@@ -1,5 +1,3 @@
-import G from '@cizn/global'
-
 const indent = (App: Cizn.Application, remove: boolean) => () => {
   const { Log } = App.Adapter
   const { Level: level } = Log

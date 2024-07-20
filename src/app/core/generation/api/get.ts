@@ -1,4 +1,3 @@
-import G from '@cizn/global'
 import { readdir } from 'node:fs/promises'
 
 const get = (App: Cizn.Application) => async (

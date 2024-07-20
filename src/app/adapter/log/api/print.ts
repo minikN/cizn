@@ -1,5 +1,4 @@
 /* global process */
-import G from '@cizn/global'
 import chalk from 'chalk'
 import { Props } from '.'
 

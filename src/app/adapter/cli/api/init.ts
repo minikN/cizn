@@ -1,5 +1,3 @@
-import G from '@cizn/global'
-
 const init = (App: Cizn.Application) => () => {
   const { Cli } = App.Adapter
   const {

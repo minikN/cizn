@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-import G from '@cizn/global'
 import {
   access, constants, lstat, realpath,
 } from 'node:fs/promises'

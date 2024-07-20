@@ -1,5 +1,4 @@
 import appComposition from '@cizn/index'
-import G from '@cizn/global'
 
 const app = await appComposition(<Cizn.Application>{})
 

@@ -1,7 +1,6 @@
 import { pipe } from "@lib/util/index.js"
 import { defineImmutableProp } from "@lib/composition/property.js"
 import { APP_NAME, APP_VERSION } from "@cizn/index.js"
-import G from '@cizn/global'
 import { program } from "@commander-js/extra-typings"
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import cliApi from "@cizn/adapter/cli/api/index.js"

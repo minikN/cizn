@@ -1,4 +1,3 @@
-import G from '@cizn/global'
 import crypto from 'crypto'
 import { readdir } from 'node:fs/promises'
 import { GetProps, GetType } from '.'

@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-import G from '@cizn/global'
 import {
   stat, writeFile, unlink,
 } from 'node:fs/promises'

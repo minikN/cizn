@@ -1,5 +1,4 @@
 import { pipe } from "@lib/util/index.js"
-import G from '@cizn/global'
 import { defineImmutableProp, defineProp } from "@lib/composition/property.js"
 import cliAdapter from "@cizn/adapter/cli/index.js"
 import logAdapter from "@cizn/adapter/log/index.js"
