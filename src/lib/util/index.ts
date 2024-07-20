@@ -4,6 +4,14 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'path'
 import G from '@cizn/global'
 
+export const def = (x: any) => typeof x !== 'undefined'
+export const isFn = (x: any) => typeof x === 'function'
+export const isNum = (x: any) => typeof x === 'number'
+export const isBool = (x: any) => typeof x === 'boolean'
+export const isStr = (x: any) => def(x) && x.constructor === String
+export const isObj = (x: any) => def(x) && x.constructor === Object
+export const isArr = (x: any) => def(x) && x.constructor === Array
+
 /**
  * Functional composition from left to right
  *

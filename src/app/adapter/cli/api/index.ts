@@ -3,6 +3,7 @@ import build from "@cizn/adapter/cli/api/build.js"
 
 export type BuildProps = {
   source: string
+  environment: Cizn.Application.State.Environment
 }
 
 export type Api = {

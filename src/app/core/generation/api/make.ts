@@ -6,6 +6,7 @@ const make = (App: Cizn.Application) => async ({
   const {
     Derivation,
     Generation,
+    Environment: environment,
   } = App.State
 
   const { Log, File } = App.Adapter
@@ -17,7 +18,7 @@ const make = (App: Cizn.Application) => async ({
 
     if (path) {
       // Reuse generation
-      Log.Api.info({ message: 'Reusing generation %d ...', options: [generationNumber] })
+      Log.Api.info({ message: 'Reusing %d generation %d ...', options: [<string>environment, generationNumber] })
       Generation.Current = `${Generation.Root}/${path}`
       Generation.Api.set()
       return
@@ -25,7 +26,7 @@ const make = (App: Cizn.Application) => async ({
 
     Log.Api.info({ message: 'Moving from generation %d to %d ...', options: [generationNumber - 1, generationNumber] })
 
-    const newGeneration = `${generationNumber}-${hash}`
+    const newGeneration = `${generationNumber}${environment ? `-${environment}` : ''}-${hash}`
     const newGenerationPath = `${Generation.Root}/${newGeneration}`
 
     // Creating folder for new generation
@@ -36,10 +37,6 @@ const make = (App: Cizn.Application) => async ({
     /**
      * Creating the utility functions for the derivation to execute
      */
-    // const configUtils = Object.keys(internalUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
-    //   acc[key] = internalUtils[key](`${newGenerationPath}/files`)
-    //   return acc
-    // }, {})
     const configUtils = Object.entries(File.Internal).reduce((acc, [key, fn]) => {
       acc[key] = fn?.(`${newGenerationPath}/files`)
       return acc

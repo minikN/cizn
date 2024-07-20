@@ -10,6 +10,7 @@ declare namespace Cizn {
     namespace State {
       export type Derivation = import('@cizn/core/state').Derivation
       export type Generation = import('@cizn/core/state').Generation
+      export type Environment = import('@cizn/core/state').Environment
 
       namespace Derivation {
         export type Api = import('@cizn/core/derivation/api').Api

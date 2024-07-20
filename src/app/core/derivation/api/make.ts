@@ -8,7 +8,9 @@ import {
 const make = (App: Cizn.Application) => async (
   module: Cizn.Application.State.Derivation.Module,
 ): Promise<Cizn.Application.State.Derivation | undefined> => {
-  const { Derivation, Config: stateConfig } = App.State
+  const {
+    Derivation, Config: stateConfig, Environment: environment,
+  } = App.State
   const { Config: derivationConfig, Packages: derivationPackages } = Derivation.State
   const { Log, File } = App.Adapter
 
@@ -45,24 +47,16 @@ const make = (App: Cizn.Application) => async (
      * function and if the user calls e.g. {@link withFile}, it will have the
      * first param (temp file) applied already.
     */
-    // const moduleUtils = Object.keys(publicUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
-    //   acc[key] = publicUtils[key]?.(derivationTempFile)
-    //   return acc
-    // }, {})
-
     const publicFileApi = Object.entries(File.Public).reduce((acc, [key, fn]) => {
       acc[key] = fn?.(derivationTempFile)
       return acc
     }, <{[key: string]: Function}>{})
+
     /**
      * The same for the internal utilities that cizn will use when creating
      * the generation later on.
      */
-    // const configUtils = Object.keys(internalUtils).reduce<{[key: string]: Function}>((acc: {[key: string]: Function}, key: string) => {
-    //   acc[key] = internalUtils[key](derivationTempFile)
-    //   return acc
-    // }, {})
-    const configUtils = Object.entries(File.Internal).reduce((acc, [key, fn]) => {
+    const internalFileApi = Object.entries(File.Internal).reduce((acc, [key, fn]) => {
       acc[key] = fn?.(derivationTempFile)
       return acc
     }, <{[key: string]: Function}>{})
@@ -134,12 +128,12 @@ const make = (App: Cizn.Application) => async (
       const subDerivation = await Derivation.Api.make(subModules[i])
 
       /**
-       * Using the {@link configUtils.include} method to include the sub derivation
+       * Using the {@link internalFileApi.include} method to include the sub derivation
        * into the main derivation. This will add an {@link import} statement to the
        * file that can later be used to execute all sub modules when creating the
        * generation.
        */
-      configUtils?.include(subDerivation.name, `${Derivation.Root}/${subDerivation.path}`)
+      internalFileApi?.include(subDerivation.name, `${Derivation.Root}/${subDerivation.path}`)
 
       subDerivations.push(subDerivation)
     }
@@ -178,7 +172,7 @@ const make = (App: Cizn.Application) => async (
      * for this subtree. We just need to copy the file over with the correctn name
      * and we're done.
      */
-    const derivationFileName = `${fnName}-${accumulatedHash}.${G.EXT}`
+    const derivationFileName = `${fnName}${environment ? `-${environment}` : ''}-${accumulatedHash}.${G.EXT}`
     const derivationFilePath = `${Derivation.Root}/${derivationFileName}`
     await copyFile(derivationTempFile, derivationFilePath)
 

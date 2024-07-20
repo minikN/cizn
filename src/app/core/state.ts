@@ -3,6 +3,8 @@ import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import { pipe } from "@lib/util/index.js"
 import { $ } from 'execa'
 
+export type Environment = 'home' | 'system' | undefined
+
 export type Derivation = {
   name: string,
   path: string,
@@ -16,6 +18,7 @@ export type Generation = {
 }
 
 export type State = {
+  Environment: Cizn.Application.State.Environment
   Config: {
     Current: string,
     Root: string,
@@ -56,6 +59,7 @@ const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.Stat
       State: {
         Config: {},
         Packages: [],
+        Environment: undefined,
       // [G.OPTIONS]: {}, // TODO: Not needed?
       // [G.MODULES]: {}, // TODO: Not needed?
       },

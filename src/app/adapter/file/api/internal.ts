@@ -10,7 +10,6 @@ export type Props = {
   }
 
 export type Api = {
-    // write: (source: Props['source'], target: Props['target'], content: Props['content']) => void
     write: CurriedFunction<[], (source: Props['source'], target: Props['target'], content: Props['content']) => void>
     include: CurriedFunction<[], (source: Props['source'], target: Props['name'], content: Props['target']) => void>
   }

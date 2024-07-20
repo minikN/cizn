@@ -1,9 +1,10 @@
 import crypto from 'crypto'
 import { readdir } from 'node:fs/promises'
 import { GetProps, GetType } from '.'
+import { isStr } from '@lib/util'
 
 const get = (App: Cizn.Application) => async ({ hashParts, name }: GetProps): GetType => {
-  const { Derivation } = App.State
+  const { Derivation, Environment: environment } = App.State
 
   const {
     module = () => {}, args = {}, config = {},
@@ -17,7 +18,11 @@ const get = (App: Cizn.Application) => async ({ hashParts, name }: GetProps): Ge
 
   const derivations = await readdir(Derivation.Root)
 
-  const existingDerivation = derivations.find(file => file.includes(hash))
+  const existingDerivation = derivations.find(
+    file => isStr(environment)
+      ? file.includes(`${environment}-${hash}`)
+      : file.includes(hash),
+  )
 
   return existingDerivation
     ? { path: existingDerivation }

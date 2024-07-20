@@ -2,8 +2,11 @@
 import {
   access, constants, lstat, realpath,
 } from 'node:fs/promises'
-import { getFileName } from '@lib/util/index.js'
+import {
+  def, getFileName, isStr,
+} from '@lib/util/index.js'
 import { BuildProps } from '.'
+import { Environment } from '@cizn/core/state'
 
 /**
  * Building the configuration
@@ -17,7 +20,17 @@ const build = (App: Cizn.Application) => async (options: BuildProps) => {
     Derivation: { Api: derivationAdapter },
     Generation: { Api: generationAdapter },
   } = App.State
-  const { source } = options
+  const { source, environment } = options
+
+  if (isStr(environment) && environment !== 'home' && environment !== 'system') {
+    const falseEnvironment = <unknown>environment
+    log.error({
+      message: 'Environment given is not recognized. Can only be "home" or "system". Given value: %d',
+      options: [<string>falseEnvironment],
+    })
+  }
+
+  App.State.Environment = environment
 
   let configPath: string = ''
 
@@ -41,15 +54,40 @@ const build = (App: Cizn.Application) => async (options: BuildProps) => {
     log.error({ message: `%d does not have a default export`, options: configPath ? [configPath] : [] })
   }
 
-  // Creating (or reusing) a derivation from the current config
-  const { name, path } = await derivationAdapter.make(module)
+  if (!def(environment)) {
+    // Building both system and home environments
+    for (const currentEnvironment of ['system', 'home']) {
+      // Cleaning state between environments
+      App.State.Derivation.State.Config = {}
+      App.State.Derivation.State.Packages = []
 
-  const derivationHash = getFileName(path).split('-').pop()
+      // Setting current environment
+      App.State.Environment = <Environment>currentEnvironment
 
-  // Creating (or reusing) a generation from the current derivation
-  await generationAdapter.make({
-    path, hash: derivationHash, name,
-  })
+      log.info({ message: 'Building %d derivation ...', options: [<string>currentEnvironment] })
+
+      // Creating (or reusing) a derivation from the current config
+      const { name, path } = await derivationAdapter.make(module)
+      const derivationHash = getFileName(path).split('-').pop()
+
+      // Creating (or reusing) a generation from the current derivation
+      await generationAdapter.make({
+        path, hash: derivationHash, name,
+      })
+    }
+  } else {
+    log.info({ message: 'Building %d derivation ...', options: [<string>environment] })
+
+    // Just building the environment given by the user
+    // Creating (or reusing) a derivation from the current config
+    const { name, path } = await derivationAdapter.make(module)
+    const derivationHash = getFileName(path).split('-').pop()
+
+    // Creating (or reusing) a generation from the current derivation
+    await generationAdapter.make({
+      path, hash: derivationHash, name,
+    })
+  }
 }
 
 export default build
