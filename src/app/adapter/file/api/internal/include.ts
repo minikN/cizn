@@ -4,9 +4,9 @@ import { appendFileSync } from "node:fs"
 import { Props } from "../internal"
 
 const include = (App: Cizn.Application) => curry((
-    source: Props['source'],
-    name: Props['name'],
-    target: Props['target'],
+  source: Props['source'],
+  name: Props['name'],
+  target: Props['target'],
 ) => {
   const fnName = sanitize(toCamelCase(name))
 

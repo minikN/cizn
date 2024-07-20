@@ -1,8 +1,6 @@
 /* global process */
-import { setNamespace, defineNamespace } from "@lib/composition/namespace.js"
-import { defineProp } from "@lib/composition/property.js"
+import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import { pipe } from "@lib/util/index.js"
-import G from '@cizn/global'
 import { $ } from 'execa'
 
 export type Derivation = {
@@ -58,8 +56,8 @@ const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.Stat
       State: {
         Config: {},
         Packages: [],
-        // [G.OPTIONS]: {}, // TODO: Not needed?
-        // [G.MODULES]: {}, // TODO: Not needed?
+      // [G.OPTIONS]: {}, // TODO: Not needed?
+      // [G.MODULES]: {}, // TODO: Not needed?
       },
       Root: derivationsRoot,
       Api: null,

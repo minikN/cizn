@@ -30,26 +30,26 @@ export type Adapter = {
 */
 const app = async (obj: Cizn.Application): Promise<Cizn.Application> => {
   const stateComposition = await state(<Cizn.Application.State>{})
-  
+
   /** @type Cizn.Application */
   const appComposition = pipe<Cizn.Application>(
     defineImmutableProp('_name', APP_NAME),
     defineProp('Api', {}),
     defineImmutableProp('State', stateComposition),
   )(obj)
-  
-  
+
+
   appComposition.Adapter = {
     Cli: cliAdapter(appComposition),
     Log: logAdapter(appComposition),
-    File: fileAdapter(appComposition)
+    File: fileAdapter(appComposition),
   }
-  
+
   appComposition.State.Derivation.Api = derivationApi(appComposition)
   appComposition.State.Generation.Api = generationApi(appComposition)
-  
+
   appComposition.Adapter.Cli.Api.init(appComposition)
-  
+
   return appComposition
 }
 

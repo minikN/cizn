@@ -2,7 +2,9 @@ import G from '@cizn/global'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { internalUtils } from '@cizn/utils/index.js'
 
-const make = (App: Cizn.Application) => async ({ path: derivationPath, hash: derivationHash, name }: Cizn.Application.State.Derivation) => {
+const make = (App: Cizn.Application) => async ({
+  path: derivationPath, hash: derivationHash, name,
+}: Cizn.Application.State.Derivation) => {
   const {
     Derivation,
     Generation,
@@ -11,7 +13,9 @@ const make = (App: Cizn.Application) => async ({ path: derivationPath, hash: der
   const { Log, File } = App.Adapter
 
   try {
-    const { number: generationNumber, path, hash } = await Generation.Api.get({ hash: derivationHash || '' })
+    const {
+      number: generationNumber, path, hash,
+    } = await Generation.Api.get({ hash: derivationHash || '' })
 
     if (path) {
       // Reuse generation
@@ -43,9 +47,7 @@ const make = (App: Cizn.Application) => async ({ path: derivationPath, hash: der
       return acc
     }, <{[key: string]: Function}>{})
 
-    const internalUtils = {
-      file: configUtils
-    }
+    const internalUtils = { file: configUtils }
 
     const { default: fn }: {default: Function } = await import(`${Derivation.Root}/${derivationPath}`)
     await fn?.(internalUtils)

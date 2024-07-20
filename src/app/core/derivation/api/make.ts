@@ -2,10 +2,12 @@ import { internalUtils, publicUtils } from '@cizn/utils/index.js'
 import G from '@cizn/global'
 import { getFileName, mkTempFile } from '@lib/util/index.js'
 import { locate } from 'func-loc'
-import { copyFile, writeFile, appendFile } from 'node:fs/promises'
+import {
+  copyFile, writeFile, appendFile,
+} from 'node:fs/promises'
 
 const make = (App: Cizn.Application) => async (
-  module: Cizn.Application.State.Derivation.Module
+  module: Cizn.Application.State.Derivation.Module,
 ): Promise<Cizn.Application.State.Derivation | undefined> => {
   const { Derivation, Config: stateConfig } = App.State
   const { Config: derivationConfig, Packages: derivationPackages } = Derivation.State
@@ -24,7 +26,7 @@ const make = (App: Cizn.Application) => async (
     const fnName = getFileName(`${fnPath.path}`)
 
     if (!fnPath) {
-      Log.Api.error({message: 'Could not locate module'})
+      Log.Api.error({ message: 'Could not locate module' })
     }
 
     /**
@@ -74,9 +76,7 @@ const make = (App: Cizn.Application) => async (
      * being written into the {@link derivationTempFile}.
     */
 
-    const publicUtils = {
-      file: publicFileApi
-    }
+    const publicUtils = { file: publicFileApi }
     const {
       modules: subModules = [],
       config: moduleConfig = {},
@@ -110,7 +110,11 @@ const make = (App: Cizn.Application) => async (
    * which we can reuse, OR, if no such derivation can be found, a
    * {@link hash} that should be used for the derivation we want to create.
    */
-    const { path, hash } = await Derivation.Api.get({ hashParts: { module, args, config: globalConfig }, name: fnName })
+    const { path, hash } = await Derivation.Api.get({
+      hashParts: {
+        module, args, config: globalConfig,
+      }, name: fnName,
+    })
 
     // This is a leaf module that we've already built
     if (path && subModules.length === 0) {

@@ -2,7 +2,7 @@ import G from '@cizn/global'
 import { readdir } from 'node:fs/promises'
 
 const get = (App: Cizn.Application) => async (
-  { hash: derivationHash }: {hash: Cizn.Application.State.Derivation['hash']}
+  { hash: derivationHash }: {hash: Cizn.Application.State.Derivation['hash']},
 ): Promise<Cizn.Application.State.Generation> => {
   const { Generation } = App.State
 

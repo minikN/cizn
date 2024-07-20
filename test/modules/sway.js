@@ -31,16 +31,12 @@ world1 2
 
   utils.file.writeJson('.config/test.json', {
     foo: 'bar',
-    hello: {
-      great: 'world',
-    },
+    hello: { great: 'world' },
   })
 
   utils.file.writeXml('.config/test.xml', {
     foo: 'bar',
-    hello: {
-      great: 'world',
-    },
+    hello: { great: 'world' },
   })
   const modules = [
     swaySubModule({ wayland: true }),
@@ -48,9 +44,7 @@ world1 2
 
   return {
     modules,
-    config: {
-      err: 'hello1',
-    },
+    config: { err: 'hello1' },
     packages: [
       'sway',
     ],

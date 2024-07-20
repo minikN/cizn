@@ -1,8 +1,10 @@
 /* eslint-disable no-unused-vars */
 import G from '@cizn/global'
-import { access, constants, lstat, realpath } from 'node:fs/promises'
+import {
+  access, constants, lstat, realpath,
+} from 'node:fs/promises'
 import { getFileName } from '@lib/util/index.js'
-import {BuildProps} from '.'
+import { BuildProps } from '.'
 
 /**
  * Building the configuration
@@ -46,7 +48,9 @@ const build = (App: Cizn.Application) => async (options: BuildProps) => {
   const derivationHash = getFileName(path).split('-').pop()
 
   // Creating (or reusing) a generation from the current derivation
-  await generationAdapter.make({ path, hash: derivationHash, name })
+  await generationAdapter.make({
+    path, hash: derivationHash, name,
+  })
 }
 
 export default build

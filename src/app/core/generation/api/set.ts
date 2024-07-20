@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 import G from '@cizn/global'
-import { stat, writeFile, unlink } from 'node:fs/promises'
+import {
+  stat, writeFile, unlink,
+} from 'node:fs/promises'
 import path from 'path'
 
 const set = (App: Cizn.Application) => async (): Promise<void> => {

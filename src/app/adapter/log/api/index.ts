@@ -13,13 +13,13 @@ export type Props = {
 
 export type Api = {
   init: () => void
-  error: ({message, options}: Props) => void
+  error: ({ message, options }: Props) => void
   indent: () => void
   unindent: () => void
-  info: ({message, options}: Props) => void
-  print: ({message, options}: Props) => void
-  success: ({message, options}: Props) => void
-  warn: ({message, options}: Props) => void
+  info: ({ message, options }: Props) => void
+  print: ({ message, options }: Props) => void
+  success: ({ message, options }: Props) => void
+  warn: ({ message, options }: Props) => void
 }
 
 const cliApi = (App: Cizn.Application): Cizn.Adapter.Log.Api => Object.create({}, {

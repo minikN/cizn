@@ -26,14 +26,14 @@ export const pipeAsync = <T>(...functions: Array<(a: T) => T>) => (param: Return
   param,
 )
 
-type PartialTuple<TUPLE extends any[],EXTRACTED extends any[] = []> =
+type PartialTuple<TUPLE extends any[], EXTRACTED extends any[] = []> =
   // If the tuple provided has at least one required value
   TUPLE extends [infer NEXT_PARAM, ...infer REMAINING]
-    // recurse back in to this type with one less item 
+    // recurse back in to this type with one less item
     // in the original tuple, and the latest extracted value
     // added to the extracted list as optional
     ? PartialTuple<REMAINING, [...EXTRACTED, NEXT_PARAM?]>
-    // else if there are no more values, 
+    // else if there are no more values,
     // return an empty tuple so that too is a valid option
     : [...EXTRACTED, ...TUPLE]
 
@@ -67,7 +67,7 @@ export type CurriedFunction<PROVIDED extends any[], FN extends (...args: any[]) 
 
 /**
  * Typed currying function.
- * 
+ *
  * @param targetFn the function to eventually execute
  * @param existingArgs already curried arguments
  * @returns {CurriedFunctionOrReturnValue}
@@ -78,7 +78,7 @@ export function curry<
 >(targetFn: FN, ...existingArgs: STARTING_ARGS):
   CurriedFunction<STARTING_ARGS, FN>
 {
-  return function(...args) {
+  return function (...args) {
     const totalArgs = [...existingArgs, ...args]
     if(totalArgs.length >= targetFn.length) {
       return targetFn(...totalArgs)
@@ -106,7 +106,9 @@ type TempFileProps = {
  * @param {string} [props.ext='js'] the extension to use
  * @returns {string}
  */
-export const mkTempFile = async ({ name, hash = null, ext = G.EXT }: TempFileProps) => {
+export const mkTempFile = async ({
+  name, hash = null, ext = G.EXT,
+}: TempFileProps) => {
   const tempDir = path.join(tmpdir(), 'cizn')
   await mkdir(tempDir, { recursive: true })
 

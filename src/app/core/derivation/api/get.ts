@@ -6,7 +6,9 @@ import { GetProps, GetType } from '.'
 const get = (App: Cizn.Application) => async ({ hashParts, name }: GetProps): GetType => {
   const { Derivation } = App.State
 
-  const { module = () => {}, args = {}, config = {} } = hashParts
+  const {
+    module = () => {}, args = {}, config = {},
+  } = hashParts
   const hashString = `${JSON.stringify(args)}${JSON.stringify(config)}${module.toString()}`
 
   const hash = crypto

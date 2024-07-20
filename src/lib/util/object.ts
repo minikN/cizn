@@ -6,9 +6,10 @@
  */
 export const empty = (object: Object) => {
   for (const property in object) {
-    if (object.hasOwnProperty(property)) {
+    if (Object.prototype.hasOwnProperty.call(object, property)) {
       return false
     }
   }
+
   return true
 }
