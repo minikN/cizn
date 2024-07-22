@@ -45,8 +45,11 @@ world1 2
   return {
     modules,
     config: { err: 'hello1' },
-    packages: [
+    homePackages: [
       'sway',
+    ],
+    systemPackages: [
+      'chromium',
     ],
     args,
   }

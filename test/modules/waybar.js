@@ -42,12 +42,13 @@ world
   return {
     config: {
       test: 2,
-      waybar: {
-        foo: 'bar2',
-      },
+      waybar: { foo: 'bar2' },
     },
-    packages: [
+    homePackages: [
       'waybar',
+    ],
+    systemPackages: [
+      'unzip',
     ],
     args,
   }

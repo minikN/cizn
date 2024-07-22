@@ -7,10 +7,8 @@ world2
 `)
 
   return {
-    config: {
-      test: 2,
-    },
-    packages: [
+    config: { test: 2 },
+    homePackages: [
       'sway-subpackage',
     ],
     args,

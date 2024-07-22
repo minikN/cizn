@@ -11,7 +11,7 @@ world
 
   return {
     config: { test: 56 },
-    packages: [
+    homePackages: [
       'zsh',
     ],
     args,
