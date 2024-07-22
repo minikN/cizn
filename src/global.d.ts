@@ -21,7 +21,8 @@ declare namespace Cizn {
         ) => ModuleOptions
         type ModuleOptions = {
           modules: Module[],
-          packages: string[],
+          homePackages: string[],
+          systemPackages: string[],
           config: object,
           args: object
         }

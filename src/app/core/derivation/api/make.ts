@@ -11,7 +11,13 @@ const make = (App: Cizn.Application) => async (
   const {
     Derivation, Config: stateConfig, Environment: environment,
   } = App.State
-  const { Config: derivationConfig, Packages: derivationPackages } = Derivation.State
+  const {
+    Config: derivationConfig,
+    Packages: {
+      Home: derivationHomePackages,
+      System: derivationSystemPackages,
+    },
+  } = Derivation.State
   const { Log, File } = App.Adapter
 
   Log.Api.indent()
@@ -73,7 +79,8 @@ const make = (App: Cizn.Application) => async (
     const {
       modules: subModules = [],
       config: moduleConfig = {},
-      packages: modulePackages = [],
+      homePackages: moduleHomePackages = [],
+      systemPackages: moduleSystemPackages = [],
       args = {},
     } = module(derivationConfig || {}, <Cizn.Utils.Public>publicUtils)
 
@@ -94,7 +101,9 @@ const make = (App: Cizn.Application) => async (
       ...configName !== fnName && { [fnName]: true },
       ...moduleConfig,
     }
-    Derivation.State.Packages = [ ...derivationPackages || [], ...modulePackages ]
+
+    Derivation.State.Packages.Home = [ ...derivationHomePackages || [], ...moduleHomePackages ]
+    Derivation.State.Packages.System = [ ...derivationSystemPackages || [], ...moduleSystemPackages ]
 
     const globalConfig = Derivation.State.Config
 

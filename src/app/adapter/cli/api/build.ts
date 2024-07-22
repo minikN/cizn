@@ -59,7 +59,8 @@ const build = (App: Cizn.Application) => async (options: BuildProps) => {
     for (const currentEnvironment of ['system', 'home']) {
       // Cleaning state between environments
       App.State.Derivation.State.Config = {}
-      App.State.Derivation.State.Packages = []
+      App.State.Derivation.State.Packages.Home = []
+      App.State.Derivation.State.Packages.System = []
 
       // Setting current environment
       App.State.Environment = <Environment>currentEnvironment

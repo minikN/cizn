@@ -26,7 +26,10 @@ export type State = {
   Derivation: {
     State: {
       Config: object,
-      Packages: string[]
+      Packages: {
+        Home: string[],
+        System: string[]
+      }
     }
     Root: string,
     Api: Cizn.Application.State.Derivation.Api
@@ -58,7 +61,10 @@ const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.Stat
     setNamespace('Derivation', {
       State: {
         Config: {},
-        Packages: [],
+        Packages: {
+          Home: [],
+          System: [],
+        },
         Environment: undefined,
       // [G.OPTIONS]: {}, // TODO: Not needed?
       // [G.MODULES]: {}, // TODO: Not needed?
