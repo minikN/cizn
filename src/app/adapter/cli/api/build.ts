@@ -14,13 +14,13 @@ import { Environment } from '@cizn/core/state'
  * @param {Cizn.Application} App the main application
  * @returns {Cizn.Adapter.Cli.Api['build']}
  */
-const build = (App: Cizn.Application) => async (options: BuildProps) => {
+const build = (App: Cizn.Application) => async (environment: Environment, options: BuildProps) => {
   const log = App.Adapter.Log.Api
   const {
     Derivation: { Api: derivationAdapter },
     Generation: { Api: generationAdapter },
   } = App.State
-  const { source, environment } = options
+  const { source } = options
 
   if (isStr(environment) && environment !== 'home' && environment !== 'system') {
     const falseEnvironment = <unknown>environment

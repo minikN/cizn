@@ -9,7 +9,7 @@ const init = (App: Cizn.Application) => () => {
 
   Program.command('build')
     .description('Build a given configuration')
-    .option('-e, --environment <env>', 'Environment to build, can be "home" or "system". If omitted, both will be built.', undefined)
+    .argument('[environment]', 'Environment to build. Can be "home" or "system". If ommitted, both will be built.')
     .option('-s, --source <string>', 'path to the source file', './config.js')
     .action(Api.build)
 }
