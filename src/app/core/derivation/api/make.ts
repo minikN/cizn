@@ -1,15 +1,18 @@
 import G from '@cizn/global'
-import { getFileName, mkTempFile } from '@lib/util/index.js'
+import {
+  curry, getFileName, mkTempFile,
+} from '@lib/util/index.js'
 import { locate } from 'func-loc'
 import {
-  copyFile, writeFile, appendFile,
+  appendFile,
+  copyFile, writeFile,
 } from 'node:fs/promises'
 
 const make = (App: Cizn.Application) => async (
   module: Cizn.Application.State.Derivation.Module,
 ): Promise<Cizn.Application.State.Derivation | undefined> => {
   const {
-    Derivation, Config: stateConfig, Environment: environment,
+    Derivation, Source: stateSource, Environment: environment,
   } = App.State
   const {
     Config: derivationConfig,
@@ -84,7 +87,7 @@ const make = (App: Cizn.Application) => async (
       args = {},
     } = module(derivationConfig || {}, <Cizn.Utils.Public>publicUtils)
 
-    const configName = getFileName(`${stateConfig.Current}`)
+    const configName = getFileName(`${stateSource.Current}`)
 
     // In case a already present value in config gets overwritten by the
     // current module, we need to inform the user about it
