@@ -7,6 +7,7 @@ import {
 } from '@lib/util/index.js'
 import { BuildProps } from '.'
 import { Environment } from '@cizn/core/state'
+import path from 'path'
 
 /**
  * Building the configuration
@@ -22,6 +23,11 @@ const build = (App: Cizn.Application) => async (environment: Environment, option
   } = App.State
   const { source } = options
 
+  if (source) {
+    App.State.Source.Current = source
+    App.State.Source.Root = path.dirname(source)
+  }
+
   if (isStr(environment) && environment !== 'home' && environment !== 'system') {
     const falseEnvironment = <unknown>environment
     log.error({
@@ -32,26 +38,26 @@ const build = (App: Cizn.Application) => async (environment: Environment, option
 
   App.State.Environment = environment
 
-  let configPath: string = ''
+  let sourcePath: string = ''
 
   try {
     // Reading the source file
-    configPath = await realpath(`${source}`)
-    log.info({ message: `Reading config file %d ...`, options: [configPath] })
-    await access(configPath, constants.F_OK)
+    sourcePath = await realpath(`${App.State.Source.Current}`)
+    log.info({ message: `Reading source file %d ...`, options: [sourcePath] })
+    await access(sourcePath, constants.F_OK)
 
-    if (!(await lstat(configPath)).isFile()) {
+    if (!(await lstat(sourcePath)).isFile()) {
       throw new Error()
     }
   } catch(e) {
     log.error({ message: `%d does not exist or is not readable`, options: [source] })
   }
 
-  const { default: module }: { default: Cizn.Application.State.Derivation.Module } = await import(`${configPath}`)
+  const { default: module }: { default: Cizn.Application.State.Derivation.Module } = await import(`${sourcePath}`)
 
   if (!module) {
     // error no default export
-    log.error({ message: `%d does not have a default export`, options: configPath ? [configPath] : [] })
+    log.error({ message: `%d does not have a default export`, options: sourcePath ? [sourcePath] : [] })
   }
 
   if (!def(environment)) {
