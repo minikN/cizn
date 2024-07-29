@@ -1,22 +1,3 @@
-import { Command } from "@commander-js/extra-typings"
-
-// /**
-//  *
-//  * @param flags
-//  * @param name
-//  * @param args
-//  * @returns
-//  */
-// function getSingleOption (flags, name, args) {
-//   const findOne = new Command
-//   findOne
-//     .allowUnknownOption()
-//     .helpOption(false)
-//     .option(flags)
-//   findOne.parse(args)
-//   return findOne.opts()[name]
-// }
-
 const init = (App: Cizn.Application) => () => {
   const { Cli } = App.Adapter
   const {
@@ -29,14 +10,17 @@ const init = (App: Cizn.Application) => () => {
     .option('-c, --config [path]', 'Path to the configuration file', undefined)
     .parse(process.argv)
 
-  // TODO: Save config option in state, then read the config file
   const globalOpts = Global.opts()
 
+  globalOpts.config && (App.State.Config.Current = <string>globalOpts.config)
+
+  // Parses global options, that come before the command
   Program
     .version(_version)
     .description(_name)
     .option('-c, --config [path]', 'Path to the configuration file', undefined)
 
+  // Parses command and command-specific options/arguments
   Program
     .command('build')
     .description('Build a given configuration')
