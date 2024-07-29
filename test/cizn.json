@@ -1,0 +1,6 @@
+{
+    "package": {
+        "manager": "pacman",
+        "helper": "yay"
+    }
+}
