@@ -1,7 +1,7 @@
 /* global process */
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
+import { defineProp } from "@lib/composition/property.js"
 import { pipe } from "@lib/util/index.js"
-import { $ } from 'execa'
 
 export type Environment = 'home' | 'system' | undefined
 
@@ -17,12 +17,21 @@ export type Generation = {
   hash?: string,
 }
 
+export type Config = {
+  package?: {
+    manager?: string,
+    helper?: string,
+  }
+}
+
 export type State = {
+  Api: Cizn.Application.State.Api
   Environment: Cizn.Application.State.Environment
-  Config: {
+  Source: {
     Current: string,
     Root: string,
   }
+  Config: Cizn.Application.State.Config
   Derivation: {
     State: {
       Config: object,
@@ -42,20 +51,16 @@ export type State = {
 }
 
 const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.State> => {
-  const configRoot = await process.cwd()
-  const currentConfig = `${configRoot}/config.js`
-  const stateRoot = process.env?.XDG_STATE_HOME || `${process?.env.HOME}/.local/state`
-  const generationsRoot = `${stateRoot}/cizn/generations`
-  const derivationsRoot = `${stateRoot}/cizn/derivations`
-
-  await $`mkdir -p ${stateRoot}/cizn/generations`
-  await $`mkdir -p ${stateRoot}/cizn/derivations`
-
   const stateComposition = pipe<Cizn.Application.State>(
     defineNamespace('Config'),
     setNamespace('Config', {
-      Current: currentConfig,
-      Root: configRoot,
+      Current: null,
+      State: {},
+    }),
+    defineNamespace('Source'),
+    setNamespace('Source', {
+      Current: null,
+      Root: null,
     }),
     defineNamespace('Derivation'),
     setNamespace('Derivation', {
@@ -69,15 +74,16 @@ const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.Stat
       // [G.OPTIONS]: {}, // TODO: Not needed?
       // [G.MODULES]: {}, // TODO: Not needed?
       },
-      Root: derivationsRoot,
+      Root: null,
       Api: null,
     }),
     defineNamespace('Generation'),
     setNamespace('Generation', {
-      Root: generationsRoot,
+      Root: null,
       Current: null,
       Api: null,
     }),
+    defineProp('Api', {}),
   )(obj)
 
   return stateComposition

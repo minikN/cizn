@@ -5,6 +5,7 @@ import logAdapter from "@cizn/adapter/log/index.js"
 import state from "@cizn/core/state.js"
 import derivationApi from "@cizn/core/derivation/api/index.js"
 import generationApi from "@cizn/core/generation/api/index.js"
+import stateApi from "@cizn/core/state/api"
 import fileAdapter from "./adapter/file"
 
 export const APP_NAME = 'cizn'
@@ -44,10 +45,12 @@ const app = async (obj: Cizn.Application): Promise<Cizn.Application> => {
     File: fileAdapter(appComposition),
   }
 
+  appComposition.State.Api = stateApi(appComposition)
   appComposition.State.Derivation.Api = derivationApi(appComposition)
   appComposition.State.Generation.Api = generationApi(appComposition)
 
-  appComposition.Adapter.Cli.Api.init(appComposition)
+  await appComposition.Adapter.Cli.Api.init(appComposition)
+  await appComposition.State.Api.init()
 
   return appComposition
 }
