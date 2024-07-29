@@ -6,7 +6,7 @@ export type GetProps = {
   hashParts: {
     config?: Object,
     args?: Object,
-    module: Cizn.Application.State.Derivation.Module,
+    module: Cizn.Application.State.Derivation.Module | string,
   }
 }
 
