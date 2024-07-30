@@ -33,13 +33,11 @@ export type Adapter = {
 const app = async (obj: Cizn.Application): Promise<Cizn.Application> => {
   const stateComposition = await state(<Cizn.Application.State>{})
 
-  /** @type Cizn.Application */
   const appComposition = pipe<Cizn.Application>(
     defineImmutableProp('_name', APP_NAME),
-    defineProp('Api', {}),
+    defineProp('Adapter', {}),
     defineImmutableProp('State', stateComposition),
   )(obj)
-
 
   appComposition.Adapter = {
     Cli: cliAdapter(appComposition),
