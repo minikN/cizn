@@ -1,5 +1,5 @@
 import api from "@cizn/adapter/package/api"
-import { defineProp } from "@lib/composition/property"
+import { defineNamespace, setNamespace } from "@lib/composition/namespace"
 import { pipe } from "@lib/util"
 
 export type Package = {
@@ -14,12 +14,9 @@ export type Package = {
  */
 const packageAdapter = (app: Cizn.Application): Cizn.Adapter.Package => {
   const adapterComposition = pipe<Cizn.Adapter.Package>(
-    defineProp('Api', null),
+    defineNamespace('Api'),
+    setNamespace('Api', api(app).init()),
   )(<Cizn.Adapter.Package>{})
-
-  const packageApi = api(app)
-  const initializedPackageApi = packageApi.init()
-  adapterComposition.Api = initializedPackageApi
 
   return adapterComposition
 }
