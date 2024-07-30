@@ -1,4 +1,3 @@
-import { CurriedFunction } from '@lib/util'
 import init from '@cizn/adapter/package/api/init'
 
 export type Api = {
