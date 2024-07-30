@@ -1,4 +1,3 @@
-/* global process */
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import { defineProp } from "@lib/composition/property.js"
 import { pipe } from "@lib/util/index.js"
@@ -71,8 +70,6 @@ const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.Stat
           System: [],
         },
         Environment: undefined,
-      // [G.OPTIONS]: {}, // TODO: Not needed?
-      // [G.MODULES]: {}, // TODO: Not needed?
       },
       Root: null,
       Api: null,
