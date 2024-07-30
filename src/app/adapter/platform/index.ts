@@ -19,11 +19,7 @@ const platformAdapter = (app: Cizn.Application): Cizn.Adapter.Platform => {
   const adapterComposition = pipe<Cizn.Adapter.Platform>(
     defineNamespace('Api'),
     setNamespace('Api', api(app)),
-
-    defineProp('Package', null),
-    // defineNamespace('Package'),
-    // setNamespace('Package', packageAdapter(app)),
-
+    defineProp('Package', null), // Will get set by api's init method
     defineNamespace('Service'),
   )(<Cizn.Adapter.Platform>{})
 
