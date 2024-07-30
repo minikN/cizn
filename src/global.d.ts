@@ -46,12 +46,22 @@ declare namespace Cizn {
       export type Cli = import('@cizn/adapter/cli').Cli
       export type Log = import('@cizn/adapter/log').Log
       export type File = import('@cizn/adapter/file').File
+      export type Platform = import('@cizn/adapter/platform').Platform
+      export type Package = import('@cizn/adapter/package').Package
 
       namespace Cli {
         export type Api = import('@cizn/adapter/cli/api').Api
       }
       namespace Log {
         export type Api = import('@cizn/adapter/log/api').Api
+      }
+
+      namespace Package {
+        export type Api = import('@cizn/adapter/package/api').Api
+      }
+
+      namespace Platform {
+        export type Api = import('@cizn/adapter/platform/api').Api
       }
 
       namespace File {

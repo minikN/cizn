@@ -2,6 +2,7 @@ import { pipe } from "@lib/util/index.js"
 import { defineImmutableProp, defineProp } from "@lib/composition/property.js"
 import cliAdapter from "@cizn/adapter/cli/index.js"
 import logAdapter from "@cizn/adapter/log/index.js"
+import platformAdapter from "@cizn/adapter/platform"
 import state from "@cizn/core/state.js"
 import derivationApi from "@cizn/core/derivation/api/index.js"
 import generationApi from "@cizn/core/generation/api/index.js"
@@ -20,6 +21,7 @@ export type Adapter = {
   Cli: Cizn.Adapter.Cli
   Log: Cizn.Adapter.Log
   File: Cizn.Adapter.File
+  Platform: Cizn.Adapter.Platform
 }
 
 /**
@@ -43,6 +45,7 @@ const app = async (obj: Cizn.Application): Promise<Cizn.Application> => {
     Cli: cliAdapter(appComposition),
     Log: logAdapter(appComposition),
     File: fileAdapter(appComposition),
+    Platform: platformAdapter(appComposition),
   }
 
   appComposition.State.Api = stateApi(appComposition)
@@ -51,6 +54,7 @@ const app = async (obj: Cizn.Application): Promise<Cizn.Application> => {
 
   await appComposition.Adapter.Cli.Api.init(appComposition)
   await appComposition.State.Api.init()
+  await appComposition.Adapter.Platform.Api.init()
 
   return appComposition
 }
