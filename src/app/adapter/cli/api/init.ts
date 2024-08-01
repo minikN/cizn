@@ -1,4 +1,4 @@
-const init = (App: Cizn.Application) => () => {
+const init = (App: Cizn.Application) => async (): Promise<void> => {
   const { Cli } = App.Adapter
   const {
     _name, _version, Api, Program, Global,
