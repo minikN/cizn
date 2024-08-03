@@ -1,18 +1,21 @@
-import api from "@cizn/adapter/package/api"
 import { defineNamespace, setNamespace } from "@lib/composition/namespace"
-import { defineImmutableProp, defineProp } from "@lib/composition/property"
+import { defineProp } from "@lib/composition/property"
 import { pipe } from "@lib/util"
+import { Result, ResultPromise } from "execa"
 
 export type Package = {
   Api: Cizn.Adapter.Package.Api
   Manager: {
     Exec: string,
     Arguments: string[]
+    Root: boolean
   }
   Helper: {
-    Exec: string,
+    Exec: string | undefined,
     Arguments: string[]
+    Root: boolean,
   }
+  Run: (args: string[], options?: Object) => Promise<Result<{}>>
 }
 
 /**
@@ -27,11 +30,13 @@ const packageAdapter = async (app: Cizn.Application): Promise<Cizn.Adapter.Packa
     setNamespace('Manager', {
       Exec: null,
       Arguments: null,
+      Root: true,
     }),
     defineNamespace('Helper'),
     setNamespace('Helper', {
       Exec: null,
       Arguments: null,
+      Root: true,
     }),
     defineProp('Api', {}),
   )(<Cizn.Adapter.Package>{})

@@ -5,12 +5,25 @@ import {
 } from "@lib/util/error"
 import { $ } from 'execa'
 
+import pacmanApi from '@cizn/adapter/package/pacman/api'
+
+type ApiFunction = (App: Cizn.Application) => Cizn.Adapter.Package.Api
+
+type ApiType = {
+  [pacman: string]: ApiFunction
+}
+
+const apiMapping: ApiType = {
+  pacman: pacmanApi,
+  yay: pacmanApi,
+}
+
 const packageManagerMappings = {
   pacman: ['arch'],
   dpkg: ['ubuntu', 'debian'],
 }
 
-const packageApiMappings = { pacman: ['pacman', 'yay'] }
+// const packageApiMappings = { pacman: ['pacman', 'yay'] }
 
 /**
  * Determines the correct package manager to use based on
@@ -48,26 +61,20 @@ const init = (app: Cizn.Application) => async (): Promise<Cizn.Adapter.Package.A
 
   try {
     const { stdout: manager } = await $`which ${defaultManager || await _determinePackageManager()}`
-    const { stdout: helper = manager } = defaultHelper
+    const { stdout: helper = undefined } = defaultHelper
       ? await $`which ${defaultHelper}`
       : {}
 
     Package.Manager.Exec = manager
     Package.Helper.Exec = helper
 
-    const managerName = manager.split('/').pop()
-    const helperName = helper.split('/').pop()
+    const managerName = manager && manager.split('/').pop()
+    const helperName = helper && helper.split('/').pop()
 
     if (managerName || helperName) {
-      const targetApi = Object.entries(packageApiMappings).reduce((acc: string | null, [api, managers]) => {
-        if (managers.includes(<string>managerName) || managers.includes(<string>helperName)) {
-          return api
-        }
-        return acc
-      }, null)
-      const { default: foundApi }: {default: Function} = await import(`../${targetApi}/api`)
+      const targetApi = apiMapping[<string>helperName] || apiMapping[<string>managerName]
+      const loadedApi = <Cizn.Adapter.Package.Api>targetApi(app)
 
-      const loadedApi = <Cizn.Adapter.Package.Api>foundApi(app)
       loadedApi.init()
 
       return loadedApi
