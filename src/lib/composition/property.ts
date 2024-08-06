@@ -1,11 +1,12 @@
-import { curry } from "@lib/util/index.js"
-
 /**
- * Defines immutable {@param prop} in {@obj} with {@param value}.
+ * Returns a function that allows the definition of an immutable
+ * {@param prop} with {@param value} on {@code obj}.
  *
- * @type {(function(...[*]): (*))|*}
+ * @param prop the name of the prop to set
+ * @param value the value of the prop to set
+ * @returns Function
  */
-export const defineImmutableProp = curry((prop: string | symbol, value: any, obj: any) => {
+export const defineImmutableProp = <A, T>(prop: string, value: A): (obj: T) => T => (obj: T): T => {
   Object.defineProperty(obj, prop, {
     enumerable: true,
     configurable: false,
@@ -16,14 +17,16 @@ export const defineImmutableProp = curry((prop: string | symbol, value: any, obj
   })
 
   return obj
-})
+}
 
 /**
- * Defines mutable {@param prop} in {@param obj}.
+ * Returns a function that allows the definition of a mutable
+ * {@param prop}, with initial {@param value} on {@code obj}.
  *
- * @type {(function(...[*]): (*))|*}
+ * @param {string} prop the name of the prop to set
+ * @param {A} value     the value of the prop to set
  */
-export const defineProp = curry((prop: string | symbol, value: any, obj: any) => {
+export const defineProp = <A, T>(prop: string, value: A): (obj: T) => T => (obj: T): T => {
   let propValue = value
   Object.defineProperty(obj, prop, {
     enumerable: true,
@@ -34,4 +37,4 @@ export const defineProp = curry((prop: string | symbol, value: any, obj: any) =>
   })
 
   return obj
-})
+}

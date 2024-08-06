@@ -1,6 +1,4 @@
-import { curry } from "@lib/util/index.js"
-
-export const defineNamespace = curry((namespace: PropertyKey, obj: any) => {
+export const defineNamespace = (namespace: string) => <T>(obj: T) => {
   const ns = {}
 
   Object.defineProperty(obj, namespace, {
@@ -11,9 +9,9 @@ export const defineNamespace = curry((namespace: PropertyKey, obj: any) => {
   })
 
   return obj
-})
+}
 
-export const setNamespace = curry((symbol: PropertyKey, value: any, obj: any) => {
+export const setNamespace = (symbol: string, value: object) => <T extends {[key: string]: any}>(obj: T) => {
   Object.assign(obj[symbol], { ...value })
   return obj
-})
+}
