@@ -1,8 +1,16 @@
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import { defineProp } from "@lib/composition/property.js"
-import { pipe } from "@lib/util/index.js"
+import stateApi from "@cizn/core/state/api"
+import derivationApi from "@cizn/core/derivation/api/index.js"
+// import { pipe } from "@lib/util/index.js"
+import { pipe } from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import { tee } from "@lib/composition/function"
+import generationApi from "./generation/api"
 
-export type Environment = 'home' | 'system' | undefined
+export type Environment = O.Option<'home' | 'system'>
+
+type ApiTypes = O.Option<'Derivation' | 'Generation'>
 
 export type Derivation = {
   name: string,
@@ -49,42 +57,57 @@ export type State = {
   }
 }
 
-const state = async (obj: Cizn.Application.State): Promise<Cizn.Application.State> => {
-  const stateComposition = pipe<Cizn.Application.State>(
-    defineNamespace('Config'),
-    setNamespace('Config', {
-      Current: null,
-      State: {},
-    }),
-    defineNamespace('Source'),
-    setNamespace('Source', {
-      Current: null,
-      Root: null,
-    }),
-    defineNamespace('Derivation'),
-    setNamespace('Derivation', {
-      State: {
-        Config: {},
-        Packages: {
-          Home: [],
-          System: [],
-        },
-        Environment: undefined,
+const state = pipe(
+  <Cizn.Application.State>{},
+  defineNamespace('Config'),
+  setNamespace('Config', {
+    Current: null,
+    State: {},
+  }),
+  defineNamespace('Source'),
+  setNamespace('Source', {
+    Current: null,
+    Root: null,
+  }),
+  defineNamespace('Derivation'),
+  setNamespace('Derivation', {
+    State: {
+      Config: {},
+      Packages: {
+        Home: [],
+        System: [],
       },
-      Root: null,
-      Api: null,
-    }),
-    defineNamespace('Generation'),
-    setNamespace('Generation', {
-      Root: null,
-      Current: null,
-      Api: null,
-    }),
-    defineProp('Api', {}),
-  )(obj)
+      Environment: O.none,
+    },
+    Root: null,
+  }),
+  defineNamespace('Generation'),
+  setNamespace('Generation', {
+    Root: null,
+    Current: null,
+  }),
+)
 
-  return stateComposition
-}
+/**
+ * Helper function to build the {@param ns} api.
+ *
+ * @param {Function} fn builder function for the {@param ns} api
+ * @param {ApiTypes} ns the api to build
+ * @returns {Cizn.Application}
+ */
+const setApi = (fn: Function, ns: ApiTypes = O.none) => tee((app: Cizn.Application) => pipe(
+  ns,
+  O.matchW(
+    () => app.State,
+    api => app.State[api],
+  ),
+  defineNamespace('Api'),
+  setNamespace('Api', fn(app)),
+))
+
+export const setStateApi = setApi(stateApi)
+export const setDerivationApi = setApi(derivationApi, O.some('Derivation'))
+export const setGenerationApi = setApi(generationApi, O.some('Generation'))
 
 export default state
 
