@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "TS-Node",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "program": "${workspaceFolder}/src/app.ts",
+            "args": ["--config", "test/cizn.json", "build", "home", "--source", "test/config.js"],
+            "env": {
+                // "CIZN_PACKAGE_MANAGER": "bla"
+            },
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal", 
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"]
+          },
+    ]
+}
