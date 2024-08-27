@@ -4,7 +4,7 @@ export type Api = {
   init: () => Promise<void>
 }
 
-const derivationApi = (App: Cizn.Application) => Object.create({}, {
+const derivationApi = (App: Cizn.Application): Cizn.Application.State.Api => Object.create({}, {
   init: {
     value: init(App),
     enumerable: true,
