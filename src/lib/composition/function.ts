@@ -4,6 +4,16 @@ import {
 } from "@lib/composition/result"
 
 
+/**
+S * PATTERN MATCHING
+ * 
+ * Matches the result of the last function in the chain and returns the output immediately
+ * in case it is an error or passes it on to the next function and returns that output
+ * 
+ * @param {(a: A): Result<E2, B>} nextFunction Next function in the pipe
+ * @param {Result<E1, A>} input                 Output from the last function in the pipe
+ * @returns {Result<E2, B> | E1}
+ */
 const match = <E1, A, E2, B>(nextFunction: (a: A) => Result<E2, B>, input: Result<E1, A>) => {
   switch (input._tag) {
     case 'error':
@@ -119,8 +129,6 @@ const guard = <L, R, T extends Error>(
  * @param {(a: T) => void} deadEndFunction
  * @returns {T} previousValue
  */
-
-
 export const tap = <T>(deadEndFunction: (a: T) => void) => (previousValue: T) => {
   deadEndFunction(previousValue)
 
