@@ -1,8 +1,8 @@
-import { pipe } from "@lib/util/index.js"
-import { defineImmutableProp } from "@lib/composition/property.js"
-import { APP_NAME, APP_VERSION } from "@cizn/index.js"
+import G from '@cizn/constants'
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
-import cliApi from "@cizn/adapter/cli/api/index.js"
+import { defineImmutableProp } from "@lib/composition/property.js"
+import cliApi from "@lib/managers/cli/api/index.js"
+import { pipe } from "@lib/util/index.js"
 import { Command } from "commander"
 
 export type Cli = {
@@ -10,7 +10,7 @@ export type Cli = {
   readonly _version: string,
   Program: Command
   Global: Command
-  Api: Cizn.Adapter.Cli.Api
+  Api: Cizn.Manager.Cli.Api
 }
 
 /**
@@ -19,15 +19,15 @@ export type Cli = {
  * @param {Cizn.Application} app
  * @returns {Cizn.Adapter.Cli}
  */
-const cliAdapter = (app: Cizn.Application): Cizn.Adapter.Cli => {
-  const adapterComposition = pipe<Cizn.Adapter.Cli>(
-    defineImmutableProp('_name', APP_NAME),
-    defineImmutableProp('_version', APP_VERSION),
+const cliAdapter = (app: Cizn.Application): Cizn.Manager.Cli => {
+  const adapterComposition = pipe<Cizn.Manager.Cli>(
+    defineImmutableProp('_name', G.APP_NAME),
+    defineImmutableProp('_version', G.APP_VERSION),
     defineImmutableProp('Program', new Command),
     defineImmutableProp('Global', new Command),
     defineNamespace('Api'),
     setNamespace('Api', cliApi(app)),
-  )(<Cizn.Adapter.Cli>{})
+  )(<Cizn.Manager.Cli>{})
 
   return adapterComposition
 }

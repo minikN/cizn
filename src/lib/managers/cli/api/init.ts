@@ -1,5 +1,7 @@
-const init = (App: Cizn.Application) => async (): Promise<void> => {
-  const { Cli } = App.Adapter
+import { Result, Success } from "@lib/composition/result"
+
+const init = (app: Cizn.Application) => (): Result<never, Cizn.Application> => {
+  const { Cli } = app.Manager
   const {
     _name, _version, Api, Program, Global,
   } = Cli
@@ -12,7 +14,7 @@ const init = (App: Cizn.Application) => async (): Promise<void> => {
 
   const globalOpts = Global.opts()
 
-  globalOpts.config && (App.State.Config.Current = <string>globalOpts.config)
+  globalOpts.config && (app.State.Config.Current = <string>globalOpts.config)
 
   // Parses global options, that come before the command
   Program
@@ -27,6 +29,8 @@ const init = (App: Cizn.Application) => async (): Promise<void> => {
     .argument('[environment]', 'Environment to build. Can be "home" or "system". If ommitted, both will be built.')
     .option('-s, --source <string>', 'path to the source file', './config.js')
     .action(Api.build)
+
+  return Success(app)
 }
 
 export default init

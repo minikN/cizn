@@ -1,5 +1,6 @@
-import init from "@cizn/adapter/cli/api/init.js"
-import build from "@cizn/adapter/cli/api/build.js"
+import init from "@lib/managers/cli/api/init.js"
+import build from "@lib/managers/cli/api/build.js"
+import { Result } from "@lib/composition/result"
 
 export type BuildProps = {
   source: string
@@ -8,10 +9,10 @@ export type BuildProps = {
 
 export type Api = {
   build: (options: BuildProps) => Promise<void>
-  init: (app: Cizn.Application) => Promise<void>
+  init: () => Promise<Result<never, Cizn.Application>>
 }
 
-const cliApi = (App: Cizn.Application): Cizn.Adapter.Cli.Api => Object.create({}, {
+const cliApi = (App: Cizn.Application): Cizn.Manager.Cli.Api => Object.create({}, {
   build: {
     value: build(App),
     enumerable: true,

@@ -1,4 +1,4 @@
-export const defineNamespace = (namespace: string) => <T>(obj: T) => {
+export const defineNamespace = <T>(namespace: string) => (obj: T) => {
   const ns = {}
 
   Object.defineProperty(obj, namespace, {
@@ -8,10 +8,10 @@ export const defineNamespace = (namespace: string) => <T>(obj: T) => {
     enumerable: true,
   })
 
-  return obj
+  return obj as T
 }
 
 export const setNamespace = (symbol: string, value: object) => <T extends {[key: string]: any}>(obj: T) => {
   Object.assign(obj[symbol], { ...value })
-  return obj
+  return obj as T
 }

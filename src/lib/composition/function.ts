@@ -6,10 +6,10 @@ import {
 
 /**
 S * PATTERN MATCHING
- * 
+ *
  * Matches the result of the last function in the chain and returns the output immediately
  * in case it is an error or passes it on to the next function and returns that output
- * 
+ *
  * @param {(a: A): Result<E2, B>} nextFunction Next function in the pipe
  * @param {Result<E1, A>} input                 Output from the last function in the pipe
  * @returns {Result<E2, B> | E1}
@@ -109,14 +109,16 @@ export const bind = <E1, A, B>(singleFunction: (a: A) => B) => (previousValue: R
  * @param {Object} [errors] Mapping between error types and thrown errors
  * @returns
  */
-const guard = <L, R, T extends Error>(
-  switchFunction: (a: R) => Result<L, R> | Promise<Result<L, R>>,
-  errors?: {[key: string]: T},
+export const guard = <L, R, G, F extends (...args: any) => any>(
+  switchFunction: (a: R) => Result<L, G> | Promise<Result<L, G>>,
+  errors?: {[key: string]: F},
 ) => async (previousValue: R) => {
     try {
       return await switchFunction(previousValue)
     } catch (e: any) {
-      return Failure(errors?.[e.code] || e as L)
+      return Failure(errors?.[e.code || e.name]?.({
+        ...e, message: e.message, stack: e.stack,
+      }) as ReturnType<F> || e as L)
     }
   }
 

@@ -55,7 +55,8 @@ const _determinePackageManager = async (): Promise<string> => {
 
 const init = (app: Cizn.Application) => async (): Promise<Cizn.Adapter.Package.Api | void> => {
   // Figure out correct package API here based on system
-  const { Platform: { Package }, Log: { Api: log } } = app.Adapter
+  const { Platform: { Package } } = app.Adapter
+  const { Log: { Api: log } } = app.Manager
   const { Config: { State } } = app.State
   const { manager: defaultManager, helper: defaultHelper } = State.package || {}
 

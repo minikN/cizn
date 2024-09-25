@@ -9,7 +9,8 @@ const make = (App: Cizn.Application) => async ({
     Environment: environment,
   } = App.State
 
-  const { Log, File } = App.Adapter
+  const { File } = App.Adapter
+  const { Log } = App.Manager
 
   try {
     const {

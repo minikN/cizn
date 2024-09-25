@@ -1,7 +1,5 @@
-import G from '@cizn/global'
-import {
-  curry, getFileName, mkTempFile,
-} from '@lib/util/index.js'
+import G from '@cizn/constants'
+import { getFileName, mkTempFile } from '@lib/util/index.js'
 import { locate } from 'func-loc'
 import {
   appendFile,
@@ -21,7 +19,8 @@ const make = (App: Cizn.Application) => async (
       System: derivationSystemPackages,
     },
   } = Derivation.State
-  const { Log, File } = App.Adapter
+  const { File } = App.Adapter
+  const { Log } = App.Manager
 
   Log.Api.indent()
 
@@ -184,7 +183,7 @@ const make = (App: Cizn.Application) => async (
      * for this subtree. We just need to copy the file over with the correctn name
      * and we're done.
      */
-    const derivationFileName = `${fnName}${environment ? `-${environment}` : ''}-${accumulatedHash}.${G.EXT}`
+    const derivationFileName = `${fnName}${environment ? `-${environment}` : ''}-${accumulatedHash}.${G.DRV_EXT}`
     const derivationFilePath = `${Derivation.Root}/${derivationFileName}`
     await copyFile(derivationTempFile, derivationFilePath)
 

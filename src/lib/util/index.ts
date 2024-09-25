@@ -4,7 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'path'
 import G from '@cizn/global'
 
-export const def = (x: any) => typeof x !== 'undefined'
+export const def = (x: any) => !!x
 export const isFn = (x: any) => typeof x === 'function'
 export const isNum = (x: any) => typeof x === 'number'
 export const isBool = (x: any) => typeof x === 'boolean'
@@ -115,7 +115,7 @@ type TempFileProps = {
  * @returns {string}
  */
 export const mkTempFile = async ({
-  name, hash = null, ext = G.EXT,
+  name, hash = null, ext = 'mjs',
 }: TempFileProps) => {
   const tempDir = path.join(tmpdir(), 'cizn')
   await mkdir(tempDir, { recursive: true })

@@ -1,10 +1,11 @@
-import init from "@cizn/adapter/log/api/init.js"
-import info from "@cizn/adapter/log/api/info.js"
-import error from "@cizn/adapter/log/api/error.js"
-import warn from "@cizn/adapter/log/api/warn.js"
-import indent from "@cizn/adapter/log/api/indent.js"
-import print from "@cizn/adapter/log/api/print.js"
-import success from "@cizn/adapter/log/api/success.js"
+import init from "@lib/managers/log/api/init.js"
+import info from "@lib/managers/log/api/info.js"
+import error from "@lib/managers/log/api/error.js"
+import warn from "@lib/managers/log/api/warn.js"
+import indent from "@lib/managers/log/api/indent.js"
+import print from "@lib/managers/log/api/print.js"
+import success from "@lib/managers/log/api/success.js"
+import { Result } from "@lib/composition/result"
 
 export type Props = {
   message: string,
@@ -12,7 +13,7 @@ export type Props = {
 }
 
 export type Api = {
-  init: () => void
+  init: () => Promise<Result<never, Cizn.Application>>
   error: ({ message, options }: Props) => void
   indent: () => void
   unindent: () => void
@@ -22,7 +23,7 @@ export type Api = {
   warn: ({ message, options }: Props) => void
 }
 
-const cliApi = (App: Cizn.Application): Cizn.Adapter.Log.Api => Object.create({}, {
+const cliApi = (App: Cizn.Application): Cizn.Manager.Log.Api => Object.create({}, {
   init: {
     value: init(App),
     enumerable: true,

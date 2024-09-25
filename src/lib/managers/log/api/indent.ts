@@ -1,5 +1,5 @@
 const indent = (App: Cizn.Application, remove: boolean) => () => {
-  const { Log } = App.Adapter
+  const { Log } = App.Manager
   const { Level: level } = Log
 
   Log.Level = remove

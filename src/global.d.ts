@@ -8,7 +8,6 @@ declare namespace Cizn {
     export type State = import('@cizn/core/state').State
 
     namespace State {
-      export type Api = import ('@cizn/core/state/api').Api
       export type Derivation = import('@cizn/core/state').Derivation
       export type Generation = import('@cizn/core/state').Generation
       export type Environment = import('@cizn/core/state').Environment
@@ -43,18 +42,9 @@ declare namespace Cizn {
     type Application = import('@cizn/index').Application
 
     namespace Adapter {
-      export type Cli = import('@cizn/adapter/cli').Cli
-      export type Log = import('@cizn/adapter/log').Log
       export type File = import('@cizn/adapter/file').File
       export type Platform = import('@cizn/adapter/platform').Platform
       export type Package = import('@cizn/adapter/package').Package
-
-      namespace Cli {
-        export type Api = import('@cizn/adapter/cli/api').Api
-      }
-      namespace Log {
-        export type Api = import('@cizn/adapter/log/api').Api
-      }
 
       namespace Package {
         export type Api = import('@cizn/adapter/package/api').Api
@@ -70,5 +60,21 @@ declare namespace Cizn {
       }
     }
 
+    namespace Manager {
+      export type FS = import('@lib/managers/fs').FS
+      export type Cli = import('@lib/managers/cli').Cli
+      export type Log = import('@lib/managers/log').Log
+      namespace FS {
+        export type Api = import('@lib/managers/fs/api/index').Api
+      }
+      namespace Cli {
+        export type Api = import('@lib/managers/cli/api').Api
+      }
+      namespace Log {
+        export type Api = import('@lib/managers/log/api').Api
+      }
+    }
+
+    type Manager = import('@cizn/index').Manager
     type Adapter = import('@cizn/index').Adapter
 }

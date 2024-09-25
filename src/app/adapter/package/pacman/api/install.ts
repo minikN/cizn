@@ -8,7 +8,8 @@ import { ExecaError, execa } from 'execa'
  * @returns {Promise<boolean>}
  */
 const install = (app: Cizn.Application) => async (x: string): Promise<void> => {
-  const { Platform: { Package }, Log: { Api: log } } = app.Adapter
+  const { Platform: { Package } } = app.Adapter
+  const { Log: { Api: log } } = app.Manager
   const isInstalled = await Package.Api.isInstalled(x)
 
   if (!isInstalled) {

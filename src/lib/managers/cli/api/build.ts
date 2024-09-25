@@ -16,7 +16,7 @@ import path from 'path'
  * @returns {Cizn.Adapter.Cli.Api['build']}
  */
 const build = (App: Cizn.Application) => async (environment: Environment, options: BuildProps) => {
-  const log = App.Adapter.Log.Api
+  const log = App.Manager.Log.Api
   const {
     Derivation: { Api: derivationAdapter },
     Generation: { Api: generationAdapter },

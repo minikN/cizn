@@ -1,119 +1,186 @@
-// import { pipe } from "@lib/util/index.js"
-import { pipe } from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
-import * as T from 'fp-ts/lib/Task'
-import { defineImmutableProp, defineProp } from "@lib/composition/property.js"
-import cliAdapter from "@cizn/adapter/cli/index.js"
-import logAdapter from "@cizn/adapter/log/index.js"
 import platformAdapter from "@cizn/adapter/platform"
-import stateComposition, {
-  setDerivationApi, setGenerationApi, setStateApi, testStateApi,
-} from "@cizn/core/state.js"
-import derivationApi from "@cizn/core/derivation/api/index.js"
-import generationApi from "@cizn/core/generation/api/index.js"
-import stateApi from "@cizn/core/state/api"
-import fileAdapter from "./adapter/file"
+import stateComposition from "@cizn/core/state.js"
+import {
+  bind, guard, map,
+} from '@lib/composition/function'
 import { defineNamespace, setNamespace } from '@lib/composition/namespace'
-import { tee } from '@lib/composition/function'
-
-export const APP_NAME = 'cizn'
-export const APP_VERSION = '0.0.1'
+import { asyncPipe, pipe } from "@lib/composition/pipe"
+import { defineImmutableProp } from "@lib/composition/property.js"
+import { Success } from "@lib/composition/result"
+import cliManager from "@lib/managers/cli/index.js"
+import fileSystemManager from "@lib/managers/fs"
+import logManager from "@lib/managers/log/index.js"
+import fileAdapter from "./adapter/file"
+import derivationApi from "./core/derivation/api"
+import generationApi from "./core/generation/api"
+import { initApplicationState } from "./core/state/init"
+import G from '@cizn/constants'
 
 type AdapterApiTypes =
- | Cizn.Adapter.Cli
  | Cizn.Adapter.File
- | Cizn.Adapter.Log
  | Cizn.Adapter.Platform
 
-type AdapterTypes = 'Log' | 'File' | 'Platform' | 'Cli'
+type AdapterTypes = 'File' | 'Platform'
+
+type ManagerApiTypes =
+  | Cizn.Manager.FS
+  | Cizn.Manager.Cli
+  | Cizn.Manager.Log
+
+type ManagerTypes = 'FS' | 'Log' | 'Cli'
+
+type CoreTypes = 'Derivation' | 'Generation'
+
+type CoreApiTypes =
+  | Cizn.Application.State.Derivation.Api
+  | Cizn.Application.State.Generation.Api
 
 export type Application = {
   Adapter: Cizn.Adapter,
+  Manager: Cizn.Manager,
   State: Cizn.Application.State
 }
 
 export type Adapter = {
-  Cli: Cizn.Adapter.Cli
-  Log: Cizn.Adapter.Log
   File: Cizn.Adapter.File
   Platform: Cizn.Adapter.Platform
 }
 
-// const setApi = (fn: Function, ns: ApiTypes = O.none) => tee((app: Cizn.Application) => pipe(
-//   ns,
-//   O.matchW(
-//     () => app.State,
-//     api => app.State[api],
-//   ),
-//   defineNamespace('Api'),
-//   setNamespace('Api', fn(app)),
-// ))
+export type Manager = {
+  FS: Cizn.Manager.FS
+  Cli: Cizn.Manager.Cli
+  Log: Cizn.Manager.Log
+}
 
-const setAdapter = (fn: AdapterApiTypes, ns: AdapterTypes) => tee((adapterNamespace: object) => pipe(
-  adapterNamespace,
-  defineImmutableProp(ns, fn),
-))
-
-const createAdapters = (app: Cizn.Application) => pipe(
-  {},
-  setAdapter(cliAdapter(app), 'Cli'),
-  setAdapter(logAdapter(app), 'Log'),
-  setAdapter(fileAdapter(app), 'File'),
-  setAdapter(platformAdapter(app), 'Platform'),
+/**
+ * Sets an individual adapter
+ *
+ * @param {AdapterTypes} ns     namespace of the adapter to set
+ * @param {AdapterApiTypes} fn  init function for the adapter
+ * @returns {Cizn.Adapter}
+ */
+const setAdapter = (ns: AdapterTypes, fn: AdapterApiTypes) => (adapterNs: Cizn.Adapter) => pipe(
+  adapterNs,
+  defineNamespace(ns),
+  setNamespace(ns, fn),
 )
 
+/**
+ * Sets all adapters
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {Cizn.Adapter}
+ */
+const setAdapters = (app: Cizn.Application) => pipe(
+  <Cizn.Adapter>{},
+  setAdapter('File', fileAdapter(app)),
+  setAdapter('Platform', platformAdapter(app)),
+)
+
+/**
+ * Sets and individual manager
+ *
+ * @param {ManagerTypes} ns     namespace of the adapter to set
+ * @param {ManagerApiTypes} fn  init function for the adapter
+ * @returns {Cizn.Manager}
+ */
+const setManager = (ns: ManagerTypes, fn: ManagerApiTypes) => (managerNs: Cizn.Manager) => pipe(
+  managerNs,
+  defineNamespace(ns),
+  setNamespace(ns, fn),
+)
+
+/**
+ * Sets all managers
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {Cizn.Manager}
+ */
+const setManagers = (app: Cizn.Application) => pipe(
+  <Cizn.Manager>{},
+  setManager('FS', fileSystemManager(app)),
+  setManager('Cli', cliManager(app)),
+  setManager('Log', logManager(app)),
+)
+
+/**
+ * Sets an individual core api
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {Cizn.Application}
+ */
+const setApi = (ns: CoreTypes, fn: CoreApiTypes) => (app: Cizn.Application) => pipe(
+  app.State[ns],
+  defineNamespace('Api'),
+  setNamespace('Api', fn),
+  () => app,
+)
+
+/**
+ * Sets the core apis
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {Cizn.Application}
+ */
+const setApis = (app: Cizn.Application) => pipe(
+  app,
+  setApi('Derivation', derivationApi(app)),
+  setApi('Generation', generationApi(app)),
+)
+
+/**
+ * Initializes the main application
+ *
+ * @returns {Cizn.Application}
+ */
 const appComposition = pipe(
     <Cizn.Application>{},
-    defineImmutableProp('_name', APP_NAME),
+    defineImmutableProp('_name', G.APP_NAME),
     defineImmutableProp('State', stateComposition),
-    setStateApi,
-    setDerivationApi,
-    setGenerationApi,
+    setApis,
 )
 
-const initializeApi = (name: Exclude<AdapterTypes, 'File'> | null = null) => tee((app: Cizn.Application) => pipe(
-  O.fromNullable(name),
-  O.matchW(
-    // TODO: Incorrect!
-    async () => await app.State.Api.init(),
-    async x => await app.Adapter[x].Api.init(app),
-  ),
-))
+/**
+ * Initializes an adapter by executing it `init` api function
+ *
+ * @param {Exclude<AdapterTypes, 'File'>} adapter the adapter to initialize
+ * @returns {Cizn.Application}
+ */
+const initAdapter = (adapter: Exclude<AdapterTypes, 'File'>) => (app: Cizn.Application) => asyncPipe(
+  Success(app),
+  map(guard(app.Adapter[adapter].Api.init)),
+)
 
-const initializeStateApi = initializeApi()
-const initializeCliApi = initializeApi('Cli')
-const intializePlatformApi = initializeApi('Platform')
+/**
+ * Initializes an manager by executing it `init` api function
+ *
+ * @param {Exclude<ManagerTypes, 'File'>} adapter the adapter to initialize
+ * @returns {Cizn.Application}
+ */
+const initManager = (manager: Exclude<ManagerTypes, 'FS'>) => (app: Cizn.Application) => asyncPipe(
+  Success(app),
+  map(guard(app.Manager[manager].Api.init)),
+)
 
 /**
 * The main application
 *
 * @returns {Cizn.Application} app
 */
-const app = pipe(
-  appComposition,
-  defineNamespace('Adapter'),
-  setNamespace('Adapter', createAdapters(appComposition)),
-  // TODO: Incorrect!
-  initializeCliApi,
-  initializeStateApi,
-  intializePlatformApi,
-  // initializeApi(),
-  // appComposition.Adapter = {
-  //   Cli: cliAdapter(appComposition),
-  //   Log: logAdapter(appComposition),
-  //   File: fileAdapter(appComposition),
-  //   Platform: platformAdapter(appComposition),
-  // }
+const app = asyncPipe(
+  Success(appComposition),
 
-  // // appComposition.State.Api = stateApi(appComposition)
-  // // appComposition.State.Derivation.Api = derivationApi(appComposition)
-  // // appComposition.State.Generation.Api = generationApi(appComposition)
+  // Setting Adapters
+  bind(defineNamespace('Adapter')),
+  bind(setNamespace('Adapter', setAdapters(appComposition))),
 
-  // await appComposition.Adapter.Cli.Api.init(appComposition)
-  // await appComposition.State.Api.init()
-  // await appComposition.Adapter.Platform.Api.init()
+  // Setting Managers
+  bind(defineNamespace('Manager')),
+  bind(setNamespace('Manager', setManagers(appComposition))),
 
-  // return appComposition
+  map(initManager('Cli')),
+  map(initApplicationState),
+  map(initAdapter('Platform')),
 )
 
 export default app
