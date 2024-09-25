@@ -2,7 +2,7 @@ import crypto from 'crypto'
 import { tmpdir } from 'os'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'path'
-import G from '@cizn/global'
+import G from '@cizn/constants'
 
 export const def = (x: any) => !!x
 export const isFn = (x: any) => typeof x === 'function'
@@ -115,9 +115,9 @@ type TempFileProps = {
  * @returns {string}
  */
 export const mkTempFile = async ({
-  name, hash = null, ext = 'mjs',
+  name, hash = null, ext = G.DRV_EXT,
 }: TempFileProps) => {
-  const tempDir = path.join(tmpdir(), 'cizn')
+  const tempDir = path.join(tmpdir(), G.APP_NAME)
   await mkdir(tempDir, { recursive: true })
 
   const tempFile = path.join(tempDir, `${name}-${hash || crypto.randomBytes(6).readUIntLE(0, 6).toString(36)}${ext ? `.${ext}` : ''}`)

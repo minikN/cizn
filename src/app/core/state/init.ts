@@ -1,3 +1,4 @@
+import G from '@cizn/constants'
 import {
   bind,
   map,
@@ -22,7 +23,7 @@ This could be because of one of two things:
  * @returns {string}
  */
 const getConfigPath = (app: Cizn.Application): Result<never, string> =>
-  Success(app.State.Config.Current || `${process.env.XDG_CONFIG_HOME ?? '~/.config'}/cizn/config.json`)
+  Success(app.State.Config.Current || `${process.env.XDG_CONFIG_HOME ?? '~/.config'}/${G.APP_NAME}/config.json`)
 
 /**
  * Parses the config file and returns its values.
@@ -94,7 +95,7 @@ const getDefaultStatePath = (): string => process.env?.XDG_STATE_HOME || `${proc
  */
 const setDefaultGenerationPath = (app: Cizn.Application) => (path: string) => asyncPipe(
   Success(path),
-  bind(path => `${path}/cizn/generations`),
+  bind(path => `${path}/${G.APP_NAME}/generations`),
   map(app.Manager.FS.Api.makeDirectory),
   bind((path) => {
     app.State.Generation.Root = path
@@ -111,7 +112,7 @@ const setDefaultGenerationPath = (app: Cizn.Application) => (path: string) => as
  */
 const setDefaultDerivationPath = (app: Cizn.Application) => (path: string) => asyncPipe(
   Success(path),
-  bind(path => `${path}/cizn/derivations`),
+  bind(path => `${path}/${G.APP_NAME}/derivations`),
   map(app.Manager.FS.Api.makeDirectory),
   bind((path) => {
     app.State.Derivation.Root = path
