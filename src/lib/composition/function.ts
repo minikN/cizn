@@ -131,8 +131,12 @@ export const guard = <L, R, G, F extends (...args: any) => any>(
  * @param {(a: T) => void} deadEndFunction
  * @returns {T} previousValue
  */
-export const tap = <T>(deadEndFunction: (a: T) => void) => (previousValue: T) => {
-  deadEndFunction(previousValue)
+export const tap = <E, V>(deadEndFunction: (a: E | V) => void) => (previousValue: Result<E, V>) => {
+  const content = previousValue._tag === 'value'
+    ? previousValue.value
+    : previousValue.error
+
+  deadEndFunction(content)
 
   return previousValue
 }
