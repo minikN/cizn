@@ -1,15 +1,20 @@
-import init from "@lib/managers/log/api/init.js"
-import info from "@lib/managers/log/api/info.js"
+import { Result } from "@lib/composition/result"
 import error from "@lib/managers/log/api/error.js"
-import warn from "@lib/managers/log/api/warn.js"
 import indent from "@lib/managers/log/api/indent.js"
+import info from "@lib/managers/log/api/info.js"
+import init from "@lib/managers/log/api/init.js"
 import print from "@lib/managers/log/api/print.js"
 import success from "@lib/managers/log/api/success.js"
-import { Result } from "@lib/composition/result"
+import warn from "@lib/managers/log/api/warn.js"
 
 export type Props = {
   message: string,
   options?: (string | number | object)[],
+  error?: {
+    message?: string,
+    stack?: string,
+    reasons?: string[],
+  },
 }
 
 export type Api = {
