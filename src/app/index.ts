@@ -1,4 +1,5 @@
 import platformAdapter from "@cizn/adapter/platform"
+import G from '@cizn/constants'
 import stateComposition from "@cizn/core/state.js"
 import {
   bind, guard, map,
@@ -6,7 +7,7 @@ import {
 import { defineNamespace, setNamespace } from '@lib/composition/namespace'
 import { asyncPipe, pipe } from "@lib/composition/pipe"
 import { defineImmutableProp } from "@lib/composition/property.js"
-import { Success } from "@lib/composition/result"
+import { Success, SuccessType } from "@lib/composition/result"
 import cliManager from "@lib/managers/cli/index.js"
 import fileSystemManager from "@lib/managers/fs"
 import logManager from "@lib/managers/log/index.js"
@@ -14,7 +15,6 @@ import fileAdapter from "./adapter/file"
 import derivationApi from "./core/derivation/api"
 import generationApi from "./core/generation/api"
 import { initApplicationState } from "./core/state/init"
-import G from '@cizn/constants'
 
 type AdapterApiTypes =
  | Cizn.Adapter.File
@@ -148,6 +148,7 @@ const appComposition = pipe(
  */
 const initAdapter = (adapter: Exclude<AdapterTypes, 'File'>) => (app: Cizn.Application) => asyncPipe(
   Success(app),
+  // TODO: Add error handlilng to guard once refactored
   map(guard(app.Adapter[adapter].Api.init)),
 )
 
@@ -159,6 +160,7 @@ const initAdapter = (adapter: Exclude<AdapterTypes, 'File'>) => (app: Cizn.Appli
  */
 const initManager = (manager: Exclude<ManagerTypes, 'FS'>) => (app: Cizn.Application) => asyncPipe(
   Success(app),
+  // TODO: Add error handlilng to guard once refactored
   map(guard(app.Manager[manager].Api.init)),
 )
 
@@ -177,10 +179,24 @@ const app = asyncPipe(
   // Setting Managers
   bind(defineNamespace('Manager')),
   bind(setNamespace('Manager', setManagers(appComposition))),
+)
 
+/**
+ * Returns an instance of the application to use outside
+ * of the main application flow.
+ *
+ * @returns {Cizn.Application}
+ */
+export const getApp = async () => {
+  const appI = await app as SuccessType<Cizn.Application>
+  return appI.value
+}
+
+const hydratedApp = asyncPipe(
+  app,
   map(initManager('Cli')),
   map(initApplicationState),
   map(initAdapter('Platform')),
 )
 
-export default app
+export default hydratedApp
