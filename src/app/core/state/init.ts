@@ -2,6 +2,7 @@ import G from '@cizn/constants'
 import {
   bind,
   map,
+  tap,
 } from "@lib/composition/function"
 import { asyncPipe } from "@lib/composition/pipe"
 import { Result, Success } from "@lib/composition/result"
@@ -11,6 +12,10 @@ const noConfigPathError = `No valid path for the configuration file was given.
 This could be because of one of two things:
 - The --config parameter was not provided
 - The XDG_CONFIG_HOME environment variable is not set`
+
+const log = (Log: Cizn.Manager.Log.Api) => (level: keyof Cizn.Manager.Log.Api, message: string) => (input: string) => {
+  Log?.[level]?.({ message, options: [input] })
+}
 
 /**
  * Gets the default config path
@@ -47,6 +52,7 @@ const getConfigValues = (FS: Cizn.Manager.FS.Api) => (path: string) => asyncPipe
  * @returns {Cizn.Application}
  */
 const setConfigValues = (app: Cizn.Application) => (config: Cizn.Application.State.Config["State"]): Cizn.Application => {
+  // Add verbose logging
   const {
     package: {
       manager = undefined,
@@ -93,15 +99,18 @@ const getDefaultStatePath = (): string => process.env?.XDG_STATE_HOME || `${proc
  * @param {Cizn.Application} app the application
  * @returns {string}
  */
-const setDefaultGenerationPath = (FS: Cizn.Manager.FS.Api, app: Cizn.Application) => (path: string) => asyncPipe(
-  Success(path),
-  bind(path => `${path}/${G.APP_NAME}/generations`),
-  map(FS.makeDirectory),
-  bind((path) => {
-    app.State.Generation.Root = path
-    return path
-  }),
-)
+const setDefaultGenerationPath = (app: Cizn.Application) => (path: string) => {
+  const FS = app.Manager.FS.Api
+
+  return asyncPipe(
+    Success(path),
+    bind(path => `${path}/${G.APP_NAME}/generations`),
+    map(FS.makeDirectory),
+    bind((path) => {
+      app.State.Generation.Root = path
+      return path
+    }),
+  )}
 
 /**
  * Sets the default derivation directory (and creates the directory on
@@ -110,15 +119,18 @@ const setDefaultGenerationPath = (FS: Cizn.Manager.FS.Api, app: Cizn.Application
  * @param {Cizn.Application} app the application
  * @returns {string}
  */
-const setDefaultDerivationPath = (FS: Cizn.Manager.FS.Api, app: Cizn.Application) => (path: string) => asyncPipe(
-  Success(path),
-  bind(path => `${path}/${G.APP_NAME}/derivations`),
-  map(FS.makeDirectory),
-  bind((path) => {
-    app.State.Derivation.Root = path
-    return path
-  }),
-)
+const setDefaultDerivationPath = (app: Cizn.Application) => (path: string) => {
+  const FS = app.Manager.FS.Api
+
+  return asyncPipe(
+    Success(path),
+    bind(path => `${path}/${G.APP_NAME}/derivations`),
+    map(FS.makeDirectory),
+    bind((path) => {
+      app.State.Derivation.Root = path
+      return path
+    }),
+  )}
 
 /**
  * Initializes the state of the main application.
@@ -129,12 +141,14 @@ const setDefaultDerivationPath = (FS: Cizn.Manager.FS.Api, app: Cizn.Application
  */
 export const initApplicationState = (app: Cizn.Application) => {
   const FS = app.Manager.FS.Api
+  const Log = log(app.Manager.Log.Api)
 
   return asyncPipe(
     Success(app),
 
     // Reading and setting config
     map(getConfigPath),
+    tap(Log('info', 'Reading config file %d...')),
     map(getConfigValues(FS)),
     bind(setConfigValues(app)),
 
@@ -144,8 +158,8 @@ export const initApplicationState = (app: Cizn.Application) => {
 
     // Setting necessary paths for the application
     bind(getDefaultStatePath),
-    map(setDefaultGenerationPath(FS, app)),
-    map(setDefaultDerivationPath(FS, app)),
+    map(setDefaultGenerationPath(app)),
+    map(setDefaultDerivationPath(app)),
 
     // Returning the hydrated app
     bind(() => app),
