@@ -66,7 +66,7 @@ export const readFile = (app: Cizn.Application) => (path: string): Result<NonNul
   })),
 )
 
-export const parseFileAsJSON = (app: Cizn.Application) => (contents: string): Result<CiznError<'NO_CONTENT_GIVEN'> | CiznError<'INVALID_CONTENT_GIVEN'>, object> => pipe(
+export const parseJSON = (app: Cizn.Application) => (contents: string): Result<CiznError<'NO_CONTENT_GIVEN'> | CiznError<'INVALID_CONTENT_GIVEN'>, object> => pipe(
   Success(contents),
   map(guard(_parseJSON, { SyntaxError: ErrorAs('INVALID_CONTENT_GIVEN') })),
 )
