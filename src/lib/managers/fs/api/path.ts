@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { guard, map } from "@lib/composition/function"
 import { asyncPipe } from "@lib/composition/pipe"
 import {
@@ -43,10 +44,8 @@ const _probePath = async (path: string, mode = constants.F_OK): Promise<Result<C
 }
 
 /**
- * Probes the given `path` and checks for `mode`.
+ * Gets the `cwd`.
  *
- * @param {string} path the path to check
- * @param {number} mode mode to check against
  * @private
  */
 const _getCwd = async (): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> => {
@@ -61,30 +60,34 @@ const _getCwd = async (): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> =>
 /**
  * Gets the full system path of the provided `path`
  *
- * @param {string} path the path to read
+ * @param {Cizn.Application} app the application
  */
-export const getRealPath = (app: Cizn.Application) => (path: string): Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'>>, string> => asyncPipe(
+export const getRealPath = (app: Cizn.Application) => <F extends (...args: any) => any>(path: string, errors?: {[key: string]: F}): Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'>>, string> => asyncPipe(
   Success(path),
   map(guard(_realPath, {
-    ERR_INVALID_ARG_TYPE: ErrorAs('NO_PATH_GIVEN'),
-    ENOENT: ErrorAs('INCORRECT_PATH_GIVEN'),
+    ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
+    ENOENT: errors?.ENOENT ?? ErrorAs('INCORRECT_PATH_GIVEN'),
   })),
 )
 
 /**
  * Checks whether `path` is readable.
  *
- * @param {string} path the path to check
+ * @param {Cizn.Application} app the application
  */
-export const isPathReadable = (app: Cizn.Application) => (path: string): Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_READABLE_FILE'>>, string> => asyncPipe(
+export const isPathReadable = (app: Cizn.Application) => <F extends (...args: any) => any>(path: string, errors?: {[key: string]: F}): Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_READABLE_FILE'>>, string> => asyncPipe(
   Success(path),
   map(guard(_probePath, {
-    ERR_INVALID_ARG_TYPE: ErrorAs('NO_PATH_GIVEN'),
-    ENOENT: ErrorAs('NOT_READABLE_FILE'),
+    ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
+    ENOENT: errors?.ENOENT ?? ErrorAs('NOT_READABLE_FILE'),
   })),
 )
 
-
+/**
+ * Gets the current `cwd`.
+ *
+ * @param {string} path the path to check
+ */
 export const getCwd = (app: Cizn.Application) => (): Result<CiznError<'NO_PATH_GIVEN'>, string> => asyncPipe(
   Success(true),
   map(guard(_getCwd)),
