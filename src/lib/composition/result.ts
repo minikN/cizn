@@ -17,7 +17,7 @@ type FailureType<E> = { readonly _tag: 'error', readonly error: E } // left side
  * @kind variable
  * @param {unknown} V
  */
-type SuccessType<V> = { readonly _tag: 'value', readonly value: V } // right side of either
+export type SuccessType<V> = { readonly _tag: 'value', readonly value: V } // right side of either
 
 /**
  * Result Type
