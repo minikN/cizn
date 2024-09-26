@@ -31,13 +31,13 @@ const getConfigPath = (app: Cizn.Application): Result<never, string> =>
  * @param {Cizn.Application} app the application
  * @returns {Cizn.Application.State.Config['State']}
  */
-const getConfigValues = (app: Cizn.Application) => (path: string) => asyncPipe(
+const getConfigValues = (FS: Cizn.Manager.FS.Api) => (path: string) => asyncPipe(
   Success(path),
-  map(app.Manager.FS.Api.getRealPath),
-  map(app.Manager.FS.Api.isPathReadable),
-  map(app.Manager.FS.Api.isFile),
-  map(app.Manager.FS.Api.readFile),
-  map(app.Manager.FS.Api.parseFileAsJSON),
+  map(FS.getRealPath),
+  map(FS.isPathReadable),
+  map(FS.isFile),
+  map(FS.readFile),
+  map(FS.parseJSON),
 )
 
 /**
@@ -93,10 +93,10 @@ const getDefaultStatePath = (): string => process.env?.XDG_STATE_HOME || `${proc
  * @param {Cizn.Application} app the application
  * @returns {string}
  */
-const setDefaultGenerationPath = (app: Cizn.Application) => (path: string) => asyncPipe(
+const setDefaultGenerationPath = (FS: Cizn.Manager.FS.Api, app: Cizn.Application) => (path: string) => asyncPipe(
   Success(path),
   bind(path => `${path}/${G.APP_NAME}/generations`),
-  map(app.Manager.FS.Api.makeDirectory),
+  map(FS.makeDirectory),
   bind((path) => {
     app.State.Generation.Root = path
     return path
@@ -110,10 +110,10 @@ const setDefaultGenerationPath = (app: Cizn.Application) => (path: string) => as
  * @param {Cizn.Application} app the application
  * @returns {string}
  */
-const setDefaultDerivationPath = (app: Cizn.Application) => (path: string) => asyncPipe(
+const setDefaultDerivationPath = (FS: Cizn.Manager.FS.Api, app: Cizn.Application) => (path: string) => asyncPipe(
   Success(path),
   bind(path => `${path}/${G.APP_NAME}/derivations`),
-  map(app.Manager.FS.Api.makeDirectory),
+  map(FS.makeDirectory),
   bind((path) => {
     app.State.Derivation.Root = path
     return path
@@ -127,23 +127,27 @@ const setDefaultDerivationPath = (app: Cizn.Application) => (path: string) => as
  * @param {Cizn.Application} app the application
  * @returns {Cizn.Application}
  */
-export const initApplicationState = (app: Cizn.Application) => asyncPipe(
-  Success(app),
+export const initApplicationState = (app: Cizn.Application) => {
+  const FS = app.Manager.FS.Api
 
-  // Reading and setting config
-  map(getConfigPath),
-  map(getConfigValues(app)),
-  bind(setConfigValues(app)),
+  return asyncPipe(
+    Success(app),
 
-  // Setting the default path for the source file
-  map(app.Manager.FS.Api.getCwd),
-  bind(setDefaultSourcePath(app)),
+    // Reading and setting config
+    map(getConfigPath),
+    map(getConfigValues(FS)),
+    bind(setConfigValues(app)),
 
-  // Setting necessary paths for the application
-  bind(getDefaultStatePath),
-  map(setDefaultGenerationPath(app)),
-  map(setDefaultDerivationPath(app)),
+    // Setting the default path for the source file
+    map(FS.getCwd),
+    bind(setDefaultSourcePath(app)),
 
-  // Returning the hydrated app
-  bind(() => app),
-)
+    // Setting necessary paths for the application
+    bind(getDefaultStatePath),
+    map(setDefaultGenerationPath(FS, app)),
+    map(setDefaultDerivationPath(FS, app)),
+
+    // Returning the hydrated app
+    bind(() => app),
+  )
+}
