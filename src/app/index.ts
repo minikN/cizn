@@ -182,18 +182,28 @@ const app = asyncPipe(
 )
 
 /**
+ * The unhydrated app
+ *
+ * We `await` the app composition early here and pass it onto
+ * {@link hydratedApp}. We do this so that we can access the
+ * same instance from {@link getApp} for use outside of the
+ * main application flow.
+ */
+const unhydratedApp = await app
+
+/**
  * Returns an instance of the application to use outside
  * of the main application flow.
  *
  * @returns {Cizn.Application}
  */
 export const getApp = async () => {
-  const appI = await app as SuccessType<Cizn.Application>
-  return appI.value
+  const appInstance = unhydratedApp as SuccessType<Cizn.Application>
+  return appInstance.value
 }
 
 const hydratedApp = asyncPipe(
-  app,
+  unhydratedApp,
   map(initManager('Cli')),
   map(initApplicationState),
   map(initAdapter('Platform')),
