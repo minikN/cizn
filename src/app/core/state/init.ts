@@ -3,18 +3,18 @@ import {
   bind,
   map,
   tap,
+  withError,
 } from "@lib/composition/function"
 import { asyncPipe } from "@lib/composition/pipe"
 import { Result, Success } from "@lib/composition/result"
+import { ErrorAs } from '@lib/errors'
+import { log } from '@lib/util'
 import process from 'node:process'
 
-const noConfigPathError = `No valid path for the configuration file was given.
-This could be because of one of two things:
-- The --config parameter was not provided
-- The XDG_CONFIG_HOME environment variable is not set`
-
-const log = (Log: Cizn.Manager.Log.Api) => (level: keyof Cizn.Manager.Log.Api, message: string) => (input: string) => {
-  Log?.[level]?.({ message, options: [input] })
+const noConfigPathOptions = {
+  label: 'No valid path for the %d was given',
+  options: ['configuration file', '--config'],
+  reasons: ['The %d parameter was provided with no value'],
 }
 
 /**
@@ -38,7 +38,7 @@ const getConfigPath = (app: Cizn.Application): Result<never, string> =>
  */
 const getConfigValues = (FS: Cizn.Manager.FS.Api) => (path: string) => asyncPipe(
   Success(path),
-  map(FS.getRealPath),
+  map(withError(FS.getRealPath, { ENOENT: ErrorAs('NO_PATH_GIVEN', noConfigPathOptions) })),
   map(FS.isPathReadable),
   map(FS.isFile),
   map(FS.readFile),
@@ -141,14 +141,14 @@ const setDefaultDerivationPath = (app: Cizn.Application) => (path: string) => {
  */
 export const initApplicationState = (app: Cizn.Application) => {
   const FS = app.Manager.FS.Api
-  const Log = log(app.Manager.Log.Api)
+  const logAs = log(app)
 
   return asyncPipe(
     Success(app),
 
     // Reading and setting config
     map(getConfigPath),
-    tap(Log('info', 'Reading config file %d...')),
+    tap(logAs('info', 'Reading config file %d...')),
     map(getConfigValues(FS)),
     bind(setConfigValues(app)),
 
