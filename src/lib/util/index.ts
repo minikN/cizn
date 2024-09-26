@@ -1,8 +1,9 @@
-import crypto from 'crypto'
-import { tmpdir } from 'os'
-import { mkdir, writeFile } from 'node:fs/promises'
-import path from 'path'
 import G from '@cizn/constants'
+import { CiznError, DefaultErrorTypes } from '@lib/errors'
+import crypto from 'crypto'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'os'
+import path from 'path'
 
 export const def = (x: any) => !!x
 export const isFn = (x: any) => typeof x === 'function'
@@ -33,6 +34,24 @@ export const pipeAsync = <T>(...functions: Array<(a: T) => T>) => (param: Return
   async (result, next) => next(await result),
   param,
 )
+
+/**
+ * Helper function to log an incoming error
+ * @param {Cizn.Application} app the application
+ */
+export const logError = (app: Cizn.Application) => <E extends DefaultErrorTypes>(error: CiznError<E>) => {
+  app.Manager.Log.Api?.error?.({
+    message: error.label, options: error.options, error,
+  })
+}
+
+/**
+ * Helper function to log an incoming string.
+ * @param {Cizn.Application} app the application
+ */
+export const log = (app: Cizn.Application) => (level: keyof Cizn.Manager.Log.Api, message: string) => (input: string) => {
+  app.Manager.Log.Api?.[level]?.({ message, options: [input] })
+}
 
 type PartialTuple<TUPLE extends any[], EXTRACTED extends any[] = []> =
   // If the tuple provided has at least one required value
