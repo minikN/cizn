@@ -99,6 +99,17 @@ export const bind = <E1, A, B>(singleFunction: (a: A) => B) => (previousValue: R
 )
 
 /**
+ * Wraps `switchFunction` and makes it possible to overwrite the
+ * default error mapping with `errors`.
+ *
+ * @param {Function} switchFunction next function to call
+ * @param {object} errors           overriding errors
+ */
+export const withError = <A, E2, B, F extends (...args: any) => any>(switchFunction: (a: A, b?: {[key: string]: F}) => Result<E2, B>, errors: {[key: string]: F}) => (input: A): Result<E2, B> => {
+  return switchFunction(input, errors)
+}
+
+/**
  * GUARD ADAPTER FUNCTION
  *
  * Wraps the {@param switchFunction} in a try/catch block and if an error is
@@ -137,6 +148,23 @@ export const tap = <E, V>(deadEndFunction: (a: E | V) => void) => (previousValue
     : previousValue.error
 
   deadEndFunction(content)
+
+  return previousValue
+}
+
+/**
+ * TAP ERROR ADAPTER FUNCTION
+ *
+ * Executes a `deadEndFunction`, meaning a function that returns `void`
+ * and returns the outpur of the previous function to the next function
+ *
+ * @param {(a: T) => void} deadEndFunction
+ * @returns {T} previousValue
+ */
+export const tapError = <E, V>(deadEndFunction: (a: E | V) => void) => (previousValue: Result<E, V>) => {
+  if (previousValue._tag === 'error') {
+    deadEndFunction(previousValue.error)
+  }
 
   return previousValue
 }
