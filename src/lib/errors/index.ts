@@ -1,5 +1,5 @@
 
-type DefaultErrorTypes =
+export type DefaultErrorTypes =
     // Generic errors
     | 'ENOENT'
     | 'ERR_INVALID_ARG_TYPE'
@@ -16,6 +16,7 @@ export type CiznError<E extends DefaultErrorTypes> = {
     readonly label: string,
     readonly message?: string,
     readonly stack?: string
+    readonly options?: string[]
 }
 
 const defaultErrorMessages = Object.freeze({
@@ -31,20 +32,22 @@ const defaultErrorMessages = Object.freeze({
 
 type OptionalErrorProps = {
     label?: string,
-    explanation?: string,
+    reasons?: string[],
     message?: string,
     stack?: string,
+    options?: string[]
 }
-const _error = <E extends DefaultErrorTypes>(name: E, options?: OptionalErrorProps): CiznError<E> => ({
+const _error = <E extends DefaultErrorTypes>(name: E, props?: OptionalErrorProps): CiznError<E> => ({
   name,
-  label: options?.label || defaultErrorMessages[name],
-  ...options?.explanation && { explanation: options.explanation },
-  ...options?.message && { message: options.message },
-  ...options?.stack && { stack: options.stack },
+  label: props?.label || defaultErrorMessages[name],
+  ...props?.reasons && { reasons: props.reasons },
+  ...props?.message && { message: props.message },
+  ...props?.options && { options: props.options },
+  ...props?.stack && { stack: props.stack },
 })
 
 export const Error: <E extends DefaultErrorTypes>(name: E) => CiznError<E> = _error
 export const ErrorWith: <E extends DefaultErrorTypes>(name: E, options: OptionalErrorProps) => CiznError<E> = _error
-export const ErrorAs = <E extends DefaultErrorTypes>(name: E, explanation?: string) => (options: OptionalErrorProps) => _error(name, { ...options, explanation })
+export const ErrorAs = <E extends DefaultErrorTypes>(name: E, overrides?: OptionalErrorProps) => (options: OptionalErrorProps) => _error(name, { ...options, ...overrides })
 
 
