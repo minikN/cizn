@@ -1,18 +1,21 @@
 import { _dual } from "@lib/composition/pipe"
 import {
-  Failure, Result, Success,
+  Failure,
+  isFailure,
+  Result, Success,
 } from "@lib/composition/result"
+import { CiznError } from "@lib/errors"
 
 
 /**
-S * PATTERN MATCHING
+ * PATTERN MATCHING
  *
  * Matches the result of the last function in the chain and returns the output immediately
  * in case it is an error or passes it on to the next function and returns that output
  *
- * @param {(a: A): Result<E2, B>} nextFunction Next function in the pipe
- * @param {Result<E1, A>} input                 Output from the last function in the pipe
- * @returns {Result<E2, B> | E1}
+ * @param nextFunction Next function in the pipe
+ * @param input        Output from the last function in the pipe
+ * @returns nextValue
  */
 const match = <E1, A, E2, B>(nextFunction: (a: A) => Result<E2, B>, input: Result<E1, A>) => {
   switch (input._tag) {
@@ -23,6 +26,29 @@ const match = <E1, A, E2, B>(nextFunction: (a: A) => Result<E2, B>, input: Resul
     default:
       const _exhaustive: never = input
       return _exhaustive
+  }
+}
+
+/**
+ * ERROR PATTERN MATCHING
+ *
+ * Works similiar to {@link match}, but matches against error types.
+ * If `input` is not an error, it will simply return it. If it is,
+ * it will match the type of the error against the ones defined in
+ * `errors`. It will then execute the callback for that specific
+ * error and return its result.
+ *
+ * @param errors Mapping between error types and callbacks
+ * @param input output of previous function
+ * @returns nextValue | input
+ */
+const matchError = <E1, A, E2, B, F extends (...args: any) => Result<E2, B> | void>(errors: {[key: string]: F}, input: Result<E1, A>): Result<E1, A> | Result<E2, B> => {
+  switch (input._tag) {
+    case 'value':
+      return input
+    case 'error':
+      const error = input.error as CiznError<any>
+      return errors?.[error.name]?.() || input
   }
 }
 
@@ -84,14 +110,15 @@ export const map: {
  * Binds a single function. A single function is a function that has an input and
  * only one possible output. Meaning it cannot fail. It will match the `previousValue`
  * by passing it the output of the single function wrappen in a {@link Success}.
+ *
+ * @example
+ * pipe(
+ *   map(...) // previous calculation, returns v
+ *   bind((v: number) => v + 1) // it cannot fail
+ *   map(...) // gets v + 1 as input
+ * )
 
  * @param {Function} singleFunction
- *
- * @constant
- * @name bind
- * @kind variable
- * @type {<E1, A, B>(singleFunction: (a: A) => B) => (previousValue: Result<E1, A>) => Result<E1, B>}
- * @exports
  */
 export const bind = <E1, A, B>(singleFunction: (a: A) => B) => (previousValue: Result<E1, A>): Result<E1, B> => match(
   value => Success(singleFunction(value)),
@@ -99,8 +126,17 @@ export const bind = <E1, A, B>(singleFunction: (a: A) => B) => (previousValue: R
 )
 
 /**
- * Wraps `switchFunction` and makes it possible to overwrite the
+ * ERROR MAPPING OVERRIDE
+ *
+ * Wraps `switchFunction` like ({@link parseJSON}) and makes it possible to overwrite the
  * default error mapping with `errors`.
+ *
+ * @example
+ * pipe(
+ *   ...,
+ *   // The ENOENT error handling for fn gets overwritten only for this case
+ *   map(withError(fn, { ENOENT: () => console.log('Oops, file not found') }))
+ * )
  *
  * @param {Function} switchFunction next function to call
  * @param {object} errors           overriding errors
@@ -115,6 +151,26 @@ export const withError = <A, E2, B, F extends (...args: any) => any>(switchFunct
  * Wraps the {@param switchFunction} in a try/catch block and if an error is
  * thrown, it will wrap it in a {@link Failure} and return it. Otherwise it
  * will return the result of the function.
+ * If `errors` is given, it will return the errors defined in the mapping.
+ *
+ * @example <caption>Without mapping</caption>
+ * pipe(
+ *   ...,
+ *   // It will return a Failure containing the thrown error
+ *   map(guard(functionThatCanThrow))
+ *   ...
+ * )
+
+ * @example <caption>With mapping</caption>
+ * pipe(
+ *   ...,
+ *   // It will return a Failure containing the mapped error
+ *   map(guard(functionThatCanThrow, {
+ *     ENOENT: new Error('File not found')
+ *     ERR_INVALID_ARG_TYPE: new Error('no arg given')
+ *   }))
+ *   ...
+ * )
  *
  * @param {Function} switchFunction Function to wrap
  * @param {Object} [errors] Mapping between error types and thrown errors
@@ -134,20 +190,66 @@ export const guard = <L, R, G, F extends (...args: any) => any>(
   }
 
 /**
+ * RECOVER ADAPTER FUNCTION
+ *
+ * Tries to recover from an error. If `input` is not an error, it will simply
+ * return it. If it is an error, it will execute the callback in `errors` that
+ * matches the error type and returns that return value wrapped in a
+ * {@link Success}.
+ *
+ * @TODO Make recover use map to flatten types, so that we don't have to wrap
+ * the result in a Success
+ *
+ * @example
+ * pipe(
+ *   map(...) // Previous calculation that may return errors
+ *   recover({
+ *     ENOENT: () => ({ foo: bar }) // Will return an object if error is ENOENT
+ *     NO_PATH_GIVEN: () => '~/.config' // Will return a string if error is NO_PATH_GIVEN
+ *   })
+ *   map(...) // Using either the object or the string from above
+ * )
+ *
+ * @param errors Mapping between error types and callbacks
+ * @returns {SuccessType} newValue
+ */
+export const recover = <E1, A, F extends (...args: any) => any>(errors: {[key: string]: F}) => (input: Result<E1, A>): Result<E1, ReturnType<F>> | Result<E1, A> => {
+  switch (input._tag) {
+    case 'error':
+      const error = input.error as CiznError<any>
+      return errors?.[error.name]
+        ? Success(errors?.[error.name]?.(input.error))
+        : input
+    case 'value':
+      return input
+    default:
+      const _exhaustive: never = input
+      return _exhaustive
+  }
+}
+
+/**
  * TAP ADAPTER FUNCTION
  *
- * Executes a `deadEndFunction`, meaning a function that returns `void`
- * and returns the outpur of the previous function to the next function
+ * Executes `fn` with `previousValue`. Any return value is disregarded and
+ * `previousValue` is returned.
  *
- * @param {(a: T) => void} deadEndFunction
- * @returns {T} previousValue
+ * @example
+ * pipe(
+ *   map(...) // Previous calculation
+ *   tap((v) => { console.log(`Working with: ${v}`) })
+ *   map(...) // Using result of map above
+ * )
+ *
+ * @param fn Void function to tap into
+ * @returns previousValue
  */
-export const tap = <E, V>(deadEndFunction: (a: E | V) => void) => (previousValue: Result<E, V>) => {
+export const tap = <E, V>(fn: (a: E | V) => void) => (previousValue: Result<E, V>) => {
   const content = previousValue._tag === 'value'
     ? previousValue.value
     : previousValue.error
 
-  deadEndFunction(content)
+  fn(content)
 
   return previousValue
 }
@@ -155,15 +257,50 @@ export const tap = <E, V>(deadEndFunction: (a: E | V) => void) => (previousValue
 /**
  * TAP ERROR ADAPTER FUNCTION
  *
- * Executes a `deadEndFunction`, meaning a function that returns `void`
- * and returns the outpur of the previous function to the next function
+ * Executes `deadEndFunction` if and only if the input is an error.
+ * Any result from the function is disregarded and the `previousValue`
+ * is returned.
  *
- * @param {(a: T) => void} deadEndFunction
- * @returns {T} previousValue
+ * @example
+ * pipe(
+ *   map(...) // Previous calculation
+ *   tapError((e) => { console.log(`Error: ${e.name}`) })
+ *   map(...) // Using result of map above
+ * )
+ *
+ * @param tapFn Void function to tap into
+ * @returns previousValue
  */
-export const tapError = <E, V>(deadEndFunction: (a: E | V) => void) => (previousValue: Result<E, V>) => {
+export const tapError = <E, V>(tapFn: (a: E | V) => void) => (previousValue: Result<E, V>) => {
   if (previousValue._tag === 'error') {
-    deadEndFunction(previousValue.error)
+    tapFn(previousValue.error)
+  }
+
+  return previousValue
+}
+
+
+/**
+ * TAP WITH ERROR ADAPTER FUNCTION
+ *
+ * If `previousValue` is an error, it will execute {@link matchError} and pass
+ * it `errors`. {@link matchError} will execute the closure inside `errors` that
+ * matches the error type. The result of the closure is disregarded and
+ * `previousValue` is returned.
+ *
+ * @example
+ * pipe(
+ *   map(...) // Previous calculation
+ *   tapWithError({ ENOENT: () => { console.log('File not found') } })
+ *   map(...) // Using result of map above
+ * )
+ *
+ * @param errors Mapping between error types and callbacks
+ * @returns previousValue
+ */
+export const tapWithError = <E1, A, F extends (...args: any) => void>(errors: {[key: string]: F}) => (previousValue: Result<E1, A>): Result<E1, A> => {
+  if (isFailure(previousValue)) {
+    matchError(errors, previousValue)
   }
 
   return previousValue
