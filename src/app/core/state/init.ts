@@ -2,13 +2,15 @@ import G from '@cizn/constants'
 import {
   bind,
   map,
+  recover,
   tap,
+  tapWithError,
   withError,
 } from "@lib/composition/function"
 import { asyncPipe } from "@lib/composition/pipe"
 import { Result, Success } from "@lib/composition/result"
 import { ErrorAs } from '@lib/errors'
-import { log } from '@lib/util'
+import { logString } from '@lib/util'
 import process from 'node:process'
 
 const noConfigPathOptions = {
@@ -141,7 +143,7 @@ const setDefaultDerivationPath = (app: Cizn.Application) => (path: string) => {
  */
 export const initApplicationState = (app: Cizn.Application) => {
   const FS = app.Manager.FS.Api
-  const logAs = log(app)
+  const logAs = logString(app)
 
   return asyncPipe(
     Success(app),
@@ -150,6 +152,12 @@ export const initApplicationState = (app: Cizn.Application) => {
     map(getConfigPath),
     tap(logAs('info', 'Reading config file %d...')),
     map(getConfigValues(FS)),
+
+    // In case there is no config file, use default values
+    tapWithError({ NO_PATH_GIVEN: logAs('warn', 'No config file found. Using default values...') }),
+    recover({ NO_PATH_GIVEN: () => (<object>{}) }),
+
+    // Setting config values
     bind(setConfigValues(app)),
 
     // Setting the default path for the source file
