@@ -49,8 +49,8 @@ export const logError = (app: Cizn.Application) => <E extends DefaultErrorTypes>
  * Helper function to log an incoming string.
  * @param {Cizn.Application} app the application
  */
-export const log = (app: Cizn.Application) => (level: keyof Cizn.Manager.Log.Api, message: string) => (input: string) => {
-  app.Manager.Log.Api?.[level]?.({ message, options: [input] })
+export const logString = (app: Cizn.Application) => (level: keyof Cizn.Manager.Log.Api, message: string) => (input: string) => {
+  app.Manager.Log.Api?.[level]?.({ message, ...input && { options: [input] } })
 }
 
 type PartialTuple<TUPLE extends any[], EXTRACTED extends any[] = []> =
