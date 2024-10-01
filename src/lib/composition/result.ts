@@ -1,4 +1,3 @@
-
 /**
  * Failure type
  *
@@ -105,3 +104,5 @@ export const isSuccess = (input: any) => input?._tag === 'value' || false
  * @returns {boolean}
  */
 export const isFailure = (input: any) => input?._tag === 'error' || false
+
+export const toSuccess = <A>(a: A): Result<never, A> => _success(a)
