@@ -24,5 +24,3 @@ asyncPipe(
   // have an error here, lets tap into it and log it.
   tapError(logError),
 )
-
-
