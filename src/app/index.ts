@@ -160,8 +160,7 @@ const initAdapter = (adapter: Exclude<AdapterTypes, 'File'>) => (app: Cizn.Appli
  */
 const initManager = (manager: Exclude<ManagerTypes, 'FS'>) => (app: Cizn.Application) => asyncPipe(
   Success(app),
-  // TODO: Add error handlilng to guard once refactored
-  map(guard(app.Manager[manager].Api.init)),
+  map(app.Manager[manager].Api.init),
 )
 
 /**
@@ -179,6 +178,9 @@ const app = asyncPipe(
   // Setting Managers
   bind(defineNamespace('Manager')),
   bind(setNamespace('Manager', setManagers(appComposition))),
+
+  // Init log manager
+  map(initManager('Log')),
 )
 
 /**
