@@ -1,32 +1,37 @@
-import crypto from 'crypto'
+import G from '@cizn/constants'
+import { isStr } from '@lib/util'
+import { makeHash, sanitizeMultilineString } from '@lib/util/string'
 import { readdir } from 'node:fs/promises'
 import { GetProps, GetType } from '.'
-import { isStr } from '@lib/util'
 
-const get = (App: Cizn.Application) => async ({ hashParts, name }: GetProps): GetType => {
+const get = (App: Cizn.Application) => async ({
+  hashParts, name, builder,
+}: GetProps): GetType => {
   const { Derivation, Environment: environment } = App.State
 
   const {
-    module = () => {}, args = {}, config = {},
+    module = () => {}, env = {}, args = {}, config = {}, inputs = [],
   } = hashParts
-  const hashString = `${JSON.stringify(args)}${JSON.stringify(config)}${module.toString()}`
+  const hashString = JSON.stringify({
+    args, env, config, inputs, module: sanitizeMultilineString(module.toString()),
+  })
 
-  const hash = crypto
-    .createHash('md5')
-    .update(hashString)
-    .digest('hex')
-
+  const hash = makeHash(hashString)
   const derivations = await readdir(Derivation.Root)
 
+  const includeEnvironment = !isStr(environment)
+    ? false
+    : builder === 'generation'
+
   const existingDerivation = derivations.find(
-    file => isStr(environment)
+    file => includeEnvironment
       ? file.includes(`${environment}-${hash}`)
       : file.includes(hash),
   )
 
-  return existingDerivation
-    ? { path: existingDerivation }
-    : { hash }
+  const path = existingDerivation || `${name}-${includeEnvironment ? `${environment}-` : ''}${hash}.${G.DRV_EXT}`
+
+  return { path, exists: !!existingDerivation }
 }
 
 export default get

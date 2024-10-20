@@ -18,8 +18,8 @@ import path from 'path'
 const build = (App: Cizn.Application) => async (environment: Environment, options: BuildProps) => {
   const log = App.Manager.Log.Api
   const {
-    Derivation: { Api: derivationAdapter },
-    Generation: { Api: generationAdapter },
+    Derivation: { Api: derivation },
+    Generation: { Api: generation },
   } = App.State
   const { source } = options
 
@@ -74,11 +74,11 @@ const build = (App: Cizn.Application) => async (environment: Environment, option
       log.info({ message: 'Building %d derivation ...', options: [<string>currentEnvironment] })
 
       // Creating (or reusing) a derivation from the current config
-      const { name, path } = await derivationAdapter.make(module)
+      const { name, path } = await derivation.make(module)
       const derivationHash = getFileName(path).split('-').pop()
 
       // Creating (or reusing) a generation from the current derivation
-      await generationAdapter.make({
+      await generation.make({
         path, hash: derivationHash, name,
       })
     }
@@ -87,13 +87,13 @@ const build = (App: Cizn.Application) => async (environment: Environment, option
 
     // Just building the environment given by the user
     // Creating (or reusing) a derivation from the current config
-    const { name, path } = await derivationAdapter.make(module)
+    const { name, path } = await derivation.make(module)
     const derivationHash = getFileName(path).split('-').pop()
 
-    // Creating (or reusing) a generation from the current derivation
-    await generationAdapter.make({
-      path, hash: derivationHash, name,
-    })
+    // // Creating (or reusing) a generation from the current derivation
+    // await generationAdapter.make({
+    //   path, hash: derivationHash, name,
+    // })
   }
 }
 

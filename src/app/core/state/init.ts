@@ -108,8 +108,8 @@ const setDefaultGenerationPath = (app: Cizn.Application) => (path: string) => {
     Success(path),
     bind(path => `${path}/${G.APP_NAME}/generations`),
     map(FS.makeDirectory),
-    bind((path) => {
-      app.State.Generation.Root = path
+    bind((generationPath) => {
+      app.State.Generation.Root = generationPath
       return path
     }),
   )}
@@ -128,8 +128,8 @@ const setDefaultDerivationPath = (app: Cizn.Application) => (path: string) => {
     Success(path),
     bind(path => `${path}/${G.APP_NAME}/derivations`),
     map(FS.makeDirectory),
-    bind((path) => {
-      app.State.Derivation.Root = path
+    bind((derivationPath) => {
+      app.State.Derivation.Root = derivationPath
       return path
     }),
   )}

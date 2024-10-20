@@ -20,12 +20,13 @@ declare namespace Cizn {
       namespace Derivation {
         export type Api = import('@cizn/core/derivation/api').Api
 
-        type Module = (
+        type Module = (() => void) | ((
           config: object,
           utils: Cizn.Utils.Public
-        ) => ModuleOptions
+        ) => ModuleOptions)
+
         type ModuleOptions = {
-          modules: Module[],
+          imports: Module[],
           homePackages: string[],
           systemPackages: string[],
           config: object,
@@ -45,6 +46,7 @@ declare namespace Cizn {
       export type File = import('@cizn/adapter/file').File
       export type Platform = import('@cizn/adapter/platform').Platform
       export type Package = import('@cizn/adapter/package').Package
+      export type Service = {} // TBI
 
       namespace Package {
         export type Api = import('@cizn/adapter/package/api').Api

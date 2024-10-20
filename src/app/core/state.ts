@@ -3,10 +3,22 @@ import { pipe } from '@lib/composition/pipe'
 
 export type Environment = 'home' | 'system' | null
 
+export type DerivationEnvironment = {
+  out?: string,
+  content?: string,
+  path?: string,
+  name?: string,
+}
+
 export type Derivation = {
   name: string,
   path: string,
-  hash?: string,
+  hash: string,
+
+  env?: DerivationEnvironment,
+  inputs?: Derivation[],
+  outputs?: string[],
+  builder?: 'generation' | 'module' | 'file' | 'package' | 'service',
 }
 
 export type Generation = {
@@ -31,7 +43,7 @@ export type State = {
   Config: Cizn.Application.State.Config
   Derivation: {
     State: {
-      Config: object,
+      Config: { [key: string]: string | boolean | number | null },
       Packages: {
         Home: string[],
         System: string[]

@@ -6,7 +6,7 @@ import { pipe } from "@lib/util"
 export type Platform = {
   Api: Cizn.Adapter.Platform.Api
   Package: Cizn.Adapter.Package
-  Serice: Cizn.Adapter.Service
+  Service: Cizn.Adapter.Service
 }
 
 /**
