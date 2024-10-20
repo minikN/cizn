@@ -1,10 +1,10 @@
 // Migrate built-in rules to @stylistic/js namespace
 /* eslint @stylistic/migrate/migrate-js: "error" */
-import globals from "globals"
-import jsdoc from 'eslint-plugin-jsdoc'
+import eslint from '@eslint/js'
 import stylisticJs from '@stylistic/eslint-plugin-js'
 import stylisticMigrate from '@stylistic/eslint-plugin-migrate'
-import eslint from '@eslint/js'
+import jsdoc from 'eslint-plugin-jsdoc'
+import globals from "globals"
 import tseslint from 'typescript-eslint'
 
 const rules = {
@@ -115,6 +115,8 @@ const rules = {
   '@typescript-eslint/no-explicit-any': 'off',
   '@typescript-eslint/ban-types': 'off',
   'no-unused-vars': 'off',
+  // overrides
+  '@typescript-eslint/no-unused-vars': 1,
 }
 
 export default [
