@@ -3,6 +3,7 @@ export type DefaultErrorTypes =
     // Generic errors
     | 'ENOENT'
     | 'ERR_INVALID_ARG_TYPE'
+    | 'EACCESS'
     // Application errors
     | 'NO_PATH_GIVEN'
     | 'NO_CONTENT_GIVEN'
@@ -25,6 +26,7 @@ const defaultErrorMessages = Object.freeze({
   INVALID_CONTENT_GIVEN: 'Invalid content given',
   INCORRECT_PATH_GIVEN: 'Incorrect path given',
   ENOENT: 'No such file or directory',
+  EACCESS: 'Insufficient file permissions',
   ERR_INVALID_ARG_TYPE: 'Invalid number of arguments',
   NOT_READABLE_FILE: 'File doesn\'t exist or isn\'t readable',
   NOT_A_FILE: 'Given path is not a file',

@@ -13,7 +13,11 @@ export type Api = {
 export type FSFileApi = {
   is: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>>, string>
   read: (path: string, errors?: {[key: string]: (...args: any) => any}) => Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>>, string>,
-  write: () => Promise<void>
+  write: ({
+    file, content, mode,
+  }: {file: string, content: string, mode?: number},
+  errors?: {[key: string]: (...args: any) => any}
+) => Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>>, string>
   parseAsJSON: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<CiznError<'NO_CONTENT_GIVEN'> | CiznError<'INVALID_CONTENT_GIVEN'>, object>,
 }
 
