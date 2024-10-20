@@ -40,11 +40,11 @@ const getConfigPath = (app: Cizn.Application): Result<never, string> =>
  */
 const getConfigValues = (FS: Cizn.Manager.FS.Api) => (path: string) => asyncPipe(
   Success(path),
-  map(withError(FS.getRealPath, { ENOENT: ErrorAs('NO_PATH_GIVEN', noConfigPathOptions) })),
-  map(FS.isPathReadable),
-  map(FS.isFile),
-  map(FS.readFile),
-  map(FS.parseJSON),
+  map(withError(FS.Path.getReal, { ENOENT: ErrorAs('NO_PATH_GIVEN', noConfigPathOptions) })),
+  map(FS.Path.isReadable),
+  map(FS.File.is),
+  map(FS.File.read),
+  map(FS.File.parseAsJSON),
 )
 
 /**
@@ -107,7 +107,7 @@ const setDefaultGenerationPath = (app: Cizn.Application) => (path: string) => {
   return asyncPipe(
     Success(path),
     bind(path => `${path}/${G.APP_NAME}/generations`),
-    map(FS.makeDirectory),
+    map(FS.Directory.make),
     bind((generationPath) => {
       app.State.Generation.Root = generationPath
       return path
@@ -127,7 +127,7 @@ const setDefaultDerivationPath = (app: Cizn.Application) => (path: string) => {
   return asyncPipe(
     Success(path),
     bind(path => `${path}/${G.APP_NAME}/derivations`),
-    map(FS.makeDirectory),
+    map(FS.Directory.make),
     bind((derivationPath) => {
       app.State.Derivation.Root = derivationPath
       return path
@@ -161,7 +161,7 @@ export const initApplicationState = (app: Cizn.Application) => {
     bind(setConfigValues(app)),
 
     // Setting the default path for the source file
-    map(FS.getCwd),
+    map(FS.Path.getCwd),
     bind(setDefaultSourcePath(app)),
 
     // Setting necessary paths for the application

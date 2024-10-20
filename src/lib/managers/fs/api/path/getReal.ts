@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { guard, map } from "@lib/composition/function"
 import { asyncPipe } from "@lib/composition/pipe"
 import {
@@ -7,7 +6,8 @@ import {
 import {
   CiznError, Error, ErrorAs,
 } from "@lib/errors"
-import { mkdir } from "node:fs/promises"
+import { realpath } from "fs/promises"
+import { FSPathApi } from "@lib/managers/fs/api"
 
 /**
  * Tries to get the real path of `path`.
@@ -15,23 +15,22 @@ import { mkdir } from "node:fs/promises"
  * @param {string} path the path to read
  * @private
  */
-const _mkdir = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> => {
+const _realPath = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> => {
   if (path) {
-    await mkdir(path, { recursive: true })
-    return Success(path)
+    return Success(await realpath(path))
   }
 
   return Failure(Error('NO_PATH_GIVEN'))
 }
 
 /**
- * Checks whether `path` is readable.
+ * Gets the full system path of the provided `path`
  *
  * @param {Cizn.Application} app the application
  */
-export const makeDirectory = (app: Cizn.Application) => <F extends (...args: any) => any>(path: string, errors?: {[key: string]: F}): Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'>>, string> => asyncPipe(
+export const getReal = (app: Cizn.Application): FSPathApi['isReadable'] => (path, errors) => asyncPipe(
   Success(path),
-  map(guard(_mkdir, {
+  map(guard(_realPath, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
     ENOENT: errors?.ENOENT ?? ErrorAs('INCORRECT_PATH_GIVEN'),
   })),
