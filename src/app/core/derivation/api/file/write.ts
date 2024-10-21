@@ -1,13 +1,37 @@
-import { Derivation } from "@cizn/core/state"
+import { Serializer } from "@lib/serializers"
 import { getFileName } from "@lib/util"
+import { WriteType } from "."
 
-const write = (App: Cizn.Application) => (inputs: Derivation[]) => async (path: string, content: string) => {
-  const { Derivation, Environment: environment } = App.State
+/**
+ *
+ * @param app
+ * @param serializer
+ * @returns
+ */
+const write = (app: Cizn.Application, serializer: Serializer | null = null): WriteType => inputs => async (path, content, props = {}) => {
+  const { Derivation } = app.State
+  const { override = false } = props
+
+  const alreadyBuiltDerivation = Derivation.State.Built.find(x => x.env.path === path)
+
+  const previousContent = alreadyBuiltDerivation
+    ? !override
+      ? <string>alreadyBuiltDerivation.env.content
+      : null
+    : null
+
+  /**
+   * Appends {@link content} to the content of the previously built derivation
+   * (of the same file) if {@link override} is `true`.
+   */
+  const fileContent = serializer
+    ? await serializer(previousContent, <object>content)
+    : `${previousContent || ''}${content}`
 
   const name = getFileName(`${path}`)
 
   const derivation = await Derivation.Api.make(() => {}, 'file', {
-    content, path, name,
+    content: fileContent, path, name,
   })
 
   inputs.push(derivation)
