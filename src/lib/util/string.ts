@@ -43,9 +43,18 @@ export const makeHash = (input: string | object) => crypto
   .digest('hex')
 
 /**
-   *  Will return the hash that is contained in `input`.
-   *
-   * @param {string} input  the path to get the filename from
-   * @returns {string} filename
-   */
-export const getHash = (input: string) => getFileName(input)?.split?.('-')?.pop?.() || ''
+ *  Will return the hash that is contained in `input`.
+ *
+ * @param {string} input  the path to get the filename from
+ * @returns {string} filename
+ */
+export const getHash = (input: string) => getFileName(input)?.split?.('-')?.[0] || ''
+
+/**
+ * Returns `true` if `path` points to a file or directory inside
+ * the users home folder.
+ *
+ * @param {string} path the path to check
+ * @returns {boolean}
+ */
+export const isHomePath = (path: string) => path.startsWith('/home/') || !path.startsWith('/')
