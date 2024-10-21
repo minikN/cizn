@@ -1,11 +1,16 @@
+import { Serializer } from '@lib/serializers'
 import { parse, stringify } from 'yaml'
 
-type Props = {
-    existingContent: string | null,
-    content: object,
-}
-
-export default async (existingContent: Props['existingContent'], content: Props['content']): Promise<string> => {
+/**
+ * Serializes `content` to an toml format.
+ *
+ * Merges with `existingContent` if available.
+ *
+ * @param {object} existingContent exising file content
+ * @param {object} content new file content
+ * @returns {Promise<string>}
+ */
+const tomlSerializer: Serializer = async (existingContent, content) => {
   const combinedContent = {
     ...existingContent ? parse(existingContent) : {},
     ...content,
@@ -13,3 +18,5 @@ export default async (existingContent: Props['existingContent'], content: Props[
 
   return stringify(combinedContent)
 }
+
+export default tomlSerializer

@@ -1,11 +1,16 @@
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
+import { Serializer } from '@lib/serializers'
 
-type Props = {
-    existingContent: string | null,
-    content: object,
-}
-
-export default async (existingContent: Props['existingContent'], content: Props['content']): Promise<string> => {
+/**
+ * Serializes `content` to an xml format.
+ *
+ * Merges with `existingContent` if available.
+ *
+ * @param {object} existingContent exising file content
+ * @param {object} content new file content
+ * @returns {Promise<string>}
+ */
+const xmlSerializer: Serializer = async (existingContent, content) => {
   const parser = new XMLParser()
   const builder = new XMLBuilder()
 
@@ -16,3 +21,5 @@ export default async (existingContent: Props['existingContent'], content: Props[
 
   return builder.build(combinedContent)
 }
+
+export default xmlSerializer

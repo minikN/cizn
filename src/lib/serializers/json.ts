@@ -1,15 +1,22 @@
-import { parse, stringify } from 'ini'
+import { Serializer } from '@lib/serializers'
 
-type Props = {
-    existingContent: string | null,
-    content: object,
-}
-
-export default async (existingContent: Props['existingContent'], content: Props['content']): Promise<string> => {
+/**
+ * Serializes `content` to an json format.
+ *
+ * Merges with `existingContent` if available.
+ *
+ * @param {object} existingContent exising file content
+ * @param {object} content new file content
+ * @returns {Promise<string>}
+ */
+const jsonSerializer: Serializer = async (existingContent, content) => {
   const combinedContent = {
+    // TODO: Use our `parseJSON` here.
     ...existingContent ? JSON.parse(existingContent) : {},
     ...content,
   }
 
   return JSON.stringify(combinedContent)
 }
+
+export default jsonSerializer
