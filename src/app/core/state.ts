@@ -64,6 +64,7 @@ export type State = {
   Derivation: {
     State: {
       Config: { [key: string]: string | boolean | number | null },
+      Built: Derivation[],
       Packages: {
         Home: string[],
         System: string[]
@@ -100,6 +101,7 @@ const state = pipe(
   setNamespace('Derivation', {
     State: {
       Config: {},
+      Built: [],
       Packages: {
         Home: [],
         System: [],

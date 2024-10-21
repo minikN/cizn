@@ -155,7 +155,6 @@ const make = (App: Cizn.Application) => async (
      */
     if (builder === 'generation') {
       for (let i = 0; i < modules.length; i++) {
-        const test = modules[i]
         const inputDerivation = await Derivation.Api.make(modules[i], 'module')
 
         inputDerivations.push(inputDerivation)
@@ -186,12 +185,24 @@ const make = (App: Cizn.Application) => async (
 
     if (exists) {
       const derivationFileContent = (await readFile(derivationFilePath)).toString()
-      const derivationContent = JSON.parse(derivationFileContent)
+      const derivationContent = JSON.parse(derivationFileContent) as Derivation
 
       Log.Api.info({ message: 'Reusing derivation %d ...', options: [path] })
       Log.Api.unindent()
 
-      return <Derivation>derivationContent
+      /**
+     * Pushing the derivation we just built into the list of built derivations. We can inspect
+     * the list to find a derivation without having the hash of it. We do that in the
+     * derivations file api for writing files.
+     */
+      /**
+       * We have already build that derivation, but we need to add it to the list of built derivations
+       * so that we can access its content from anywhere. We do that in the derivations file api for
+       * writing files.
+       */
+      Derivation.State.Built.push(derivationContent)
+
+      return derivationContent
     }
 
     Log.Api.info({ message: 'Creating derivation for %d ...', options: [fnName] })
@@ -226,16 +237,40 @@ const make = (App: Cizn.Application) => async (
     content.env.out = `${Derivation.Root}/${outputHash}-${fnName}`
 
     /**
+     * At this point, {@link content}'s `inputs` will be a recursive list of all inputs
+     * down to the most deeply nested one. We don't need to write that to the file since
+     * we can always obtain this information by recursively reading the inputs if we ever
+     * need to. So reduce the inputs down to only contain their `path` and `env.out`,
+     * and not include any subsequent `inputs`.
+     *
+     * NOTE: We don't even need the information we're currently writing. `inputs` could
+     * be a list of strings only containing the out paths of each input. But let's keep
+     * it like this for now, this is how Nix does it, and it gives us the possibility to
+     * overwrite the `env` for a specific input if we ever need to.
+     */
+    const derivationTempFileContent = {
+      ...content,
+      inputs: content.inputs.map(x => ({ path: x.path, env: { out: x.env.out } })),
+    }
+
+    /**
      * Finally writing the contents to {@link derivationTempFile} and copying it to its
      * final destination at {@link derivationFilePath}.
      */
-    await writeFile(derivationTempFile, JSON.stringify(content))
+    await writeFile(derivationTempFile, JSON.stringify(derivationTempFileContent))
     await copyFile(derivationTempFile, derivationFilePath)
 
     // TODO: Generalize this.
     builder === 'file' && Derivation.Api.builders.file(<FileDerivation>content)
     builder === 'module' && Derivation.Api.builders.module(<Derivation>content)
     builder === 'generation' && Derivation.Api.builders.generation(<Derivation>content)
+
+    /**
+     * Pushing the derivation we just built into the list of built derivations. We can inspect
+     * the list to find a derivation without having the hash of it. We do that in the
+     * derivations file api for writing files.
+     */
+    Derivation.State.Built.push(<Derivation>content)
 
     /**
      * We need to return the {@link content} of the derivation so that the function calling
