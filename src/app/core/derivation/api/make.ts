@@ -6,7 +6,8 @@ import { getFileName, mkTempFile } from '@lib/util/index.js'
 import { getHash, makeHash } from '@lib/util/string'
 import { locate } from 'func-loc'
 import {
-  copyFile, readFile, writeFile,
+  copyFile,
+  writeFile,
 } from 'node:fs/promises'
 
 
@@ -74,12 +75,6 @@ const make = (App: Cizn.Application) => async (
     if (builder === 'module' || builder === 'generation') {
       Log.Api.info({ message: 'Evaluating module %d ...', options: [fnName] })
     }
-
-    /**
-     * Creating a temp file for the new derivation with the appropriate hash
-     * Will be named `<module-name>-<hash>.drv`
-     */
-    const derivationTempFile = await mkTempFile({ name: fnName })
 
     /**
      * A derivation can have inputs, which themselves are other derivations.
@@ -184,8 +179,9 @@ const make = (App: Cizn.Application) => async (
     const derivationFilePath = `${Derivation.Root}/${path}`
 
     if (exists) {
-      const derivationFileContent = (await readFile(derivationFilePath)).toString()
-      const derivationContent = JSON.parse(derivationFileContent) as Derivation
+      const derivationHash = getHash(path)
+      const derivation = await Derivation.Api.get({ hash: derivationHash }) as Derivation
+      // const fullDerivation = Derivation.Api.get({ hash: derivationHash })
 
       Log.Api.info({ message: 'Reusing derivation %d ...', options: [path] })
       Log.Api.unindent()
@@ -200,9 +196,9 @@ const make = (App: Cizn.Application) => async (
        * so that we can access its content from anywhere. We do that in the derivations file api for
        * writing files.
        */
-      Derivation.State.Built.push(derivationContent)
+      Derivation.State.Built.push(derivation)
 
-      return derivationContent
+      return derivation
     }
 
     Log.Api.info({ message: 'Creating derivation for %d ...', options: [fnName] })
@@ -250,11 +246,17 @@ const make = (App: Cizn.Application) => async (
      */
     const derivationTempFileContent = {
       ...content,
-      inputs: content.inputs.map(x => ({ path: x.path, env: { out: x.env.out } })),
+      inputs: content.inputs.map(x => ({ path: x.path, env: { path: x.env.path, out: x.env.out } })),
     }
 
     /**
-     * Finally writing the contents to {@link derivationTempFile} and copying it to its
+     * Creating a temp file for the new derivation with the appropriate hash
+     * Will be named `<module-name>-<hash>.drv`
+     */
+    const derivationTempFile = await mkTempFile({ name: fnName })
+
+    /**
+     * Write the contents to {@link derivationTempFile} and copying it to its
      * final destination at {@link derivationFilePath}.
      */
     await writeFile(derivationTempFile, JSON.stringify(derivationTempFileContent))
