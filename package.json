@@ -9,6 +9,7 @@
   "types": "./types/index.d.ts",
   "scripts": {
     "build": "rollup --config",
+    "check": "tsc --noEmit",
     "type-coverage": "type-coverage --detail",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
