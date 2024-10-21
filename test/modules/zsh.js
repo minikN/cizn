@@ -1,6 +1,6 @@
-export default args => (config, utils) => {
+export default args => async (config, utils) => {
   return {
-    config: { test: 56 },
+    config: { test: 561 },
     homePackages: [
       'zsh',
     ],

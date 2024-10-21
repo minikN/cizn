@@ -1,54 +1,43 @@
 export default args => async (config, utils) => {
-//   utils.file.write('.config/test', `\
-// hello
-// world
-// `)
-
-  //   utils.file.writeIni('.config/test.ini', {
-  //     test: {
-  //       num: 2,
-  //       another: 'test',
-  //     },
-  //   })
-
-  //   utils.file.writeYaml('.config/test.yaml', {
-  //     test: {
-  //       num: 2,
-  //       another: 'test',
-  //     },
-  //   })
-
-  //   utils.file.writeToml('.config/test.toml', {
-  //     test: {
-  //       num: 2,
-  //       another: 'test',
-  //     },
-  //   })
-
-  //   utils.file.writeJson('.config/test.json', {
-  //     hello: {
-  //       great: 'world1',
-  //       foo: 'baz',
-  //     },
-  //   })
-
-  //   utils.file.writeXml('.config/test.xml', {
-  //     hello: {
-  //       great: 'world1',
-  //       foo: 'baz',
-  //     },
-  //   })
-
-
-  const testFile2 = await utils.file.write('.config/test3', `\
+  await utils.file.write('.config/test', `\
 hello
-world1 2 
+world
 `)
-  
-  const testFile4 = await utils.file.write('/etc/testfile', `\
-hello
-world1 2 
-`)
+
+  await utils.file.writeIni('.config/test.ini', {
+    test: {
+      num: 2,
+      another: 'test',
+    },
+  })
+
+  await utils.file.writeYaml('.config/test.yaml', {
+    test: {
+      num: 2,
+      another: 'test',
+    },
+  })
+
+  await utils.file.writeToml('.config/test.toml', {
+    test: {
+      num: 2,
+      another: 'test',
+    },
+  })
+
+  await utils.file.writeJson('.config/test.json', {
+    hello: {
+      great: 'world1',
+      foo: 'baz',
+    },
+  })
+
+  await utils.file.writeXml('.config/test.xml', {
+    hello: {
+      great: 'world1',
+      foo: 'baz',
+    },
+  })
 
   return {
     config: {
