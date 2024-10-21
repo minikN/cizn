@@ -1,4 +1,4 @@
-export default args => (config, utils) => {
+export default args => async (config, utils) => {
 //   utils.file.write('.config/test', `\
 // hello
 // world
@@ -38,6 +38,17 @@ export default args => (config, utils) => {
   //       foo: 'baz',
   //     },
   //   })
+
+
+  const testFile2 = await utils.file.write('.config/test3', `\
+hello
+world1 2 
+`)
+  
+  const testFile4 = await utils.file.write('/etc/testfile', `\
+hello
+world1 2 
+`)
 
   return {
     config: {

@@ -1,5 +1,3 @@
-import swaySubModule from './sway/sway-subModule.js'
-
 /**
  * TODO:
  *   const script = utils.file.writeScript('./myscript.sh', `\
@@ -50,12 +48,8 @@ world1 2
   //     foo: 'bar',
   //     hello: { great: 'world' },
   //   })
-  const modules = [
-    swaySubModule({ wayland: true }),
-  ]
 
   return {
-    modules,
     config: { err: 'hello1' },
     homePackages: [
       'sway',
