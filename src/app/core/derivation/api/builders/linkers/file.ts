@@ -1,6 +1,8 @@
 import { Derivation, FileDerivationEnvironment } from "@cizn/core/state"
 import { isHomePath } from "@lib/util/string"
-import { mkdir, symlink } from "node:fs/promises"
+import {
+  mkdir, rename, symlink,
+} from "node:fs/promises"
 import { dirname } from "node:path"
 
 /**
@@ -21,10 +23,18 @@ const fileLinker = async (targetDerivation: Derivation, sourceDerivation: Deriva
     : await mkdir(`${targetDerivation.env.out}/system-files`, { recursive: true })
 
   const targetPath = `${targetDerivation.env.out}/${isHomeFile ? 'home-files' : 'system-files'}/${path}`
+  const tempPath = `${targetPath}-temp`
   const symlinkPath = await dirname(targetPath)
 
   await mkdir(symlinkPath, { recursive: true })
-  await symlink(out, targetPath, 'file')
+
+  /**
+   * NOTE: Using {@link symlink}, we can't override existing links, so we work around
+   * it by first creating a temporary symlink at {@link tempPath} and then renaming it
+   * to the final name/path.
+   */
+  await symlink(out, tempPath, 'file')
+  await rename(tempPath, targetPath)
 }
 
 export default fileLinker
