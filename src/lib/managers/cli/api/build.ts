@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
-import {
-  access, constants, lstat, realpath,
-} from 'node:fs/promises'
+import { Environment } from '@cizn/core/state'
 import {
   def, getFileName, isStr,
 } from '@lib/util/index.js'
-import { BuildProps } from '.'
-import { Environment } from '@cizn/core/state'
+import {
+  access, constants, lstat, realpath,
+} from 'node:fs/promises'
 import path from 'path'
+import { BuildProps } from '.'
 
 /**
  * Building the configuration
@@ -60,6 +60,8 @@ const build = (App: Cizn.Application) => async (environment: Environment, option
     log.error({ message: `%d does not have a default export`, options: sourcePath ? [sourcePath] : [] })
   }
 
+  const derivationName = getFileName(source)
+
   if (!def(environment)) {
     // Building both system and home environments
     for (const currentEnvironment of ['system', 'home']) {
@@ -74,20 +76,20 @@ const build = (App: Cizn.Application) => async (environment: Environment, option
       log.info({ message: 'Building %d derivation ...', options: [<string>currentEnvironment] })
 
       // Creating (or reusing) a derivation from the current config
-      const { name, path } = await derivation.make(module)
-      const derivationHash = getFileName(path).split('-').pop()
+      const { name, path } = await derivation.make(module, 'generation', { name: derivationName })
+      const derivationHash = getFileName(path).split('-').pop() as string
 
       // Creating (or reusing) a generation from the current derivation
-      await generation.make({
-        path, hash: derivationHash, name,
-      })
+      // await generation.make({
+      //   path, hash: derivationHash, name,
+      // })
     }
   } else {
     log.info({ message: 'Building %d derivation ...', options: [<string>environment] })
 
     // Just building the environment given by the user
     // Creating (or reusing) a derivation from the current config
-    const { name, path } = await derivation.make(module)
+    const { name, path } = await derivation.make(module, 'generation', { name: derivationName })
     const derivationHash = getFileName(path).split('-').pop()
 
     // // Creating (or reusing) a generation from the current derivation
