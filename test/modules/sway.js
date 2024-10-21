@@ -12,6 +12,10 @@ export default args => async (config, utils) => {
 hello
 world1 2 
 `)
+  const testFile2 = await utils.file.write('.config/test2', `\
+hello
+world1 2 
+`)
 
   //   utils.file.writeIni('.config/test.ini', {
   //     foo: 'bar',
@@ -46,12 +50,12 @@ world1 2
   //     foo: 'bar',
   //     hello: { great: 'world' },
   //   })
-  const imports = [
+  const modules = [
     swaySubModule({ wayland: true }),
   ]
 
   return {
-    imports,
+    modules,
     config: { err: 'hello1' },
     homePackages: [
       'sway',

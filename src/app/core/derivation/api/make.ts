@@ -109,7 +109,7 @@ const make = (App: Cizn.Application) => async (
      * Executing the module.
      */
     const {
-      imports = [],
+      modules = [],
       config: moduleConfig = {},
       homePackages: moduleHomePackages = [],
       systemPackages: moduleSystemPackages = [],
@@ -144,10 +144,10 @@ const make = (App: Cizn.Application) => async (
      * of its `inputs` will be populated there so that the builder afterward knows what to
      * do.
      */
-    for (let i = 0; i < imports.length; i++) {
+    for (let i = 0; i < modules.length; i++) {
       const {
         name, path, hash,
-      } = await Derivation.Api.make(imports[i], 'module')
+      } = await Derivation.Api.make(modules[i], 'module')
 
       inputDerivations.push({
         name, path, hash,
