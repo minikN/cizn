@@ -1,37 +1,30 @@
-import G from '@cizn/constants'
-import { isStr } from '@lib/util'
-import { makeHash, sanitizeMultilineString } from '@lib/util/string'
-import { readdir } from 'node:fs/promises'
-import { GetProps, GetType } from '.'
+import { Derivation } from '@cizn/core/state'
+import { readdir, readFile } from 'node:fs/promises'
 
-const get = (App: Cizn.Application) => async ({
-  hashParts, name, builder,
-}: GetProps): GetType => {
-  const { Derivation, Environment: environment } = App.State
+/**
+ * Returns the contents of a derivation if it exists or `null` if it doesn't.
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {Derivation | null}
+ */
+const get = (app: Cizn.Application): Cizn.Application.State.Derivation.Api['get'] => async ({ hash }) => {
+  const { Derivation } = app.State
 
-  const {
-    module = () => {}, env = {}, args = {}, config = {}, inputs = [],
-  } = hashParts
-  const hashString = JSON.stringify({
-    args, env, config, inputs, module: sanitizeMultilineString(module.toString()),
-  })
-
-  const hash = makeHash(hashString)
   const derivations = await readdir(Derivation.Root)
 
-  const includeEnvironment = !isStr(environment)
-    ? false
-    : builder === 'generation'
-
   const existingDerivation = derivations.find(
-    file => includeEnvironment
-      ? file.includes(`${environment}-${hash}`)
-      : file.includes(hash),
+    file => file.includes(hash),
   )
 
-  const path = existingDerivation || `${name}-${includeEnvironment ? `${environment}-` : ''}${hash}.${G.DRV_EXT}`
+  if (!existingDerivation) {
+    return null
+  }
 
-  return { path, exists: !!existingDerivation }
+  const derivationPath = `${Derivation.Root}/${existingDerivation}`
+  const derivationFileContent = await readFile(`${derivationPath}`)
+  const derivationContent = JSON.parse(derivationFileContent.toString())
+
+  return <Derivation>derivationContent
 }
 
 export default get

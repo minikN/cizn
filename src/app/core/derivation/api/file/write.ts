@@ -10,8 +10,8 @@ const write = (App: Cizn.Application) => (inputs: Derivation[]) => async (path: 
     content, path, name,
   })
 
-  inputs.push({ name: derivation.name, path: derivation.path })
-  const out = derivation?.env?.out
+  inputs.push(derivation)
+  const out = derivation.env?.out
 
   return `${Derivation.Root}/${out}`
 }

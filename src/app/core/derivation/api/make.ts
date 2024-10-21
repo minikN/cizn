@@ -1,4 +1,7 @@
-import { Derivation, DerivationEnvironment } from '@cizn/core/state'
+import {
+  Derivation, DerivationData, DerivationEnvironment,
+  FileDerivation,
+} from '@cizn/core/state'
 import { getFileName, mkTempFile } from '@lib/util/index.js'
 import { getHash, makeHash } from '@lib/util/string'
 import { locate } from 'func-loc'
@@ -30,7 +33,7 @@ import {
 const make = (App: Cizn.Application) => async (
   module: Cizn.Application.State.Derivation.Module,
   builder: Derivation['builder'] = 'generation',
-  env = <DerivationEnvironment>{},
+  data: DerivationData = {},
 ): Promise<Cizn.Application.State.Derivation | undefined> => {
   const {
     Derivation, Source: stateSource, Environment: environment,
@@ -66,7 +69,7 @@ const make = (App: Cizn.Application) => async (
      * prop. So use it if it's defined, if not, we'll derive the name by
      * the path of the function that should produce this derivation.
      */
-    const fnName = env.name || getFileName(`${fnPath.path}`)
+    const fnName = data.name || getFileName(`${fnPath.path}`)
 
     if (builder === 'module' || builder === 'generation') {
       Log.Api.info({ message: 'Evaluating module %d ...', options: [fnName] })
@@ -143,15 +146,20 @@ const make = (App: Cizn.Application) => async (
      * `inputDerivations` for this derivation. After we write the derivation to a file, all
      * of its `inputs` will be populated there so that the builder afterward knows what to
      * do.
+     *
+     * NOTE: We only do this if we `builder === 'generation'`. In other words, if we're building
+     * a derivation for the root module. This means a sub module, like `sway`, can't define
+     * other sub modules itself. I see no reason to support this, but if the need arises,
+     * we need to delete the `if` here, and also change the {@link builders} to recursively
+     * collect all the files to symlink that we need.
      */
-    for (let i = 0; i < modules.length; i++) {
-      const {
-        name, path, hash,
-      } = await Derivation.Api.make(modules[i], 'module')
+    if (builder === 'generation') {
+      for (let i = 0; i < modules.length; i++) {
+        const test = modules[i]
+        const inputDerivation = await Derivation.Api.make(modules[i], 'module')
 
-      inputDerivations.push({
-        name, path, hash,
-      })
+        inputDerivations.push(inputDerivation)
+      }
     }
 
     /**
@@ -159,9 +167,9 @@ const make = (App: Cizn.Application) => async (
      * `module`. This will be a path in the store. If the derivation already exists, its
      * path will be returned.
      */
-    const { path, exists } = await Derivation.Api.get({
+    const { path, exists } = await Derivation.Api.path({
       hashParts: {
-        module, env, args, config: Derivation.State.Config, inputs: inputDerivations,
+        module, env: data, args, config: Derivation.State.Config, inputs: inputDerivations,
       }, name: fnName, builder,
     })
 
@@ -189,6 +197,13 @@ const make = (App: Cizn.Application) => async (
     Log.Api.info({ message: 'Creating derivation for %d ...', options: [fnName] })
     Log.Api.unindent()
 
+    const derivationEnv: DerivationEnvironment = {
+      name: data.name || fnName,
+      path: data.path,
+      content: data.content,
+      out: '', // This will get set properly further down
+    }
+
     /**
      * Getting all the relevant information about the derivation to create a unique hash.
      * Important: This hash is different from the hash contained in {@link path}.
@@ -196,14 +211,19 @@ const make = (App: Cizn.Application) => async (
      * when we build it, while {@link path} denotes the path to the derivation itself.
      */
     const content = {
-      name: fnName, path: derivationFilePath, inputs: inputDerivations, env, builder, hash: derivationHash,
+      name: fnName,
+      path: derivationFilePath,
+      inputs: inputDerivations,
+      env: derivationEnv,
+      hash: derivationHash,
+      builder,
     }
 
     // Creating the aforementiond output hash
     const outputHash = makeHash(content)
 
     // Adding the output path to the derivation
-    content.env = { ...env, out: `${Derivation.Root}/${outputHash}-${fnName}` }
+    content.env.out = `${Derivation.Root}/${outputHash}-${fnName}`
 
     /**
      * Finally writing the contents to {@link derivationTempFile} and copying it to its
@@ -212,13 +232,18 @@ const make = (App: Cizn.Application) => async (
     await writeFile(derivationTempFile, JSON.stringify(content))
     await copyFile(derivationTempFile, derivationFilePath)
 
+    // TODO: Generalize this.
+    builder === 'file' && Derivation.Api.builders.file(<FileDerivation>content)
+    builder === 'module' && Derivation.Api.builders.module(<Derivation>content)
+    builder === 'generation' && Derivation.Api.builders.generation(<Derivation>content)
+
     /**
      * We need to return the {@link content} of the derivation so that the function calling
      * this function (either this function itself in case we create a sub derivation or
      * {@link Cizn.Manager.Cli.Api['build']} in case we build the 'root' derivation) can use
      * the output to process it further.
      */
-    return content
+    return <Derivation>content
   } catch (e) {
     console.error(e)
   }

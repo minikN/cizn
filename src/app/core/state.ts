@@ -3,11 +3,29 @@ import { pipe } from '@lib/composition/pipe'
 
 export type Environment = 'home' | 'system' | null
 
-export type DerivationEnvironment = {
-  out?: string,
+type Builder = 'generation' | 'module' | 'package' | 'service'
+
+export type FileDerivation = {
+  builder: 'file',
+  env: FileDerivationEnvironment
+}
+
+export type DerivationData = {
   content?: string,
   path?: string,
   name?: string,
+}
+
+export type DerivationEnvironment = {
+  out: string,
+  content?: string,
+  path?: string,
+  name: string,
+}
+
+export type FileDerivationEnvironment = DerivationEnvironment & {
+  content: string,
+  path: string,
 }
 
 export type Derivation = {
@@ -15,11 +33,13 @@ export type Derivation = {
   path: string,
   hash: string,
 
-  env?: DerivationEnvironment,
-  inputs?: Derivation[],
+  inputs: Derivation[],
   outputs?: string[],
-  builder?: 'generation' | 'module' | 'file' | 'package' | 'service',
-}
+} & (FileDerivation | {
+  // TODO: Create more derivation types (for service, package, ...)
+  builder: Builder,
+  env: DerivationEnvironment
+})
 
 export type Generation = {
   number: number,
