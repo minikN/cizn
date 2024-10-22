@@ -1,5 +1,6 @@
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import { pipe } from '@lib/composition/pipe'
+import { GenerationEnvironment } from "./generation/api"
 
 export type Environment = 'home' | 'system' | null
 
@@ -43,8 +44,8 @@ export type Derivation = {
 
 export type Generation = {
   number: number,
-  path?: string,
-  hash?: string,
+  exists: boolean,
+  path: string,
 }
 
 export type Config = {
@@ -74,7 +75,9 @@ export type State = {
     Api: Cizn.Application.State.Derivation.Api
   }
   Generation: {
-    Current: string,
+    Current: {
+      [Property in GenerationEnvironment]: Generation
+    }
     Root: string,
     Api: Cizn.Application.State.Generation.Api
   }
@@ -113,7 +116,10 @@ const state = pipe(
   defineNamespace('Generation'),
   setNamespace('Generation', {
     Root: null,
-    Current: null,
+    Current: {
+      'home': null,
+      'system': null,
+    },
   }),
 )
 
