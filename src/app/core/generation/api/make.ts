@@ -1,57 +1,71 @@
-import { mkdir } from 'node:fs/promises'
+import {
+  mkdir, readdir, rename, symlink,
+} from "fs/promises"
+import { GenerationEnvironment } from "."
 
-const make = (App: Cizn.Application) => async ({
-  path: derivationPath, hash: derivationHash, name,
-}: Cizn.Application.State.Derivation) => {
+/**
+ * Creates or reuses a generation based on `derivation`
+ * and `Environment`.
+ *
+ * Does so by tasking {@link Generation.Api.path} if there is an existing
+ * generation for the given generation. If so, it returns it. If not, it
+ * will create a generation by symlinking the environment specific folders
+ * from the derivation to a new generation folder.
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {Cizn.Application.State.Generation}
+ */
+const make = (app: Cizn.Application): Cizn.Application.State.Generation.Api['make'] => async (derivation) => {
   const {
     Derivation,
     Generation,
-    Environment: environment,
-  } = App.State
+    Environment,
+  } = app.State
 
-  const { File } = App.Adapter
-  const { Log } = App.Manager
+  const { Log } = app.Manager
+  const environment = <GenerationEnvironment>Environment
 
   try {
     const {
-      number: generationNumber, path, hash,
-    } = await Generation.Api.get({ hash: derivationHash || '' })
+      number: generationNumber, path, exists,
+    } = await Generation.Api.path({ hash: derivation.hash })
 
-    if (path) {
-      // Reuse generation
-      Log.Api.info({ message: 'Reusing %d generation %d ...', options: [<string>environment, generationNumber] })
-      Generation.Current = `${Generation.Root}/${path}`
-      Generation.Api.set()
-      return
+    if (exists) {
+      Log.Api.info({ message: 'Reusing %d generation %d ...', options: [environment, generationNumber] })
+    } else {
+      Log.Api.info({ message: 'Moving to %d generation %d ...', options: [environment, generationNumber] })
+
+      const derivationPath = derivation.env.out
+      const generationPath = `${Generation.Root}/${path}`
+
+      await mkdir(generationPath, { recursive: true })
+      const derivationFolders = await readdir(derivationPath)
+      const targetFolders = derivationFolders.filter(folder => folder.includes(environment))
+
+      for (let i = 0; i < targetFolders.length; i++) {
+        const generationFolderPath = `${generationPath}/${targetFolders[i]}`
+        const derivationFolderPath = `${derivationPath}/${targetFolders[i]}`
+        const generationFolderTempPath = `${generationFolderPath}-temp`
+
+        /**
+         * NOTE: Using {@link symlink}, we can't override existing links, so we work around
+         * it by first creating a temporary symlink at {@link tempPath} and then renaming it
+         * to the final name/path.
+         */
+        await symlink(derivationFolderPath, generationFolderTempPath, 'dir')
+        await rename(generationFolderTempPath, generationFolderPath)
+      }
     }
 
-    Log.Api.info({ message: 'Moving from generation %d to %d ...', options: [generationNumber - 1, generationNumber] })
-
-    const newGeneration = `${generationNumber}${environment ? `-${environment}` : ''}-${hash}`
-    const newGenerationPath = `${Generation.Root}/${newGeneration}`
-
-    // Creating folder for new generation
-    await mkdir(`${newGenerationPath}/packages`, { recursive: true })
-    await mkdir(`${newGenerationPath}/files`, { recursive: true })
-    Generation.Current = newGenerationPath
-
-    /**
-     * Creating the utility functions for the derivation to execute
-     */
-    const configUtils = Object.entries(File.Internal).reduce((acc, [key, fn]) => {
-      acc[key] = fn?.(`${newGenerationPath}/files`)
-      return acc
-    }, <{[key: string]: Function}>{})
-
-    const internalUtils = { file: configUtils }
-
-    const { default: fn }: {default: Function } = await import(`${Derivation.Root}/${derivationPath}`)
-    await fn?.(internalUtils)
-
-    Generation.Api.set()
-
+    return {
+      number: generationNumber, path, exists,
+    }
   } catch (e) {
     console.error(e)
+    // TODO: Fix with using pipes
+    return {
+      number: -1, path: '', exists: false,
+    }
   }
 }
 
