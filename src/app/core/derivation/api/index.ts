@@ -3,6 +3,7 @@ import file from '@cizn/core/derivation/api/file'
 import get from '@cizn/core/derivation/api/get'
 import make from '@cizn/core/derivation/api/make'
 import path from '@cizn/core/derivation/api/path'
+import clean from '@cizn/core/derivation/api/clean'
 import {
   Derivation, DerivationData, FileDerivation,
 } from '@cizn/core/state'
@@ -42,6 +43,7 @@ export type Api = {
   ) => Cizn.Application.State.Derivation
   get: ({ hash }: {hash: Cizn.Application.State.Derivation['hash']}) => Promise<Cizn.Application.State.Derivation | null>
   path: (props: DerivationPathProps) => Promise<DerivationPath>
+  clean: () => void
   file: DerivationFileApi
   builders: DerivationBuilderApi
 }
@@ -49,6 +51,10 @@ export type Api = {
 const derivationApi = (app: Cizn.Application): Api => Object.create({}, {
   make: {
     value: make(app),
+    enumerable: true,
+  },
+  clean: {
+    value: clean(app),
     enumerable: true,
   },
   path: {
