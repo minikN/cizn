@@ -10,35 +10,30 @@ import {
   writeFile,
 } from 'node:fs/promises'
 
-
-// New Approach
-// What do we need for a derivation?
-// - Set of required inputs to build the derivation
-//   - name
-//   - builder? (for each derivation type [derivation, package, service, ...]?)
-//   - optional: args
-// - Set of output files
-// Thoughts:
-// In case we have a derivation that produces a file, the inputs should
-// be something like: [{name: 'foo', path: './config/foo', flags: 777, content: 'file content here'}]
-//
-// In case we have a derivation that produces a package, the inputs should be something like:
-// [{ src: 'url.to/pkg', rev: 123, }]
-
-// TODO:
-//   - Make sure global config is used
-//   - Show warning if config variable is changed by module
-//   - Make sure args work
-//   - Make sure derivations / sub-trees only get rebuild when they need to
-
+/**
+ * Creates or reuses a derivation based on provided `module` function, a
+ * `builder` type and some input `data`.
+ *
+ * Does so by executing the provided `module`function and inspecting its return
+ * values. If the `builder` is of type `generation` and the `module` function
+ * returns `modules`, it will build derivations for each of the provided modules.
+ * It will then add these derivations as inputs for the current one. After that,
+ * it builds the actual derivation by calling a builder function based on the
+ * `builder` attribute.
+ *
+ * NOTE: It does NOT take `Environment` into consideration. It will always build
+ * one derivation for all proveded inputs. It's the generation's `make` method's
+ * job to create a generation based on that derivation for the given environment.
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {Cizn.Application.State.Generation}
+ */
 const make = (App: Cizn.Application) => async (
   module: Cizn.Application.State.Derivation.Module,
   builder: Derivation['builder'] = 'generation',
   data: DerivationData = {},
 ): Promise<Cizn.Application.State.Derivation | undefined> => {
-  const {
-    Derivation, Source: stateSource, Environment: environment,
-  } = App.State
+  const { Derivation, Source: stateSource } = App.State
   const {
     Config: derivationConfig,
     Packages: {
@@ -82,7 +77,7 @@ const make = (App: Cizn.Application) => async (
      * derivation.
      *
      * It will be filled in either of two ways:
-     * - the `module` function that we'll call later returns `imports`, which
+     * - the `module` function that we'll call later returns `modules`, which
      *   is a list of input derivations
      * - Inside the `module` function, we inline create a file/service/package.
      *   Those call will run functions (e.g. `Derivation.Api.file.write` for
