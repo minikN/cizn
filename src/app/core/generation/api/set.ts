@@ -1,15 +1,20 @@
 /* eslint-disable no-unused-vars */
 import {
-  stat, writeFile, unlink,
+  rename,
+  stat,
+  symlink,
+  unlink,
 } from 'node:fs/promises'
-import path from 'path'
+import { GenerationEnvironment } from '.'
 
-const set = (App: Cizn.Application) => async (): Promise<void> => {
-  const { Generation } = App.State
+const set = (App: Cizn.Application): Cizn.Application.State.Generation.Api['set'] => async (generation) => {
+  const { Generation, Environment } = App.State
 
-  const currentGeneration = Generation.Current
+  const environment = <GenerationEnvironment>Environment
+  Generation.Current[environment] = generation
 
-  const currentGenerationFile = `${Generation.Root}/.current`
+  // Either `.current_home` or `.current_system`
+  const currentGenerationFile = `${Generation.Root}/.current_${environment}`
 
   try {
     (await stat(currentGenerationFile)).isFile()
@@ -18,8 +23,16 @@ const set = (App: Cizn.Application) => async (): Promise<void> => {
     // file doesn't exist
   }
 
-  // Writing name of current generation to file
-  await writeFile(currentGenerationFile, path.basename(currentGeneration))
+  const generationPath = `${Generation.Root}/${generation.path}`
+  const currentGenerationTempFile = `${currentGenerationFile}-temp`
+
+  /**
+   * NOTE: Using {@link symlink}, we can't override existing links, so we work around
+   * it by first creating a temporary symlink at {@link tempPath} and then renaming it
+   * to the final name/path.
+   */
+  await symlink(generationPath, currentGenerationTempFile, 'dir')
+  await rename(currentGenerationTempFile, currentGenerationFile)
 }
 
 export default set
