@@ -187,11 +187,6 @@ const make = (App: Cizn.Application) => async (
       Log.Api.unindent()
 
       /**
-     * Pushing the derivation we just built into the list of built derivations. We can inspect
-     * the list to find a derivation without having the hash of it. We do that in the
-     * derivations file api for writing files.
-     */
-      /**
        * We have already build that derivation, but we need to add it to the list of built derivations
        * so that we can access its content from anywhere. We do that in the derivations file api for
        * writing files.
@@ -263,9 +258,9 @@ const make = (App: Cizn.Application) => async (
     await copyFile(derivationTempFile, derivationFilePath)
 
     // TODO: Generalize this.
-    builder === 'file' && Derivation.Api.builders.file(<FileDerivation>content)
-    builder === 'module' && Derivation.Api.builders.module(<Derivation>content)
-    builder === 'generation' && Derivation.Api.builders.generation(<Derivation>content)
+    builder === 'file' && await Derivation.Api.builders.file(<FileDerivation>content)
+    builder === 'module' && await Derivation.Api.builders.module(<Derivation>content)
+    builder === 'generation' && await Derivation.Api.builders.generation(<Derivation>content)
 
     /**
      * Pushing the derivation we just built into the list of built derivations. We can inspect
