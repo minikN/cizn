@@ -1,6 +1,6 @@
 export default args => async (config, utils) => {
-  await utils.file.write('.config/test', `\
-hello
+  await utils.file.write('/etc/testfile', `\
+hello6
 world
 `)
 
