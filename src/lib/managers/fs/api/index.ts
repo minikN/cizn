@@ -12,6 +12,7 @@ export type Api = {
 
 export type FSFileApi = {
   is: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>>, string>
+  remove: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'> | CiznError<'EACCESS'>>, string>
   read: (path: string, errors?: {[key: string]: (...args: any) => any}) => Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>>, string>,
   write: ({
     file, content, mode,
@@ -23,6 +24,7 @@ export type FSFileApi = {
 
 export type FSDirectoryApi = {
    make: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'>>, string>
+   read: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'>>, string[]>
 }
 
 export type FSPathApi = {
