@@ -76,7 +76,7 @@ export type State = {
   }
   Generation: {
     Current: {
-      [Property in GenerationEnvironment]: Generation
+      [Property in GenerationEnvironment]: Generation | null
     }
     Root: string,
     Api: Cizn.Application.State.Generation.Api
