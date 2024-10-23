@@ -5,7 +5,37 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "TS-Node",
+            "name": "help",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "program": "${workspaceFolder}/src/app.ts",
+            "args": ["--help"],
+            "env": {
+                // "CIZN_PACKAGE_MANAGER": "bla"
+            },
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal", 
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"]
+        },
+        {
+            "name": "build",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "program": "${workspaceFolder}/src/app.ts",
+            "args": ["--config", "test/cizn.json", "build", "--source", "test/config.js"],
+            "env": {
+                // "CIZN_PACKAGE_MANAGER": "bla"
+            },
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal", 
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"]
+        },
+        {
+            "name": "build home",
             "type": "node",
             "request": "launch",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
@@ -18,6 +48,66 @@
             "console": "integratedTerminal", 
             "internalConsoleOptions": "openOnSessionStart",
             "skipFiles": ["<node_internals>/**", "node_modules/**"]
-          },
+        },
+        {
+            "name": "build system",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "program": "${workspaceFolder}/src/app.ts",
+            "args": ["--config", "test/cizn.json", "build", "system", "--source", "test/config.js"],
+            "env": {
+                // "CIZN_PACKAGE_MANAGER": "bla"
+            },
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal", 
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"]
+        },
+        {
+            "name": "apply",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "program": "${workspaceFolder}/src/app.ts",
+            "args": ["--config", "test/cizn.json", "apply"],
+            "env": {
+                // "CIZN_PACKAGE_MANAGER": "bla"
+            },
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal", 
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"]
+        },
+        {
+            "name": "apply home",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "program": "${workspaceFolder}/src/app.ts",
+            "args": ["--config", "test/cizn.json", "apply", "home"],
+            "env": {
+                // "CIZN_PACKAGE_MANAGER": "bla"
+            },
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal", 
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"]
+        },
+        {
+            "name": "apply system",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "program": "${workspaceFolder}/src/app.ts",
+            "args": ["--config", "test/cizn.json", "apply", "system"],
+            "env": {
+                // "CIZN_PACKAGE_MANAGER": "bla"
+            },
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal", 
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"],
+        },
     ]
 }
