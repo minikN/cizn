@@ -1,48 +1,31 @@
 /* eslint-disable no-unused-vars */
 import { Environment } from '@cizn/core/state'
-import {
-  def, getFileName, isStr,
-} from '@lib/util/index.js'
+import { def, getFileName } from '@lib/util/index.js'
 import {
   access, constants, lstat, realpath,
 } from 'node:fs/promises'
-import path from 'path'
-import { BuildProps } from '.'
+import { CliCommandProps } from '.'
+import _setup from './command/setup'
 
 /**
  * Building the configuration
  *
- * @param {Cizn.Application} App the main application
+ * @param {Cizn.Application} app the main application
  * @returns {Cizn.Adapter.Cli.Api['build']}
  */
-const build = (App: Cizn.Application) => async (environment: Environment, options: BuildProps) => {
-  const log = App.Manager.Log.Api
-  const {
-    Derivation: { Api: derivation },
-    Generation: { Api: generation },
-  } = App.State
+const build = (app: Cizn.Application) => async (environment: Environment, options: CliCommandProps) => {
+  const log = app.Manager.Log.Api
+
+  const { Derivation, Generation } = app.State
   const { source } = options
 
-  if (source) {
-    App.State.Source.Current = source
-    App.State.Source.Root = path.dirname(source)
-  }
-
-  if (isStr(environment) && environment !== 'home' && environment !== 'system') {
-    const falseEnvironment = <unknown>environment
-    log.error({
-      message: 'Environment given is not recognized. Can only be "home" or "system". Given value: %d',
-      options: [<string>falseEnvironment],
-    })
-  }
-
-  App.State.Environment = environment
+  _setup(app)(environment, options)
 
   let sourcePath: string = ''
 
   try {
     // Reading the source file
-    sourcePath = await realpath(`${App.State.Source.Current}`)
+    sourcePath = await realpath(`${app.State.Source.Current}`)
     log.info({ message: `Reading source file %d ...`, options: [sourcePath] })
     await access(sourcePath, constants.F_OK)
 
@@ -50,7 +33,7 @@ const build = (App: Cizn.Application) => async (environment: Environment, option
       throw new Error()
     }
   } catch(e) {
-    log.error({ message: `%d does not exist or is not readable`, options: [source] })
+    log.error({ message: `%d does not exist or is not readable`, options: [<string>source] })
   }
 
   const { default: module }: { default: Cizn.Application.State.Derivation.Module } = await import(`${sourcePath}`)
@@ -60,42 +43,38 @@ const build = (App: Cizn.Application) => async (environment: Environment, option
     log.error({ message: `%d does not have a default export`, options: sourcePath ? [sourcePath] : [] })
   }
 
-  const derivationName = getFileName(source)
+  // Creating (or reusing) a derivation from the current config
+  const derivation = await Derivation.Api.make(module, 'generation', { name: getFileName(<string>source) })
+
+  // TODO: Once converted to functional style, implement setEnvironment and withEnvironment wrappers
+  // setEnvironment simply sets App.State.Environment to the input value
+  // const withEnvironment = (app) => callback => previousValue => {
+  //   if (!app.State.Environment) {
+  //     return callback(previousValue)
+  //   }
+
+  //   const result = {}
+  //   for (const environment of ['system', 'home']) {
+  //     app.State.Environment = <Environment>environment
+  //     result[environment] = callback(previousValue)
+  //   }
+
+  //   // should be {home: <result of cb for home>, system: <result of cb for sytem>}
+  //   return result
+  // }
 
   if (!def(environment)) {
     // Building both system and home environments
     for (const currentEnvironment of ['system', 'home']) {
-      // Cleaning state between environments
-      App.State.Derivation.State.Config = {}
-      App.State.Derivation.State.Packages.Home = []
-      App.State.Derivation.State.Packages.System = []
-
       // Setting current environment
-      App.State.Environment = <Environment>currentEnvironment
-
-      log.info({ message: 'Building %d derivation ...', options: [<string>currentEnvironment] })
-
-      // Creating (or reusing) a derivation from the current config
-      const { name, path } = await derivation.make(module, 'generation', { name: derivationName })
-      const derivationHash = getFileName(path).split('-').pop() as string
+      app.State.Environment = <Environment>currentEnvironment
 
       // Creating (or reusing) a generation from the current derivation
-      // await generation.make({
-      //   path, hash: derivationHash, name,
-      // })
+      const generation = await Generation.Api.make(derivation)
     }
   } else {
-    log.info({ message: 'Building %d derivation ...', options: [<string>environment] })
-
-    // Just building the environment given by the user
-    // Creating (or reusing) a derivation from the current config
-    const { name, path } = await derivation.make(module, 'generation', { name: derivationName })
-    const derivationHash = getFileName(path).split('-').pop()
-
-    // // Creating (or reusing) a generation from the current derivation
-    // await generationAdapter.make({
-    //   path, hash: derivationHash, name,
-    // })
+    // Creating (or reusing) a generation from the current derivation
+    const generation = await Generation.Api.make(derivation)
   }
 }
 
