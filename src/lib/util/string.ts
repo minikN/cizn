@@ -58,3 +58,11 @@ export const getHash = (input: string) => getFileName(input)?.split?.('-')?.[0] 
  * @returns {boolean}
  */
 export const isHomePath = (path: string) => path.startsWith('/home/') || !path.startsWith('/')
+
+/**
+ * Returns the number of a generation for `path`.
+ *
+ * @param {string} path the path to extract the number from
+ * @returns {number}
+ */
+export const getGenerationNumber = (path: string) => parseInt(path.split('-')[0], 10)
