@@ -1,7 +1,48 @@
 /* eslint-disable no-unused-vars */
+import { GenerationEnvironment } from '@cizn/core/generation/api'
+import { bind, map } from '@lib/composition/function'
+import { asyncPipe } from '@lib/composition/pipe'
+import { Success } from '@lib/composition/result'
 import { getGenerationNumber } from '@lib/util/string'
-import { readdir } from 'node:fs/promises'
-import { GenerationEnvironment } from '.'
+
+/**
+ * Returns all generation names that match `environment`.
+ *
+ * @param GenerationEnvironment environment the current environment
+ */
+const listEnvGenerations = (environment: GenerationEnvironment) => (generations: string[]) => generations
+  .filter(g => g.includes(environment) && !g.includes('current'))
+
+/**
+ * Sorts all incoming generations by their number.
+ *
+ * @param {string[]} generations list of generations
+ */
+const sortGenerations = (generations: string[]) => generations
+  .sort((a, b) => getGenerationNumber(b) - getGenerationNumber(a))
+
+/**
+ * Returns the generation matching `generationNumber` or the
+ * newest one.
+ *
+ * @param {[string]} generationNumber number of the generation to find
+ */
+const findGeneration = (generationNumber: string | undefined) => (generations: string[]) => !generationNumber
+  ? generations[0]
+  : generations.find(g => getGenerationNumber(g) === parseInt(generationNumber, 10))
+
+/**
+ * Returns a {@link Generation} from the given `generation` path.
+ *
+ * @param {string[]} generation the generation to wrap
+ */
+const wrapGeneration = (generation: string | undefined): Cizn.Application.State.Generation | null => generation
+  ? {
+    exists: true,
+    path: generation,
+    number: getGenerationNumber(generation),
+  }
+  : null
 
 /**
  * Returns either the generation matching `generationNumber` or the latest generation.
@@ -11,27 +52,13 @@ import { GenerationEnvironment } from '.'
  * @param {Cizn.Application} app the application
  * @returns {Cizn.Application.State.Generation}
  */
-const get = (app: Cizn.Application): Cizn.Application.State.Generation.Api['get'] => async (generationNumber) => {
-  const { Generation, Environment } = app.State
-
-  const environment = <GenerationEnvironment>Environment
-  const generations = await readdir(Generation.Root)
-
-  const foundGenerations = generations
-    .filter(g => g.includes(environment) && !g.includes('current'))
-    .sort((a, b) => getGenerationNumber(b) - getGenerationNumber(a))
-
-  const targetGeneration = !generationNumber
-    ? foundGenerations[0]
-    : foundGenerations.find(g => getGenerationNumber(g) === parseInt(generationNumber, 10))
-
-  return targetGeneration
-    ? {
-      exists: true,
-      path: targetGeneration,
-      number: getGenerationNumber(targetGeneration),
-    }
-    : null
-}
+const get = (app: Cizn.Application): Cizn.Application.State.Generation.Api['get'] => generationNumber => asyncPipe(
+  Success(app.State.Generation.Root),
+  map(app.Manager.FS.Api.Directory.read),
+  bind(listEnvGenerations(<GenerationEnvironment>app.State.Environment)),
+  bind(sortGenerations),
+  bind(findGeneration(generationNumber)),
+  bind(wrapGeneration),
+)
 
 export default get
