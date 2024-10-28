@@ -1,8 +1,10 @@
+import apply from '@cizn/core/generation/api/apply'
+import get from '@cizn/core/generation/api/get'
 import make from '@cizn/core/generation/api/make'
 import path from '@cizn/core/generation/api/path'
 import set from '@cizn/core/generation/api/set'
-import get from '@cizn/core/generation/api/get'
-import apply from '@cizn/core/generation/api/apply'
+import { Result } from '@lib/composition/result'
+import { CiznError } from '@lib/errors'
 
 export type GenerationEnvironment = Extract<Cizn.Application.State.Environment, 'home' | 'system'>
 
@@ -10,7 +12,10 @@ export type Api = {
   make: (props: Cizn.Application.State.Derivation) => Promise<Cizn.Application.State.Generation>
   path: ({ hash }: {hash: Cizn.Application.State.Derivation['hash']}) => Promise<Cizn.Application.State.Generation>
   set: (generation: Cizn.Application.State.Generation) => Promise<void>
-  get: (generationNumber?: string) => Promise<Cizn.Application.State.Generation | null>
+  get: (generationNumber?: string) => Result<
+    NonNullable<CiznError<"NO_PATH_GIVEN"> | CiznError<"INCORRECT_PATH_GIVEN">>,
+    Cizn.Application.State.Generation | null
+  >
   apply: () => Promise<void>
 }
 
