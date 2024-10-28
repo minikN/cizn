@@ -110,6 +110,10 @@ const rules = {
   '@stylistic/js/space-infix-ops': 2,
   '@stylistic/js/space-unary-ops': 2,
   '@stylistic/js/indent': ['error', 2, { SwitchCase: 1 }],
+  '@stylistic/js/max-len': ['warn', {
+    code: 120,
+    comments: 90,
+  }],
   'no-plusplus': 0,
   // handled by typescript
   '@typescript-eslint/no-explicit-any': 'off',
