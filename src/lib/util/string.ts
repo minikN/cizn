@@ -66,3 +66,19 @@ export const isHomePath = (path: string) => path.startsWith('/home/') || !path.s
  * @returns {number}
  */
 export const getGenerationNumber = (path: string) => parseInt(path.split('-')[0], 10)
+
+/**
+ * Concats `str` to `input`.
+ *
+ * @param {string} str the string to concat
+ * @returns {string}
+ */
+export const concat = (str: string) => (input: string) => `${input}${str}`
+
+/**
+ * Trims `str` from the end of `input`.
+ *
+ * @param {string} str the string to concat
+ * @returns {string}
+ */
+export const trimRight = (str: string) => (input: string) => input.replace(new RegExp(`${str}+$`), '')
