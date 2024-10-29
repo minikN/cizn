@@ -153,6 +153,8 @@ export const withError = <A, E2, B, F extends (...args: any) => any>(switchFunct
  * will return the result of the function.
  * If `errors` is given, it will return the errors defined in the mapping.
  *
+ * TODO: Fix return types
+ *
  * @example <caption>Without mapping</caption>
  * pipe(
  *   ...,
