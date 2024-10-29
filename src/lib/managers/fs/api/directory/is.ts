@@ -6,17 +6,17 @@ import {
 import {
   CiznError, Error, ErrorAs,
 } from "@lib/errors"
+import { FSDirectoryApi } from "@lib/managers/fs/api"
 import { lstat } from "node:fs/promises"
-import { FSFileApi } from "@lib/managers/fs/api"
 
 /**
- * Checks whether `path` is a file.
+ * Checks whether `path` is a directory.
  *
  * @param {string} path the path to check
  * @private
  */
-const _isPathFile = async (path: string): Promise<
-  Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>, string>
+const _isPathDirectory = async (path: string): Promise<
+Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_DIR'>, string>
 > => {
   if (!path) {
     return Failure(Error('NO_PATH_GIVEN'))
@@ -28,19 +28,19 @@ const _isPathFile = async (path: string): Promise<
     return Success(path)
   }
 
-  return Failure(Error('NOT_A_FILE'))
+  return Failure(Error('NOT_A_DIR'))
 }
 
 /**
- * Checks whether `path` is a file.
+ * Checks whether `path` is a directory.
  *
  * @param {Cizn.Application} app the application
  */
-export const is = (app: Cizn.Application): FSFileApi['is'] => (path, errors) => asyncPipe(
+export const is = (app: Cizn.Application): FSDirectoryApi['is'] => (path, errors) => asyncPipe(
   Success(path),
-  map(guard(_isPathFile, {
+  map(guard(_isPathDirectory, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
     ENOENT: errors?.ENOENT ?? ErrorAs('INCORRECT_PATH_GIVEN'),
-    NOT_A_FILE: errors?.NOT_A_FILE ?? ErrorAs('NOT_A_FILE'),
+    NOT_A_DIR: errors?.NOT_A_DIR ?? ErrorAs('NOT_A_DIR'),
   })),
 )

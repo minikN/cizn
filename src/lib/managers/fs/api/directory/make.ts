@@ -7,10 +7,10 @@ import {
   CiznError, Error, ErrorAs,
 } from "@lib/errors"
 import { mkdir } from "node:fs/promises"
-import { FSDirectoryApi } from ".."
+import { FSDirectoryApi } from "@lib/managers/fs/api"
 
 /**
- * Tries to get the real path of `path`.
+* Tries to create a directory at `path`.
  *
  * @param {string} path the path to read
  * @private
@@ -25,7 +25,7 @@ const _mkdir = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>, 
 }
 
 /**
- * Checks whether `path` is readable.
+* Tries to create a directory at `path`.
  *
  * @param {Cizn.Application} app the application
  */

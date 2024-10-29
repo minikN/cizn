@@ -1,8 +1,8 @@
-import { write } from '@lib/managers/fs/api/file/write'
-import { remove } from '@lib/managers/fs/api/file/remove'
-import { read, parseAsJSON } from '@lib/managers/fs/api/file/read'
-import { is } from '@lib/managers/fs/api/file/is'
 import { FSFileApi } from '@lib/managers/fs/api'
+import { is } from '@lib/managers/fs/api/file/is'
+import { parseAsJSON, read } from '@lib/managers/fs/api/file/read'
+import { remove } from '@lib/managers/fs/api/file/remove'
+import { write } from '@lib/managers/fs/api/file/write'
 
 const fsFileApi = (app: Cizn.Application): FSFileApi => Object.create({}, {
   write: {

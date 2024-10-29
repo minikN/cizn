@@ -2,6 +2,7 @@ import { FSPathApi } from '@lib/managers/fs/api'
 import { isReadable } from '@lib/managers/fs/api/path/isReadable'
 import { getReal } from '@lib/managers/fs/api/path/getReal'
 import { getCwd } from '@lib/managers/fs/api/path/getCwd'
+import { rename } from '@lib/managers/fs/api/path/rename'
 
 const fsPathApi = (app: Cizn.Application): FSPathApi => Object.create({}, {
   isReadable: {
@@ -14,6 +15,10 @@ const fsPathApi = (app: Cizn.Application): FSPathApi => Object.create({}, {
   },
   getCwd: {
     value: getCwd(app),
+    enumerable: true,
+  },
+  rename: {
+    value: rename(app),
     enumerable: true,
   },
 })
