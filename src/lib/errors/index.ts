@@ -1,3 +1,5 @@
+import { Result } from "@lib/composition/result"
+
 export type DefaultErrorTypes =
     // Generic errors
     | 'ENOENT'
@@ -14,6 +16,7 @@ export type DefaultErrorTypes =
     | 'NOT_A_FILE'
     | 'NOT_A_DIR'
     | 'NOT_A_SYMLINK'
+    | 'NOT_OWN_FILE'
 
 export type CiznError<E extends DefaultErrorTypes> = {
     readonly name: E,
@@ -41,6 +44,7 @@ const defaultErrorMessages = Object.freeze({
   NOT_A_FILE: 'Given path is not a file',
   NOT_A_DIR: 'Given path is not a directory',
   NOT_A_SYMLINK: 'Given path is not a symbolic link',
+  NOT_OWN_FILE: 'Given path is not managed by cizn',
 })
 
 type OptionalErrorProps = {
