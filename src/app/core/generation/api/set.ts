@@ -2,7 +2,7 @@
 import { bind, map } from '@lib/composition/function'
 import { asyncPipe } from '@lib/composition/pipe'
 import { Success } from '@lib/composition/result'
-import { concat, trimRight } from '@lib/util/string'
+import { concat, stripRight } from '@lib/util/string'
 import { GenerationEnvironment } from '@cizn/core/generation/api'
 
 /**
@@ -51,7 +51,7 @@ const set = (app: Cizn.Application): Cizn.Application.State.Generation.Api['set'
     // for the target again
     map((tempPath: string) => app.Manager.FS.Api.Path.rename(
       tempPath,
-      trimRight('-temp')(tempPath),
+      stripRight('-temp')(tempPath),
     )),
   )
 }
