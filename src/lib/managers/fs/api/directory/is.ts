@@ -24,7 +24,7 @@ Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_DIR'>, string>
 
   const pathStat = await lstat(path)
 
-  if (pathStat.isDirectory() || pathStat.isSymbolicLink()) {
+  if (pathStat.isDirectory()) {
     return Success(path)
   }
 
