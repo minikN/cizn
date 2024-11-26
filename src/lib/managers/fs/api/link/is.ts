@@ -39,6 +39,6 @@ export const is = (app: Cizn.Application): FSLinkApi['is'] => (path, errors) => 
   map(guard(_isPathSymlink, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
     ENOENT: errors?.ENOENT ?? ErrorAs('INCORRECT_PATH_GIVEN'),
-    NOT_A_SYMLINK: errors?.NOT_A_DIR ?? ErrorAs('NOT_A_SYMLINK'),
+    NOT_A_SYMLINK: errors?.NOT_A_SYMLINK ?? ErrorAs('NOT_A_SYMLINK'),
   })),
 )
