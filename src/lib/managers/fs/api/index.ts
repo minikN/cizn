@@ -70,7 +70,7 @@ export type FSPathApi = {
   >
 
    getCwd: () => Result<CiznError<'NO_PATH_GIVEN'>, string>
-  
+
   rename: (a: string, b: string, errors?: {[key: string]: (...args: any) => any}) => Result<
     NonNullable<
       CiznError<'NO_PATH_GIVEN'>
@@ -103,7 +103,7 @@ export type FSLinkApi = {
       CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_SYMLINK'> | CiznError<'EACCESS'>
   >, string>
 
-  write: (t: string, p: 'file' | 'dir' | 'junction') => (a: string, errors?: {[key: string]: (...args: any) => any}) =>
+  write: (t: string, p?: 'file' | 'dir' | 'junction') => (a: string, errors?: {[key: string]: (...args: any) => any}) =>
     Result<
       NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'NO_TARGET_GIVEN'>>, string
     >
