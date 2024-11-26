@@ -85,6 +85,19 @@ export type FSLinkApi = {
     NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_SYMLINK'>>, string
   >
 
+  read: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<
+    NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'>>, string
+  >
+
+  isOwn: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<
+    NonNullable<
+    | CiznError<'NO_PATH_GIVEN'>
+    | CiznError<'INCORRECT_PATH_GIVEN'>
+    | CiznError<'NOT_A_SYMLINK'>
+    | CiznError<'NOT_OWN_FILE'>
+    >, string
+  >
+
   remove: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<
     NonNullable<
       CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_SYMLINK'> | CiznError<'EACCESS'>
