@@ -105,4 +105,10 @@ export const isSuccess = (input: any) => input?._tag === 'value' || false
  */
 export const isFailure = (input: any) => input?._tag === 'error' || false
 
+/**
+ * Wraps `a` in a {@link Success} and returns it.
+ *
+ * @param {*} a incoming value
+ * @returns {SuccessType<*>}
+ */
 export const toSuccess = <A>(a: A): Result<never, A> => _success(a)
