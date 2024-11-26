@@ -103,7 +103,6 @@ export const map: {
     input,
   ))
 
-
 /**
  * BIND ADAPTER FUNCTION
  *
@@ -215,7 +214,7 @@ export const guard = <L, R, G, F extends (...args: any) => any>(
  * @param errors Mapping between error types and callbacks
  * @returns {SuccessType} newValue
  */
-export const recover = <E1, A, F extends (...args: any) => any>(errors: {[key: string]: F}) => (input: Result<E1, A>): Result<E1, ReturnType<F>> | Result<E1, A> => {
+export const recover = <E1, A, F extends (...args: any) => any>(errors: {[key: string]: F}) => (input: Result<E1, A>): Result<E1, A | ReturnType<F>> => {
   switch (input._tag) {
     case 'error':
       const error = input.error as CiznError<any>
@@ -306,4 +305,27 @@ export const tapWithError = <E1, A, F extends (...args: any) => void>(errors: {[
   }
 
   return previousValue
+}
+
+/**
+ * Mimic `Array.forEach`, but works with {@link Result} in a pipe.
+ *
+ * If an iteration returns a {@link Failure}, it'll return that. Otherwise, it'll return
+ * `undefined`.
+ *
+ * @param {Function} fn callback for each iteration
+ */
+export const forEach = <E2, A, B>(fn: (a: A) => Promise<Result<E2, B>>) => async (previousValue: Array<A>): Promise<
+  Result<E2, undefined>
+> => {
+  for (let i = 0; i < previousValue.length; i++) {
+    const el = previousValue[i]
+    const r = await fn(el)
+
+    if (r._tag === 'error') {
+      return r
+    }
+  }
+
+  return Success(undefined)
 }
