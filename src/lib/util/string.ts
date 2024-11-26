@@ -76,9 +76,25 @@ export const getGenerationNumber = (path: string) => parseInt(path.split('-')[0]
 export const concat = (str: string) => (input: string) => `${input}${str}`
 
 /**
- * Trims `str` from the end of `input`.
+ * Prepends `str` to `input`.
  *
- * @param {string} str the string to concat
+ * @param {string} prefix the string to prepend
  * @returns {string}
  */
-export const trimRight = (str: string) => (input: string) => input.replace(new RegExp(`${str}+$`), '')
+export const prepend = (str: string) => (input: string) => `${str}${input}`
+
+/**
+ * Strips `str` from the end of `input`.
+ *
+ * @param {string} str the string to strip
+ * @returns {string}
+ */
+export const stripRight = (str: string) => (input: string) => input.replace(new RegExp(`${str}+$`), '')
+
+/**
+ * Strips `str` from `input`.
+ *
+ * @param {string} str the string to strip
+ * @returns {string}
+ */
+export const strip = (str: string) => (input: string) => input.replace(str, '')
