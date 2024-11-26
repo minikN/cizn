@@ -24,7 +24,7 @@ const _isPathFile = async (path: string): Promise<
 
   const pathStat = await lstat(path)
 
-  if (pathStat.isDirectory() || pathStat.isSymbolicLink()) {
+  if (pathStat.isFile() || pathStat.isSymbolicLink()) {
     return Success(path)
   }
 
