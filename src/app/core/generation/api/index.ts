@@ -11,13 +11,14 @@ export type GenerationEnvironment = Extract<Cizn.Application.State.Environment, 
 export type Api = {
   make: (props: Cizn.Application.State.Derivation) => Promise<Cizn.Application.State.Generation>
   path: ({ hash }: {hash: Cizn.Application.State.Derivation['hash']}) => Promise<Cizn.Application.State.Generation>
-  set: (generation: Cizn.Application.State.Generation) => Result<
-    CiznError<"NOT_A_SYMLINK">
+  set: (generation: Cizn.Application.State.Generation) => Promise<
+  Result<
+    | CiznError<"NOT_A_SYMLINK">
     | NonNullable<CiznError<"NO_PATH_GIVEN">
     | CiznError<"INCORRECT_PATH_GIVEN">
     | CiznError<"NO_TARGET_GIVEN">
     | CiznError<"EACCESS">>,
-    string
+    string>
   >
   get: (generationNumber?: string) => Result<
     NonNullable<CiznError<"NO_PATH_GIVEN"> | CiznError<"INCORRECT_PATH_GIVEN">>,
