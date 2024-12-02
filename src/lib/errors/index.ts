@@ -7,6 +7,7 @@ export type DefaultErrorTypes =
     | 'EACCESS'
     | 'EEXIST'
     // Application errors
+    | 'NO_CWD_GIVEN'
     | 'NO_PATH_GIVEN'
     | 'NO_TARGET_GIVEN'
     | 'NO_CONTENT_GIVEN'
@@ -30,6 +31,7 @@ const defaultErrorMessages = Object.freeze({
   NO_PATH_GIVEN: 'No path given',
   NO_TARGET_GIVEN: 'No target given',
   NO_CONTENT_GIVEN: 'No content given',
+  NO_CWD_GIVEN: 'No CWD given',
 
   INVALID_CONTENT_GIVEN: 'Invalid content given',
   INCORRECT_PATH_GIVEN: 'Incorrect path given',
@@ -68,4 +70,4 @@ export const ErrorWith: <E extends DefaultErrorTypes>(name: E, options: Optional
 export const ErrorAs = <E extends DefaultErrorTypes>(name: E, overrides?: OptionalErrorProps) =>
   (options: OptionalErrorProps) => _error(name, { ...options, ...overrides })
 
-
+export const isError = <E, V>(a: Result<E, V>) => a._tag === 'error'
