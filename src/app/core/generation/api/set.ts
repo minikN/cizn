@@ -28,7 +28,7 @@ const setCurrentGeneration = (app: Cizn.Application) => (generation: Cizn.Applic
  *
  * @param {Cizn.Application} app the application
  */
-const set = (app: Cizn.Application): Cizn.Application.State.Generation.Api['set'] => (generation) => {
+const set = (app: Cizn.Application): Cizn.Application.State.Generation.Api['set'] => async (generation) => {
   const generationSource = `${app.State.Generation.Root}/${generation.path}`
 
   return asyncPipe(
