@@ -1,86 +1,147 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars,@stylistic/js/object-curly-newline */
 
 import {
-  mkdir, readdir, readlink, stat,
-  symlink,
-  unlink,
+  bind, forEach, map, recover,
+  tap,
+  withError,
+} from "@lib/composition/function"
+import { asyncPipe } from "@lib/composition/pipe"
+import { Result, Success } from "@lib/composition/result"
+import { CiznError, ErrorAs } from "@lib/errors"
+import { isArr } from "@lib/util"
+import { prepend, strip } from "@lib/util/string"
+import {
+  readdir,
+  stat,
 } from "node:fs/promises"
-import path, { dirname } from "node:path"
+import path from "node:path"
+import { GenerationEnvironment } from "."
 
-const getPathAndFile = (path: string) => {
-  const i = path.lastIndexOf('/')
-  return [
-    path.slice(0, i),
-    path.slice(i + 1),
-  ]
-}
-
-// make this part of FS manager, pred should come from app
-const isOwnLink = async (path: string, pred: string) => {
-  try {
-    if ((await stat(path)).isFile()) {
-      return (await readlink(path)).includes(pred)
-    }
-  } catch (e) {}
-}
-
-const exists = async (path: string) => {
-  try {
-    await stat(path)
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-const getAllFiles = async (relative: boolean = true, dirPath: string, list: string[] = [], level: number = 0) => {
-  const files = await readdir(dirPath)
+/**
+ * Recursively lists all files in `root`.
+ *
+ * TODO: One day, convert this to pipes using recursion.
+ */
+const getAllFiles = (relative = true) => async (root: string, list: string[] = [], level: number = 0): Promise<
+  Result<CiznError<"NO_PATH_GIVEN"> | CiznError<"INCORRECT_PATH_GIVEN"> | CiznError<"NOT_A_DIR">, string[]>
+  > => {
+  const files = await readdir(root)
   let fileList = list
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
-    if ((await stat(dirPath + "/" + file)).isDirectory()) {
-      fileList = await getAllFiles(true, dirPath + "/" + file, fileList, level + 1)
+    if ((await stat(root + "/" + file)).isDirectory()) {
+      const result = await getAllFiles(true)(root + "/" + file, fileList, level + 1)
+      fileList = result._tag === 'value'
+        ? result.value
+        : []
     } else {
-      fileList.push(path.join(dirPath, "/", file))
+      fileList.push(path.join(root, "/", file))
     }
   }
 
   return level === 0 && relative
-    ? fileList.map(file => file.replace(`${dirPath}/`, ''))
-    : fileList
+    ? Success(fileList.map(file => file.replace(`${root}/`, '')))
+    : Success(fileList)
 }
 
-const apply = (App: Cizn.Application): Cizn.Application.State.Generation.Api['set'] => async () => {
-  const { Generation, Environment } = App.State
-  const log = App.Manager.Log.Api
 
-  try {
-    const filePath = `${Generation.Root}/.current_${Environment}/${Environment}-files`
-    // can throw ELOOP error: "ELOOP: too many symbolic links encountered, scandir '/home/db/.local/state/cizn/generations/.current_home/home-files'"
-    const generationFiles = await getAllFiles(false, filePath)
-    const relativeFiles = generationFiles.map(file => file.replace(`${filePath}/`, ''))
+const createFolderForPath = (app: Cizn.Application) => async (path: string) => asyncPipe(
+  Success(path),
+  map(app.Manager.FS.Api.Path.getDirname),
+  map(app.Manager.FS.Api.Directory.make),
+  bind(() => path), // return incoming `path` again
+)
 
-    for (let i = 0; i < relativeFiles.length; i++) {
-      const targetFile = `${Environment === 'home' ? process.env.HOME : ''}/${relativeFiles[i]}`
-      const sourceFile = generationFiles[i]
-      const targetFolder = await dirname(targetFile)
+/**
+ * Checks whether the file at `path` is a symlink and if its owned by cizn.
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {string} path the path of the symlink
+ */
+const checkSymlink = (app: Cizn.Application) => async (path: string) => asyncPipe(
+  Success(path),
+  map(withError(app.Manager.FS.Api.Link.isOwn, {
+    NOT_A_SYMLINK: ErrorAs('NOT_OWN_FILE', { label: `Unknown file exists: %d. Please delete or move` }),
+  })),
+  recover({ INCORRECT_PATH_GIVEN: () => path }),
+  bind(() => path), // return incoming `path` again
+)
 
-      await mkdir(targetFolder, { recursive: true })
-      if (await exists(targetFile)) {
-        if (await isOwnLink(targetFile, Generation.Root)) {
-          await unlink(targetFile)
-        } else {
-          log.error({ message: `Unknown file exists: %d. Please delete or move`, options: [targetFile] })
-        }
-      }
+/**
+ * Will delete the symlink at `path` if it exists.
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {string} path the path of the symlink
+ */
+const removeSymlink = (app: Cizn.Application) => async (path: string) => asyncPipe(
+  Success(path),
+  map(app.Manager.FS.Api.Link.remove),
+  recover({ INCORRECT_PATH_GIVEN: () => path }),
+  bind(() => path), // return incoming `path` again
+)
 
-      await symlink(sourceFile, targetFile)
-    }
-  } catch (e) {
-    console.log(e)
-  }
+/**
+ * Processes each `file` of the generation.
+ *
+ * Does so by firstly creating the parenting directory of the file if it doesn't exists.
+ * Secondly, it checks if the file already exists as part of the previous generation.
+ *
+ * If it does, it'll delete the symlink. If the file exists but is not a symlink
+ * associated with cizn, it'll return a `NOT_OWN_FILE` error.
+ *
+ * Lastly, it'll write the new symlink.
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {void}
+ */
+const processFile = (app: Cizn.Application) => async (file: string): Promise<Result<
+  | CiznError<"NO_PATH_GIVEN">
+  | CiznError<"INCORRECT_PATH_GIVEN">
+  | CiznError<"NOT_A_SYMLINK">
+  | CiznError<"NOT_OWN_FILE">
+  | CiznError<"EACCESS">
+  | CiznError<"NO_TARGET_GIVEN">,
+  undefined
+>> => asyncPipe(
+  Success(file),
+  bind(strip(`${app.State.Generation.Root}/.current_${app.State.Environment}/${app.State.Environment}-files/`)),
+  bind(prepend(`${app.State.Environment === 'home' ? process.env.HOME : ''}/`)),
+  map(createFolderForPath(app)),
+  map(checkSymlink(app)),
+  map(removeSymlink(app)),
+  map(app.Manager.FS.Api.Link.write(file)),
+  map(() => Success(undefined)),
+)
 
+/**
+ * Logs information about the generation to be applies to the user.
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {void}
+ */
+const logGenerationInfo = (app: Cizn.Application) => <V>(files: V) => {
+  const target = files && isArr(files) ? files as string[] : []
+
+  const env = app.State.Environment as GenerationEnvironment
+  const genNumber = app.State.Generation.Current[env]?.number || 1
+
+  app.Manager.Log.Api.info({ message: 'Applying generation %d to %d...', options: [genNumber, env] })
+  app.Manager.Log.Api.info({ message: 'Symlinking %d files...', options: [target.length] })
 }
+
+/**
+ * Applies the current generation, denoted by `app.State.Generation.Root` for
+ * `app.State.Environment`.
+ *
+ * @param {Cizn.Application} app the application
+ * @returns {void}
+ */
+const apply = (app: Cizn.Application) => async () => asyncPipe(
+  Success(`${app.State.Generation.Root}/.current_${app.State.Environment}/${app.State.Environment}-files`),
+  map(getAllFiles(false)),
+  tap(logGenerationInfo(app)),
+  map(forEach(processFile(app))),
+)
 
 export default apply
