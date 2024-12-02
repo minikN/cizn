@@ -12,13 +12,13 @@ import { FSPathApi } from ".."
  *
  * @private
  */
-const _getCwd = async (): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> => {
+const _getCwd = async (): Promise<Result<CiznError<'NO_CWD_GIVEN'>, string>> => {
   const cwd = await process.cwd()
   if (cwd) {
     return Success(cwd)
   }
 
-  return Failure(Error('NO_PATH_GIVEN'))
+  return Failure(Error('NO_CWD_GIVEN'))
 }
 
 /**

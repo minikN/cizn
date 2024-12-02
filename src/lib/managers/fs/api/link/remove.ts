@@ -6,7 +6,9 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
 import { FSLinkApi } from "@lib/managers/fs/api"
 import { unlink } from "node:fs/promises"
@@ -19,7 +21,7 @@ import { unlink } from "node:fs/promises"
  */
 const _unlink = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>, string>> => {
   if (!path) {
-    return Failure(Error('NO_PATH_GIVEN'))
+    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
   }
 
   await unlink(path)
@@ -34,7 +36,7 @@ const _unlink = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'> 
  */
 export const remove = (app: Cizn.Application): FSLinkApi['remove'] => (path, errors) => asyncPipe(
   Success(path),
-  map(app.Manager.FS.Api.Link.is),
+  map(x => app.Manager.FS.Api.Link.is(x, errors)),
   map(guard(_unlink, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
     EACCESS: errors?.EACCESS ?? ErrorAs('EACCESS'),

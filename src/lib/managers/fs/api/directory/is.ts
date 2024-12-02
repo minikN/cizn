@@ -4,7 +4,9 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
 import { FSDirectoryApi } from "@lib/managers/fs/api"
 import { lstat } from "node:fs/promises"
@@ -19,7 +21,7 @@ const _isPathDirectory = async (path: string): Promise<
 Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_DIR'>, string>
 > => {
   if (!path) {
-    return Failure(Error('NO_PATH_GIVEN'))
+    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
   }
 
   const pathStat = await lstat(path)
@@ -28,7 +30,7 @@ Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_DIR'>, string>
     return Success(path)
   }
 
-  return Failure(Error('NOT_A_DIR'))
+  return Failure(ErrorWith('NOT_A_DIR', { options: [path] }))
 }
 
 /**

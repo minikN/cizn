@@ -6,7 +6,9 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
 import { FSDirectoryApi } from "@lib/managers/fs/api"
 import { rmdir } from "node:fs/promises"
@@ -19,7 +21,7 @@ import { rmdir } from "node:fs/promises"
  */
 const _rmdir = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> => {
   if (!path) {
-    return Failure(Error('NO_PATH_GIVEN'))
+    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
   }
 
   await rmdir(path)
@@ -34,7 +36,7 @@ const _rmdir = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>, 
  */
 export const remove = (app: Cizn.Application): FSDirectoryApi['remove'] => (path, errors) => asyncPipe(
   Success(path),
-  map(app.Manager.FS.Api.Directory.is),
+  map(x => app.Manager.FS.Api.Directory.is(x, errors)),
   map(guard(_rmdir, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
     EACCESS: errors?.EACCESS ?? ErrorAs('EACCESS'),

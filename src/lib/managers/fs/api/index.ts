@@ -69,7 +69,7 @@ export type FSPathApi = {
     NonNullable<CiznError<'NO_PATH_GIVEN'>>, string
   >
 
-   getCwd: () => Result<CiznError<'NO_PATH_GIVEN'>, string>
+   getCwd: () => Result<CiznError<'NO_CWD_GIVEN'>, string>
 
   rename: (a: string, b: string, errors?: {[key: string]: (...args: any) => any}) => Result<
     NonNullable<

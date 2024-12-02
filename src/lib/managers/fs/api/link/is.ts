@@ -4,10 +4,12 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
-import { lstat } from "node:fs/promises"
 import { FSLinkApi } from "@lib/managers/fs/api"
+import { lstat } from "node:fs/promises"
 
 /**
  * Checks whether `path` is a symbolic link.
@@ -19,14 +21,14 @@ const _isPathSymlink = async (path: string): Promise<
 Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_SYMLINK'>, string>
 > => {
   if (!path) {
-    return Failure(Error('NO_PATH_GIVEN'))
+    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
   }
 
   if ((await lstat(path)).isSymbolicLink()) {
     return Success(path)
   }
 
-  return Failure(Error('NOT_A_SYMLINK'))
+  return Failure(ErrorWith('NOT_A_SYMLINK', { options: [path] }))
 }
 
 /**

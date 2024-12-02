@@ -4,10 +4,12 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
-import { access, constants } from "node:fs/promises"
 import { FSPathApi } from "@lib/managers/fs/api"
+import { access, constants } from "node:fs/promises"
 
 /**
  * Probes the given `path` and checks for `mode`.
@@ -22,7 +24,7 @@ const _probePath = async (path: string, mode = constants.F_OK): Promise<Result<C
     return Success(path)
   }
 
-  return Failure(Error('NO_PATH_GIVEN'))
+  return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
 }
 
 /**

@@ -4,7 +4,9 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
 import { FSLinkApi } from "@lib/managers/fs/api"
 
@@ -21,7 +23,7 @@ Result<CiznError<'NOT_OWN_FILE'>, string>
     return Success(path)
   }
 
-  return Failure(Error('NOT_OWN_FILE'))
+  return Failure(ErrorWith('NOT_OWN_FILE', { options: [path] }))
 }
 
 /**
@@ -31,7 +33,10 @@ Result<CiznError<'NOT_OWN_FILE'>, string>
  */
 export const isOwn = (app: Cizn.Application): FSLinkApi['isOwn'] => (path, errors) => asyncPipe(
   Success(path),
-  map(app.Manager.FS.Api.Link.is),
-  map(app.Manager.FS.Api.Link.read),
-  map(guard(_isOwnSymlink(app), { NOT_OWN_FILE: errors?.NOT_OWN_FILE ?? ErrorAs('NOT_OWN_FILE') })),
+  map(x => app.Manager.FS.Api.Link.is(x, errors)),
+  map(x => app.Manager.FS.Api.Link.read(x, errors)),
+  map(guard(_isOwnSymlink(app), {
+    NOT_OWN_FILE: errors?.NOT_OWN_FILE ?? ErrorAs('NOT_OWN_FILE'),
+    NOT_A_SYMLINK: errors?.NOT_OWN_FILE ?? ErrorAs('NOT_OWN_FILE'),
+  })),
 )

@@ -4,7 +4,9 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
 import { FSLinkApi } from "@lib/managers/fs/api"
 import { symlink } from "node:fs/promises"
@@ -18,11 +20,11 @@ import { symlink } from "node:fs/promises"
 const _symlink = (target: string, type: 'file' | 'dir' | 'junction') => async (path: string):
 Promise<Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NO_TARGET_GIVEN'>, string>> => {
   if (!target) {
-    return Failure(Error('NO_TARGET_GIVEN'))
+    return Failure(ErrorWith('NO_TARGET_GIVEN', { options: [path] }))
   }
 
   if (!path) {
-    return Failure(Error('NO_PATH_GIVEN'))
+    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [target] }))
   }
 
   await symlink(target, path, type)

@@ -26,6 +26,6 @@ Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_SYMLINK'>, string>
  */
 export const read = (app: Cizn.Application): FSLinkApi['read'] => (path, errors) => asyncPipe(
   Success(path),
-  map(app.Manager.FS.Api.Link.is),
+  map(x => app.Manager.FS.Api.Link.is(x, errors)),
   map(guard(_readSymlink, { EINVAL: errors?.EINVAL ?? ErrorAs('INCORRECT_PATH_GIVEN') })),
 )

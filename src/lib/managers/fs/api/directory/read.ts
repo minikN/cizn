@@ -4,10 +4,12 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
-import { readdir } from "node:fs/promises"
 import { FSDirectoryApi } from "@lib/managers/fs/api"
+import { readdir } from "node:fs/promises"
 
 /**
  * Tries to read the contents of `path`.
@@ -21,7 +23,7 @@ const _readdir = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>
     return Success(contents)
   }
 
-  return Failure(Error('NO_PATH_GIVEN'))
+  return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
 }
 
 /**

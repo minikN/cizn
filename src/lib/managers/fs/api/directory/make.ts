@@ -4,10 +4,12 @@ import {
   Failure, Result, Success,
 } from "@lib/composition/result"
 import {
-  CiznError, Error, ErrorAs,
+  CiznError,
+  ErrorAs,
+  ErrorWith,
 } from "@lib/errors"
-import { mkdir } from "node:fs/promises"
 import { FSDirectoryApi } from "@lib/managers/fs/api"
+import { mkdir } from "node:fs/promises"
 
 /**
 * Tries to create a directory at `path`.
@@ -21,7 +23,7 @@ const _mkdir = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>, 
     return Success(path)
   }
 
-  return Failure(Error('NO_PATH_GIVEN'))
+  return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
 }
 
 /**
