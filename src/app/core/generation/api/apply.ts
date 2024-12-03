@@ -137,7 +137,7 @@ const logGenerationInfo = (app: Cizn.Application) => <V>(files: V) => {
  * @param {Cizn.Application} app the application
  * @returns {void}
  */
-const apply = (app: Cizn.Application) => async () => asyncPipe(
+const apply = (app: Cizn.Application): Cizn.Application.State.Generation.Api['apply'] => async () => asyncPipe(
   Success(`${app.State.Generation.Root}/.current_${app.State.Environment}/${app.State.Environment}-files`),
   map(getAllFiles(false)),
   tap(logGenerationInfo(app)),

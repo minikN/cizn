@@ -21,10 +21,20 @@ export type Api = {
     string>
   >
   get: (generationNumber?: string) => Result<
-    NonNullable<CiznError<"NO_PATH_GIVEN"> | CiznError<"INCORRECT_PATH_GIVEN">>,
-    Cizn.Application.State.Generation | null
+    | NonNullable<CiznError<"NO_PATH_GIVEN"> | CiznError<"INCORRECT_PATH_GIVEN">>
+    | CiznError<'GENERATION_NOT_FOUND'>
+    | CiznError<'NO_GENERATIONS'>,
+    Cizn.Application.State.Generation
   >
-  apply: () => Promise<void>
+  apply: () => Promise<Result<
+  | CiznError<"NO_PATH_GIVEN">
+  | CiznError<"INCORRECT_PATH_GIVEN">
+  | CiznError<"NOT_A_SYMLINK">
+  | CiznError<"NO_TARGET_GIVEN">
+  | CiznError<"EACCES">
+  | CiznError<"NOT_A_DIR">
+  | CiznError<"NOT_OWN_FILE">,
+  undefined>>
 }
 
 const generationApi = (App: Cizn.Application): Cizn.Application.State.Generation.Api => Object.create({}, {
