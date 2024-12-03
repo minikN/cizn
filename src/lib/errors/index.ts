@@ -18,6 +18,10 @@ export type DefaultErrorTypes =
     | 'NOT_A_DIR'
     | 'NOT_A_SYMLINK'
     | 'NOT_OWN_FILE'
+    | 'NOT_KNOWN_ENVIRONMENT'
+
+    | 'NO_GENERATIONS'
+    | 'GENERATION_NOT_FOUND'
 
 export type CiznError<E extends DefaultErrorTypes> = {
     readonly name: E,
@@ -47,6 +51,10 @@ const defaultErrorMessages = Object.freeze({
   NOT_A_DIR: 'Given path is not a directory',
   NOT_A_SYMLINK: 'Given path is not a symbolic link',
   NOT_OWN_FILE: 'Given path is not managed by cizn',
+  NOT_KNOWN_ENVIRONMENT: 'Given environment is not supported',
+
+  NO_GENERATIONS: 'There are no generations',
+  GENERATION_NOT_FOUND: 'Generation %d doesn\'t exist',
 })
 
 type OptionalErrorProps = {
