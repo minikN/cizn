@@ -100,7 +100,7 @@ const processFile = (app: Cizn.Application) => async (file: string): Promise<Res
   | CiznError<"INCORRECT_PATH_GIVEN">
   | CiznError<"NOT_A_SYMLINK">
   | CiznError<"NOT_OWN_FILE">
-  | CiznError<"EACCESS">
+  | CiznError<"EACCES">
   | CiznError<"NO_TARGET_GIVEN">,
   undefined
 >> => asyncPipe(

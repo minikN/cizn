@@ -39,7 +39,7 @@ export const remove = (app: Cizn.Application): FSLinkApi['remove'] => (path, err
   map(x => app.Manager.FS.Api.Link.is(x, errors)),
   map(guard(_unlink, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
-    EACCESS: errors?.EACCESS ?? ErrorAs('EACCESS'),
+    EACCES: errors?.EACCES ?? ErrorAs('EACCES'),
     NOT_A_SYMLINK: errors?.NOT_A_SYMLINK ?? ErrorAs('NOT_A_SYMLINK'),
   })),
   recover({ INCORRECT_PATH_GIVEN: () => path }),

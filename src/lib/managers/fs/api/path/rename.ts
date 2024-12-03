@@ -41,7 +41,7 @@ export const rename = (app: Cizn.Application): FSPathApi['rename'] => (oldPath, 
   Success({ oldPath, newPath }),
   map(guard(_rename, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
-    EACCESS: errors?.EACCESS ?? ErrorAs('EACCESS'),
+    EACCES: errors?.EACCES ?? ErrorAs('EACCES'),
     ENOENT: errors?.ENOENT ?? ErrorAs('ENOENT'),
   })),
 )

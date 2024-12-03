@@ -43,6 +43,7 @@ export const write = (app: Cizn.Application): FSLinkApi['write'] => (target, typ
     map(guard(_symlink(target, type), {
       ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
       ENOENT: errors?.ENOENT ?? ErrorAs('INCORRECT_PATH_GIVEN'),
+      EACCES: errors?.EACCES ?? ErrorAs('EACCES'),
       EEXIST: errors?.EEXIST ?? ErrorAs('EEXIST'),
     })),
   )

@@ -36,5 +36,6 @@ export const make = (app: Cizn.Application): FSDirectoryApi['make'] => (path, er
   map(guard(_mkdir, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
     ENOENT: errors?.ENOENT ?? ErrorAs('INCORRECT_PATH_GIVEN'),
+    EACCES: errors?.EACCES ?? ErrorAs('EACCES'),
   })),
 )

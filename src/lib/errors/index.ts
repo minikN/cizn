@@ -4,7 +4,7 @@ export type DefaultErrorTypes =
     // Generic errors
     | 'ENOENT'
     | 'ERR_INVALID_ARG_TYPE'
-    | 'EACCESS'
+    | 'EACCES'
     | 'EEXIST'
     // Application errors
     | 'NO_CWD_GIVEN'
@@ -41,7 +41,7 @@ const defaultErrorMessages = Object.freeze({
   INCORRECT_PATH_GIVEN: 'Incorrect path given',
 
   ENOENT: 'No such file or directory',
-  EACCESS: 'Insufficient file permissions',
+  EACCES: 'Insufficient file permissions',
   EEXIST: 'Target already exists',
 
   ERR_INVALID_ARG_TYPE: 'Invalid number of arguments',

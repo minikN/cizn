@@ -17,7 +17,7 @@ export type Api = {
     | NonNullable<CiznError<"NO_PATH_GIVEN">
     | CiznError<"INCORRECT_PATH_GIVEN">
     | CiznError<"NO_TARGET_GIVEN">
-    | CiznError<"EACCESS">>,
+    | CiznError<"EACCES">>,
     string>
   >
   get: (generationNumber?: string) => Result<

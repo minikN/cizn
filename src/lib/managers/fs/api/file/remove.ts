@@ -39,7 +39,7 @@ export const remove = (app: Cizn.Application): FSFileApi['remove'] => (path, err
   map(x => app.Manager.FS.Api.File.is(x, errors)),
   map(guard(_rm, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
-    EACCESS: errors?.EACCESS ?? ErrorAs('EACCESS'),
+    EACCES: errors?.EACCES ?? ErrorAs('EACCES'),
   })),
   recover({ INCORRECT_PATH_GIVEN: () => path }),
 )

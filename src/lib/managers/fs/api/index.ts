@@ -19,7 +19,7 @@ export type FSFileApi = {
 
   remove: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<
     NonNullable<
-      CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'> | CiznError<'EACCESS'>
+      CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'> | CiznError<'EACCES'>
   >, string>
 
   read: (path: string, errors?: {[key: string]: (...args: any) => any}) => Result<
@@ -52,7 +52,7 @@ export type FSDirectoryApi = {
 
   remove: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<
     NonNullable<
-      CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_DIR'> | CiznError<'EACCESS'>
+      CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_DIR'> | CiznError<'EACCES'>
   >, string>
 }
 
@@ -76,7 +76,7 @@ export type FSPathApi = {
       CiznError<'NO_PATH_GIVEN'>
       | CiznError<'INCORRECT_PATH_GIVEN'>
       | CiznError<'NO_TARGET_GIVEN'>
-      | CiznError<'EACCESS'>
+      | CiznError<'EACCES'>
   >, string>
 }
 
@@ -100,7 +100,7 @@ export type FSLinkApi = {
 
   remove: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<
     NonNullable<
-      CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_SYMLINK'> | CiznError<'EACCESS'>
+      CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_SYMLINK'> | CiznError<'EACCES'>
   >, string>
 
   write: (t: string, p?: 'file' | 'dir' | 'junction') => (a: string, errors?: {[key: string]: (...args: any) => any}) =>

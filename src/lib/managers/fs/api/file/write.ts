@@ -43,7 +43,7 @@ export const write = (app: Cizn.Application): FSFileApi['write'] => (data, error
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),
     ENOENT: errors?.ENOENT ?? ErrorAs('INCORRECT_PATH_GIVEN'),
     EISDIR: errors?.EISDIR ?? ErrorAs('NOT_A_FILE'),
-    EACCESS: errors?.EACCESS ?? ErrorAs('EACCESS'),
+    EACCES: errors?.EACCES ?? ErrorAs('EACCES'),
   })),
 )
 
