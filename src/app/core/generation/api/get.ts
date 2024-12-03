@@ -2,7 +2,8 @@
 import { GenerationEnvironment } from '@cizn/core/generation/api'
 import { bind, map } from '@lib/composition/function'
 import { asyncPipe } from '@lib/composition/pipe'
-import { Success } from '@lib/composition/result'
+import { Failure, Success } from '@lib/composition/result'
+import { ErrorWith } from '@lib/errors'
 import { getGenerationNumber } from '@lib/util/string'
 
 /**
@@ -22,27 +23,36 @@ const sortGenerations = (generations: string[]) => generations
   .sort((a, b) => getGenerationNumber(b) - getGenerationNumber(a))
 
 /**
- * Returns the generation matching `generationNumber` or the
- * newest one.
+ * Returns the generation matching `generationNumber` or the newest one if
+ * `generationNumber` wasn't provided. If it was provided, but no generation was found,
+ * it'll return a `GENERATION_NOT_FOUND` error.
  *
  * @param {[string]} generationNumber number of the generation to find
  */
-const findGeneration = (generationNumber: string | undefined) => (generations: string[]) => !generationNumber
-  ? generations[0]
-  : generations.find(g => getGenerationNumber(g) === parseInt(generationNumber, 10))
+const findGeneration = (generationNumber: string | undefined) => (generations: string[]) => {
+  const foundGeneration = !generationNumber
+    ? generations[0]
+    : generations.find(g => getGenerationNumber(g) === parseInt(generationNumber, 10))
 
+  return foundGeneration
+    ? Success(foundGeneration)
+    : Failure(!generationNumber
+      ? ErrorWith("NO_GENERATIONS", { reasons: ['The <build> command hasn\'t been executed'] })
+      : ErrorWith("GENERATION_NOT_FOUND", {
+        reasons: ['A recent change in the source files hasn\'t been reflected by building the configuration using the <build> command'],
+        options: [generationNumber],
+      }))
+}
 /**
  * Returns a {@link Generation} from the given `generation` path.
  *
  * @param {string[]} generation the generation to wrap
  */
-const wrapGeneration = (generation: string | undefined): Cizn.Application.State.Generation | null => generation
-  ? {
-    exists: true,
-    path: generation,
-    number: getGenerationNumber(generation),
-  }
-  : null
+const wrapGeneration = (generation: string): Cizn.Application.State.Generation => ({
+  exists: true,
+  path: generation,
+  number: getGenerationNumber(generation),
+})
 
 /**
  * Returns either the generation matching `generationNumber` or the latest generation.
@@ -57,7 +67,7 @@ const get = (app: Cizn.Application): Cizn.Application.State.Generation.Api['get'
   map(app.Manager.FS.Api.Directory.read),
   bind(listEnvGenerations(<GenerationEnvironment>app.State.Environment)),
   bind(sortGenerations),
-  bind(findGeneration(generationNumber)),
+  map(findGeneration(generationNumber)),
   bind(wrapGeneration),
 )
 
