@@ -4,7 +4,6 @@ import {
   tapError,
 } from '@lib/composition/function'
 import { asyncPipe } from '@lib/composition/pipe'
-import { Success } from '@lib/composition/result'
 import { logError as logE } from '@lib/util'
 
 // `appInstance` allows us to access the application, and therefore
@@ -17,8 +16,16 @@ const logError = logE(appInstance)
 asyncPipe(
   appComposition,
   map(guard(async (app) => {
+    // Executing action handler for the given args
     await app.Manager.Cli.Program.parseAsync(process.argv)
-    return Success(app)
+
+    /**
+     * With {@link Commander}, there is no way to return something from an action handler.
+     * `parseAsync` will just return the `Command` again. We need to access the result of
+     * the operation here to log possible errors. Therefore, each action handler will save
+     * its result in {@link app.Manager.Cli.Result} so that we can access it here.
+     */
+    return app.Manager.Cli.Result
   })),
   // We reached the end of the application's lifecycle. If we
   // have an error here, lets tap into it and log it.

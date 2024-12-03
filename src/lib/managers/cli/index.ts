@@ -1,6 +1,7 @@
 import G from '@cizn/constants'
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import { defineImmutableProp } from "@lib/composition/property.js"
+import { Result } from '@lib/composition/result'
 import cliApi from "@lib/managers/cli/api/index.js"
 import { pipe } from "@lib/util/index.js"
 import { Command } from "commander"
@@ -11,6 +12,7 @@ export type Cli = {
   Program: Command
   Global: Command
   Api: Cizn.Manager.Cli.Api
+  Result: Result<unknown, unknown>
 }
 
 /**
