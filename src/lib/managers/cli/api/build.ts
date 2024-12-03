@@ -19,7 +19,7 @@ const build = (app: Cizn.Application) => async (environment: Environment, option
   const { Derivation, Generation } = app.State
   const { source } = options
 
-  _setup(app)(environment, options)
+  _setup(app)({ environment, options })
 
   let sourcePath: string = ''
 
