@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Environment } from '@cizn/core/state'
+import { Success } from '@lib/composition/result'
 import { def, getFileName } from '@lib/util/index.js'
 import {
   access, constants, lstat, realpath,
@@ -76,6 +77,8 @@ const build = (app: Cizn.Application) => async (environment: Environment, option
     // Creating (or reusing) a generation from the current derivation
     const generation = await Generation.Api.make(derivation)
   }
+
+  app.Manager.Cli.Result = Success(undefined)
 }
 
 export default build
