@@ -4,6 +4,7 @@ import {
   tapError,
 } from '@lib/composition/function'
 import { asyncPipe } from '@lib/composition/pipe'
+import { Success } from '@lib/composition/result'
 import { logError as logE } from '@lib/util'
 
 // `appInstance` allows us to access the application, and therefore
@@ -25,7 +26,7 @@ asyncPipe(
      * the operation here to log possible errors. Therefore, each action handler will save
      * its result in {@link app.Manager.Cli.Result} so that we can access it here.
      */
-    return app.Manager.Cli.Result
+    return app.Manager.Cli.Result ?? Success(undefined)
   })),
   // We reached the end of the application's lifecycle. If we
   // have an error here, lets tap into it and log it.
