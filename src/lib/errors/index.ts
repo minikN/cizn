@@ -71,6 +71,23 @@ const _error = <E extends DefaultErrorTypes>(name: E, props?: OptionalErrorProps
   ...props?.stack && { stack: props.stack },
 })
 
+/**
+ * Instantiates a new {@link CiznError} of `type` with `options`.
+ *
+ * @param {DefaultErrorTypes} name      name of the rror
+ * @param {OptionalErrorProps} options  options for the error
+ * @returns {CiznError}
+ */
 export const Error: <E extends DefaultErrorTypes>(name: E, options?: OptionalErrorProps) => CiznError<E> = _error
+
+/**
+ * Allows to override the `options` of an existing error by returning a function that
+ * will accept the underyling `options` for the original error and merge them with
+ * `overrides`.
+ *
+ * @param {DefaultErrorTypes} name        name of the rror
+ * @param {OptionalErrorProps} overrrides options for the error
+ * @returns {(a: OptionalErrorProps): CiznError}
+ */
 export const ErrorAs = <E extends DefaultErrorTypes>(name: E, overrides?: OptionalErrorProps) =>
   (options: OptionalErrorProps) => _error(name, { ...options, ...overrides })
