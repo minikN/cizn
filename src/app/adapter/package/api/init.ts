@@ -1,8 +1,3 @@
-import {
-  CiznError,
-  NotFoundError,
-  NotSupportedError,
-} from "@lib/util/error"
 import { $ } from 'execa'
 
 import pacmanApi from '@cizn/adapter/package/pacman/api'
@@ -47,10 +42,10 @@ const _determinePackageManager = async (): Promise<string> => {
       null,
     )
 
-  if(!osId) throw NotFoundError()
-  if(!foundExecutable) throw NotSupportedError([osId])
+  // if(!osId) throw NotFoundError()
+  // if(!foundExecutable) throw NotSupportedError([osId])
 
-  return foundExecutable
+  return foundExecutable || 'bla'
 }
 
 const init = (app: Cizn.Application) => async (): Promise<Cizn.Adapter.Package.Api | void> => {
@@ -92,7 +87,7 @@ const init = (app: Cizn.Application) => async (): Promise<Cizn.Adapter.Package.A
     } else if ((e as Error).name === 'CiznNotSupportedError') {
       log.error({
         message: `The selected operating system identifier (%d) is currently not supported.`,
-        options: (e as CiznError).options,
+        // options: (e as CiznError).options,
       })
     } else {
       log.error({ message: 'Generic error: %d', options: [(e as Error).message] })

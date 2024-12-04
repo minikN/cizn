@@ -1,4 +1,3 @@
-import { NotFoundError } from '@lib/util/error'
 import { ExecaError, execa } from 'execa'
 
 /**
@@ -21,7 +20,7 @@ const install = (app: Cizn.Application) => async (x: string): Promise<void> => {
       const { stderr } = await Package.Run(['-S', x], { stdout: 'ignore' })
 
       if (stderr.includes('No AUR package found')) {
-        throw NotFoundError([x])
+        // throw NotFoundError([x])
       }
     } catch (e) {
       if (
