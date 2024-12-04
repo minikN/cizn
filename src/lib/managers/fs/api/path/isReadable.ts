@@ -5,8 +5,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSPathApi } from "@lib/managers/fs/api"
 import { access, constants } from "node:fs/promises"
@@ -24,7 +24,7 @@ const _probePath = async (path: string, mode = constants.F_OK): Promise<Result<C
     return Success(path)
   }
 
-  return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
+  return Failure(Error('NO_PATH_GIVEN', { options: [path] }))
 }
 
 /**

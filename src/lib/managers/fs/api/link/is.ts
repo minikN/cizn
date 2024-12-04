@@ -5,8 +5,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSLinkApi } from "@lib/managers/fs/api"
 import { lstat } from "node:fs/promises"
@@ -21,14 +21,14 @@ const _isPathSymlink = async (path: string): Promise<
 Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_SYMLINK'>, string>
 > => {
   if (!path) {
-    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
+    return Failure(Error('NO_PATH_GIVEN', { options: [path] }))
   }
 
   if ((await lstat(path)).isSymbolicLink()) {
     return Success(path)
   }
 
-  return Failure(ErrorWith('NOT_A_SYMLINK', { options: [path] }))
+  return Failure(Error('NOT_A_SYMLINK', { options: [path] }))
 }
 
 /**

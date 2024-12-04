@@ -5,8 +5,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSFileApi } from "@lib/managers/fs/api"
 import { writeFile as nodeWriteFile } from "node:fs/promises"
@@ -24,7 +24,7 @@ const _writeFile = async ({
   file, content, mode = 0o600,
 }: {file: string, content: string, mode?: number}): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> => {
   if (!file) {
-    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [file] }))
+    return Failure(Error('NO_PATH_GIVEN', { options: [file] }))
   }
 
   await nodeWriteFile(file, content, { mode })

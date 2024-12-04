@@ -3,7 +3,7 @@ import { GenerationEnvironment } from '@cizn/core/generation/api'
 import { bind, map } from '@lib/composition/function'
 import { asyncPipe } from '@lib/composition/pipe'
 import { Failure, Success } from '@lib/composition/result'
-import { ErrorWith } from '@lib/errors'
+import { Error } from '@lib/errors'
 import { getGenerationNumber } from '@lib/util/string'
 
 /**
@@ -37,8 +37,8 @@ const findGeneration = (generationNumber: string | undefined) => (generations: s
   return foundGeneration
     ? Success(foundGeneration)
     : Failure(!generationNumber
-      ? ErrorWith("NO_GENERATIONS", { reasons: ['The <build> command hasn\'t been executed'] })
-      : ErrorWith("GENERATION_NOT_FOUND", {
+      ? Error("NO_GENERATIONS", { reasons: ['The <build> command hasn\'t been executed'] })
+      : Error("GENERATION_NOT_FOUND", {
         reasons: ['A recent change in the source files hasn\'t been reflected by building the configuration using the <build> command'],
         options: [generationNumber],
       }))

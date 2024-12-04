@@ -5,8 +5,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSFileApi } from "@lib/managers/fs/api"
 import { readFile as nodeReadFile } from "node:fs/promises"
@@ -19,7 +19,7 @@ import { readFile as nodeReadFile } from "node:fs/promises"
  */
 const _parseJSON = (contents: string): Result<CiznError<'NO_CONTENT_GIVEN'>, object> => {
   if (!contents || !contents.length) {
-    return Failure(ErrorWith('NO_CONTENT_GIVEN', { options: [contents] }))
+    return Failure(Error('NO_CONTENT_GIVEN', { options: [contents] }))
   }
 
   return Success(JSON.parse(contents))
@@ -43,7 +43,7 @@ export const parseAsJSON = (app: Cizn.Application): FSFileApi['parseAsJSON'] => 
  */
 const _readFile = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> => {
   if (!path) {
-    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
+    return Failure(Error('NO_PATH_GIVEN', { options: [path] }))
   }
 
   return Success((await nodeReadFile(path)).toString())

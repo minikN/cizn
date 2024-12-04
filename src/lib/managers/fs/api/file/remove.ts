@@ -7,8 +7,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSFileApi } from "@lib/managers/fs/api"
 import { rm } from "node:fs/promises"
@@ -21,7 +21,7 @@ import { rm } from "node:fs/promises"
  */
 const _rm = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>, string>> => {
   if (!path) {
-    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
+    return Failure(Error('NO_PATH_GIVEN', { options: [path] }))
   }
 
   await rm(path)

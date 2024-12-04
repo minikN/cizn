@@ -5,8 +5,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSPathApi } from "@lib/managers/fs/api"
 import { dirname } from "node:path"
@@ -22,7 +22,7 @@ const _dirname = (path: string): Result<CiznError<'NO_PATH_GIVEN'>, string> => {
     return Success(dirname(path))
   }
 
-  return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
+  return Failure(Error('NO_PATH_GIVEN', { options: [path] }))
 }
 
 /**

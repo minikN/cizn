@@ -5,8 +5,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSPathApi } from "@lib/managers/fs/api"
 import { realpath } from "fs/promises"
@@ -22,7 +22,7 @@ const _realPath = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'
     return Success(await realpath(path))
   }
 
-  return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
+  return Failure(Error('NO_PATH_GIVEN', { options: [path] }))
 }
 
 /**

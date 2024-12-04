@@ -5,8 +5,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSLinkApi } from "@lib/managers/fs/api"
 
@@ -23,7 +23,7 @@ Result<CiznError<'NOT_OWN_FILE'>, string>
     return Success(path)
   }
 
-  return Failure(ErrorWith('NOT_OWN_FILE', { options: [path] }))
+  return Failure(Error('NOT_OWN_FILE', { options: [path] }))
 }
 
 /**

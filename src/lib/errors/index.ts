@@ -71,7 +71,6 @@ const _error = <E extends DefaultErrorTypes>(name: E, props?: OptionalErrorProps
   ...props?.stack && { stack: props.stack },
 })
 
-export const Error: <E extends DefaultErrorTypes>(name: E) => CiznError<E> = _error
-export const ErrorWith: <E extends DefaultErrorTypes>(name: E, options: OptionalErrorProps) => CiznError<E> = _error
+export const Error: <E extends DefaultErrorTypes>(name: E, options?: OptionalErrorProps) => CiznError<E> = _error
 export const ErrorAs = <E extends DefaultErrorTypes>(name: E, overrides?: OptionalErrorProps) =>
   (options: OptionalErrorProps) => _error(name, { ...options, ...overrides })

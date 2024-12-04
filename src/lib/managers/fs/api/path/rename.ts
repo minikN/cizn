@@ -5,8 +5,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSPathApi } from "@lib/managers/fs/api"
 import { rename as nodeRename } from "node:fs/promises"
@@ -21,10 +21,10 @@ const _rename = async ({ oldPath, newPath }: {oldPath: string, newPath: string})
   Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NO_TARGET_GIVEN'>, string>
 > => {
   if (!oldPath) {
-    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [newPath] }))
+    return Failure(Error('NO_PATH_GIVEN', { options: [newPath] }))
   }
   if (!newPath) {
-    return Failure(ErrorWith('NO_TARGET_GIVEN', { options: [oldPath] }))
+    return Failure(Error('NO_TARGET_GIVEN', { options: [oldPath] }))
   }
 
   await nodeRename(oldPath, newPath)

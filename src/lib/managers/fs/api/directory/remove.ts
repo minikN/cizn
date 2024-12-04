@@ -7,8 +7,8 @@ import {
 } from "@lib/composition/result"
 import {
   CiznError,
+  Error,
   ErrorAs,
-  ErrorWith,
 } from "@lib/errors"
 import { FSDirectoryApi } from "@lib/managers/fs/api"
 import { rmdir } from "node:fs/promises"
@@ -21,7 +21,7 @@ import { rmdir } from "node:fs/promises"
  */
 const _rmdir = async (path: string): Promise<Result<CiznError<'NO_PATH_GIVEN'>, string>> => {
   if (!path) {
-    return Failure(ErrorWith('NO_PATH_GIVEN', { options: [path] }))
+    return Failure(Error('NO_PATH_GIVEN', { options: [path] }))
   }
 
   await rmdir(path)

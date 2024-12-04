@@ -4,7 +4,7 @@ import {
 } from "@lib/composition/function"
 import { pipe } from "@lib/composition/pipe"
 import { Failure, Success } from "@lib/composition/result"
-import { ErrorWith } from '@lib/errors'
+import { Error } from '@lib/errors'
 import { CliCommandProps } from "@lib/managers/cli/api"
 import { isStr } from "@lib/util"
 import path from "node:path"
@@ -36,7 +36,7 @@ const setSource = (app: Cizn.Application) => ({ options }: { options: CliCommand
  */
 const ensureEnvironment = ({ environment, options }: { environment: Environment, options: CliCommandProps}) =>
   isStr(environment) && environment !== 'home' && environment !== 'system'
-    ? Failure(ErrorWith('NOT_KNOWN_ENVIRONMENT', {
+    ? Failure(Error('NOT_KNOWN_ENVIRONMENT', {
       label: 'Environment given is not recognized. Can only be "home" or "system". Given value: %d',
       options: [<string><unknown>environment],
     }))
