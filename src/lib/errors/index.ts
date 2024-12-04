@@ -1,5 +1,3 @@
-import { Result } from "@lib/composition/result"
-
 export type DefaultErrorTypes =
     // Generic errors
     | 'ENOENT'
@@ -77,5 +75,3 @@ export const Error: <E extends DefaultErrorTypes>(name: E) => CiznError<E> = _er
 export const ErrorWith: <E extends DefaultErrorTypes>(name: E, options: OptionalErrorProps) => CiznError<E> = _error
 export const ErrorAs = <E extends DefaultErrorTypes>(name: E, overrides?: OptionalErrorProps) =>
   (options: OptionalErrorProps) => _error(name, { ...options, ...overrides })
-
-export const isError = <E, V>(a: Result<E, V>) => a._tag === 'error'

@@ -103,7 +103,7 @@ export const isSuccess = (input: any) => input?._tag === 'value' || false
  * @param {*} input the input
  * @returns {boolean}
  */
-export const isFailure = (input: any) => input?._tag === 'error' || false
+export const isFailure = <E, V>(input: Result<E, V>) => input?._tag === 'error'
 
 /**
  * Wraps `a` in a {@link Success} and returns it.

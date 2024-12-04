@@ -8,7 +8,6 @@ import { Success } from '@lib/composition/result'
 import { logError as logE } from '@lib/util'
 
 // TODO: combine Error, ErrorAs, ErrorWith into one function
-// TODO: remove isError, we have isFailure/isSuccess in result.js
 
 // `appInstance` allows us to access the application, and therefore
 // the log manager even if the application fails at the first

@@ -4,7 +4,7 @@ import {
   isFailure,
   Result, Success,
 } from "@lib/composition/result"
-import { CiznError, isError } from "@lib/errors"
+import { CiznError } from "@lib/errors"
 
 
 /**
@@ -183,7 +183,7 @@ export const guard = <L, R, G, F extends (...args: any) => any>(
 ) => async (previousValue: R) => {
     try {
       const r = await switchFunction(previousValue)
-      if (isError(r)) throw r.error
+      if (isFailure(r)) throw r.error
 
       return r
     } catch (e: any) {

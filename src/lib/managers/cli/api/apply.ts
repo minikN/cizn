@@ -2,8 +2,10 @@ import { GenerationEnvironment } from '@cizn/core/generation/api'
 import { Environment } from '@cizn/core/state'
 import { guard, map } from '@lib/composition/function'
 import { asyncPipe } from '@lib/composition/pipe'
-import { Result, Success } from '@lib/composition/result'
-import { ErrorAs, isError } from '@lib/errors'
+import {
+  isFailure, Result, Success,
+} from '@lib/composition/result'
+import { ErrorAs } from '@lib/errors'
 import { def } from '@lib/util'
 import { CliCommandProps } from '.'
 import _setup from './command/setup'
@@ -27,14 +29,14 @@ const withEnvironment = <E, V>(
         app.State.Environment = env
 
         const result = await callback(app)(options)
-        if (isError(result)) return result
+        if (isFailure(result)) return result
       }
       app.State.Environment = null
     } else {
       app.State.Environment = environment
 
       const result = await callback(app)(options)
-      if (isError(result)) return result
+      if (isFailure(result)) return result
     }
 
     return Success(undefined)
