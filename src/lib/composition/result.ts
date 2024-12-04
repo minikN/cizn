@@ -95,7 +95,7 @@ export const Success: <E = never, V = never>(v: V) => Result<E, V> = _success
  * @param {*} input the input
  * @returns {boolean}
  */
-export const isSuccess = (input: any) => input?._tag === 'value' || false
+export const isSuccess = <E, V>(input: Result<E, V>) => input?._tag === 'value'
 
 /**
  * Returns `true` if the input is of type {@link Failure}.
