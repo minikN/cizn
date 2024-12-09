@@ -3,12 +3,13 @@ import {
   Failure,
   isFailure,
   Result, Success,
+  SuccessType,
 } from "@lib/composition/result"
 import { CiznError } from "@lib/errors"
 
 
 /**
- * PATTERN MATCHING
+ * RESULT PATTERN MATCHING
  *
  * Matches the result of the last function in the chain and returns the output immediately
  * in case it is an error or passes it on to the next function and returns that output
@@ -102,6 +103,63 @@ export const map: {
     nextFunction,
     input,
   ))
+
+/**
+  * MAP IF ADAPTER FUNCTION
+  *
+  * This function is a special version of {@link map}. It takes a `predicate` function
+  * and a `nextFunction`. The predicate function is supposed to return a boolean. If the
+  * result is `true`, `nextFunction` will be executed with `input` and its output will be
+  * returned.
+  *
+  * The signature of `nextFunction` isn't changed. This means that the type of `input`'s
+  * value and the parameter of `nextFunction` need to be of the same type. If
+  * `nextFunction` should only be executed if `input`'s value is of a certain type, use
+  * {@link mapType}.
+  *
+  * @param {Function} predicateFn  function to return a boolean
+  * @param {Function} nextFunction next function to execute
+  * @exports
+  */
+export const mapIf = <A, E2, B>(
+  predicateFn: (a: A) => boolean, nextFunction: (a: A) => Result<E2, B> | Promise<Result<E2, B>>,
+) => <E1>(input: Result<E1, A>): Result<E1 | E2, A | B> =>
+    input._tag === 'value' && predicateFn(input.value)
+      ? map(nextFunction)(input)
+      : input
+
+/**
+ * MAP TYPE ADAPTER FUNCTION
+ *
+ * This function is a special version of {@link map}. It takes a `predicate` function
+ * and a `nextFunction`. The predicate function is supposed to return a boolean of type
+ * `a is P`, like {@link isStr}. If `true` is returned, `nextFunction` will be executed
+ * with the given input.
+ *
+ * Given an `input` of type `string | Derivation`, and a function `doSomething`, which
+ * has the signature `(a: string) => Result<FooError, boolean>`, one can execute
+ * `doSomething` only if `input` is of type `string` like so:
+ *
+ * @example
+ * const t = pipe(
+ *   Success(input) // <Result<never, string | Derivation>>
+ *   mapType(isStr, doSomething) // doSomething only accepts strings!
+ *   map(x => ...) // x, the return value of the previous call now has the type
+ *                 // <Result<FooError, boolean | Derivation>, because it's either
+ *                 // <Result<FooError, boolean>> if the predicate returned true or
+ *                 // <Derivation> if it didn't
+ * )
+ *
+ * @param {Function} predicateFn  function to return a boolean
+ * @param {Function} nextFunction next function to execute
+ * @exports
+ */
+export const mapType = <A, N, E2, B>(
+  predicate: (a: A) => boolean, nextFunction: (a: N) => Result<E2, B> | Promise<Result<E2, B>>,
+) => <E1>(input: Result<E1, A>): Result<E1 | E2, Exclude<A, N> | B> =>
+    input._tag === 'value' && predicate(input.value)
+      ? map(nextFunction)(input as unknown as SuccessType<N>)
+      : input as Result<E1, Exclude<A, N>>
 
 /**
  * BIND ADAPTER FUNCTION
