@@ -5,13 +5,13 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'os'
 import path from 'path'
 
-export const def = (x: any) => !!x
-export const isFn = (x: any) => typeof x === 'function'
-export const isNum = (x: any) => typeof x === 'number'
-export const isBool = (x: any) => typeof x === 'boolean'
-export const isStr = (x: any) => def(x) && x.constructor === String
-export const isObj = (x: any) => def(x) && x.constructor === Object
-export const isArr = (x: any) => def(x) && x.constructor === Array
+export const def = (x: unknown): x is Object => !!x
+export const isFn = <T>(x: Function | T): x is Function => typeof x === 'function'
+export const isNum = <T>(x: number | T): x is number => typeof x === 'number'
+export const isBool = <T>(x: boolean | T): x is boolean => typeof x === 'boolean'
+export const isStr = <T>(x: String | T): x is String => def(x) && x.constructor === String
+export const isObj = <T>(x: Object | T): x is Object => def(x) && x.constructor === Object
+export const isArr = <T, A>(x: Array<A> | T): x is Array<A> => def(x) && x.constructor === Array
 
 /**
  * Functional composition from left to right
