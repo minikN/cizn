@@ -56,6 +56,10 @@ export const BoolOption = (a: unknown) => a ? Some(a) : None
  */
 export const isNone = (o: Option<unknown>): boolean => o._tag === 'none'
 
+export const ifNone = <A>(nextFunction: () => Option<A>) => (o: Option<unknown>) => isNone(o)
+  ? nextFunction()
+  : o
+
 /**
  * isSome predicate
  *
