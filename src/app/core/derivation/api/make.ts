@@ -175,7 +175,9 @@ const make = (App: Cizn.Application) => async (
 
     if (exists) {
       const derivationHash = getHash(path)
-      const derivation = await Derivation.Api.get({ hash: derivationHash }) as Derivation
+      const derivationResult = await Derivation.Api.get(derivationHash)
+      //@ts-ignore
+      const derivation = derivationResult?.value as Derivation
       // const fullDerivation = Derivation.Api.get({ hash: derivationHash })
 
       Log.Api.info({ message: 'Reusing derivation %d ...', options: [path] })
