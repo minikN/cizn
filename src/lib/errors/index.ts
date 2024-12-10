@@ -21,6 +21,9 @@ export type DefaultErrorTypes =
     | 'NO_GENERATIONS'
     | 'GENERATION_NOT_FOUND'
 
+    | 'DERIVATION_NOT_FOUND'
+    | 'MALFORMED_DERIVATION_HASH'
+
 export type CiznError<E extends DefaultErrorTypes> = {
     readonly name: E,
     readonly label: string,
@@ -53,6 +56,9 @@ const defaultErrorMessages = Object.freeze({
 
   NO_GENERATIONS: 'There are no generations',
   GENERATION_NOT_FOUND: 'Generation %d doesn\'t exist',
+
+  DERIVATION_NOT_FOUND: 'Derivation %d doesn\'t exist',
+  MALFORMED_DERIVATION_HASH: 'Derivation %d doesn\'t contain a valid hash',
 })
 
 type OptionalErrorProps = {
