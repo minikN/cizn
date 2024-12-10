@@ -10,7 +10,7 @@ import {
 import { asyncPipe } from "@lib/composition/pipe"
 import { Result, Success } from "@lib/composition/result"
 import { ErrorAs } from '@lib/errors'
-import { logString } from '@lib/util'
+import { isObj, logString } from '@lib/util'
 import process from 'node:process'
 
 const noConfigPathOptions = {
@@ -44,7 +44,7 @@ const getConfigValues = (FS: Cizn.Manager.FS.Api) => (path: string) => asyncPipe
   map(FS.Path.isReadable),
   map(FS.File.is),
   map(FS.File.read),
-  map(FS.File.parseAsJSON),
+  map(FS.File.parseAsJSON(isObj)),
 )
 
 /**
