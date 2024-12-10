@@ -390,3 +390,30 @@ export const forEach = <E2, A, B>(fn: (a: A) => Promise<Result<E2, B>>) => async
 
   return Success(undefined)
 }
+
+/**
+ * Mimic `Array.map`, but works with {@link Result} in a pipe.
+ *
+ * If an iteration returns a {@link Failure}, it'll return that. Otherwise, it'll return
+ * `undefined`.
+ *
+ * @param {Function} fn callback for each iteration
+ */
+export const mapEach = <E2, A, B>(fn: (a: A) => Promise<Result<E2, B>>) => async (previousValue: Array<A>): Promise<
+  Result<E2, Array<B>>
+> => {
+  const acc = new Array(previousValue.length)
+
+  for (let i = 0; i < previousValue.length; i++) {
+    const el = previousValue[i]
+    const r = await fn(el)
+
+    if (isFailure(r)) {
+      return r
+    }
+
+    acc[i] = r.value
+  }
+
+  return Success(acc)
+}
