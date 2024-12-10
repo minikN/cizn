@@ -14,25 +14,46 @@ import { readFile as nodeReadFile } from "node:fs/promises"
 /**
  * Tries to parse `contents` as JSON.
  *
+ * Expects a `isType` type guard to determine the return type of the file contents.
+ *
  * @param {string} contents the content to parse
  * @private
  */
-const _parseJSON = (contents: string): Result<CiznError<'NO_CONTENT_GIVEN'>, object> => {
+const _parseJSON = <T>(isType: (t: any) => t is T) => (contents: string): Result<
+CiznError<'NO_CONTENT_GIVEN'> | CiznError<'INVALID_CONTENT_GIVEN'>
+, T> => {
   if (!contents || !contents.length) {
     return Failure(Error('NO_CONTENT_GIVEN', { options: [contents] }))
   }
 
-  return Success(JSON.parse(contents))
+  const content = JSON.parse(contents)
+
+  return isType(content)
+    ? Success(content)
+    : Failure(Error('INVALID_CONTENT_GIVEN'))
 }
 
 /**
- * Parses `contents` as JSON.
+ * Parses `contents` as JSON and returns it as a known type.
+
+ * Expects a `isType` type guard to determine the return type of the file contents. If the
+ * contents do not match the type guard, `INVALID_CONTENT_GIVEN` is returned.
+ *
+ * @example
+ * import { isObj } from '@lib/util'
+ * import { isDrv } from '@cizn/core/state'
+ *
+ * const parseAsObj = parseJSON(isObj)
+ * const parseAsDrv = parseJSON(isDrv)
+ *
+ * const obj = parseAsObj('...') // obj's type is Object
+ * const drv = parseAsDrv('...') // drv's type is Derivation
  *
  * @param {Cizn.Application} app the application
  */
-export const parseAsJSON = (app: Cizn.Application): FSFileApi['parseAsJSON'] => (contents, errors) => pipe(
+export const parseAsJSON = (app: Cizn.Application): FSFileApi['parseAsJSON'] => isType => (contents, errors) => pipe(
   Success(contents),
-  map(guard(_parseJSON, { SyntaxError: errors?.SyntaxError ?? ErrorAs('INVALID_CONTENT_GIVEN') })),
+  map(guard(_parseJSON(isType), { SyntaxError: errors?.SyntaxError ?? ErrorAs('INVALID_CONTENT_GIVEN') })),
 )
 
 /**

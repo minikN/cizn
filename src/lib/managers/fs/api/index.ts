@@ -32,8 +32,8 @@ export type FSFileApi = {
     NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'> | CiznError<'NOT_A_FILE'>>, string
   >
 
-  parseAsJSON: (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<
-    CiznError<'NO_CONTENT_GIVEN'> | CiznError<'INVALID_CONTENT_GIVEN'>, object
+  parseAsJSON: <T>(guard: (t: any) => t is T) => (a: string, errors?: {[key: string]: (...args: any) => any}) => Result<
+    CiznError<'NO_CONTENT_GIVEN'> | CiznError<'INVALID_CONTENT_GIVEN'>, T
   >,
 }
 
