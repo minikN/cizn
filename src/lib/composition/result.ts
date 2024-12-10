@@ -95,7 +95,7 @@ export const Success: <E = never, V = never>(v: V) => Result<E, V> = _success
  * @param {*} input the input
  * @returns {boolean}
  */
-export const isSuccess = <E, V>(input: Result<E, V>) => input?._tag === 'value'
+export const isSuccess = <E, V>(input: Result<E, V>): input is SuccessType<V> => input?._tag === 'value'
 
 /**
  * Returns `true` if the input is of type {@link Failure}.
@@ -103,7 +103,7 @@ export const isSuccess = <E, V>(input: Result<E, V>) => input?._tag === 'value'
  * @param {*} input the input
  * @returns {boolean}
  */
-export const isFailure = <E, V>(input: Result<E, V>) => input?._tag === 'error'
+export const isFailure = <E, V>(input: Result<E, V>): input is FailureType<E> => input?._tag === 'error'
 
 /**
  * Wraps `a` in a {@link Success} and returns it.
