@@ -1,12 +1,14 @@
 import builders from '@cizn/core/derivation/api/builders'
+import clean from '@cizn/core/derivation/api/clean'
 import file from '@cizn/core/derivation/api/file'
 import get from '@cizn/core/derivation/api/get'
 import make from '@cizn/core/derivation/api/make'
 import path from '@cizn/core/derivation/api/path'
-import clean from '@cizn/core/derivation/api/clean'
 import {
   Derivation, DerivationData, FileDerivation,
 } from '@cizn/core/state'
+import { Result } from '@lib/composition/result'
+import { CiznError } from '@lib/errors'
 
 export type DerivationPathProps = {
   name: string,
@@ -41,7 +43,17 @@ export type Api = {
     builder: Cizn.Application.State.Derivation['builder'],
     env?: Cizn.Application.State.DerivationData
   ) => Cizn.Application.State.Derivation
-  get: ({ hash }: {hash: Cizn.Application.State.Derivation['hash']}) => Promise<Cizn.Application.State.Derivation | null>
+
+  get: (hash: Cizn.Application.State.Derivation['hash']) => Promise<Result<
+   | CiznError<"MALFORMED_DERIVATION_HASH">
+   | CiznError<"NOT_A_FILE">
+   | CiznError<"NO_CONTENT_GIVEN">
+   | CiznError<"INVALID_CONTENT_GIVEN">
+   | CiznError<"NO_PATH_GIVEN">
+   | CiznError<"INCORRECT_PATH_GIVEN">,
+   Derivation | undefined
+   >>
+
   path: (props: DerivationPathProps) => Promise<DerivationPath>
   clean: () => void
   file: DerivationFileApi
