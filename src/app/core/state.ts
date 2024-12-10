@@ -1,5 +1,6 @@
 import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
 import { pipe } from '@lib/composition/pipe'
+import { def } from "@lib/util"
 import { GenerationEnvironment } from "./generation/api"
 
 export type Environment = 'home' | 'system' | null
@@ -82,6 +83,12 @@ export type State = {
     Api: Cizn.Application.State.Generation.Api
   }
 }
+
+// type guards
+export const isDrv = (x: unknown): x is Derivation => def(x)
+  && Object.hasOwnProperty.call(x, 'name')
+  && Object.hasOwnProperty.call(x, 'path')
+  && Object.hasOwnProperty.call(x, 'hash')
 
 /**
  * Composes the application state
