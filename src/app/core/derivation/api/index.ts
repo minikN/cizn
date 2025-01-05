@@ -39,7 +39,7 @@ export type DerivationBuilderApi = {
 
 export type Api = {
   make: (
-    module: Cizn.Application.State.Derivation.Module,
+    module: Cizn.Application.State.Derivation.FileModule,
     builder: Cizn.Application.State.Derivation['builder'],
     env?: Cizn.Application.State.DerivationData
   ) => Cizn.Application.State.Derivation
