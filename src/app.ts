@@ -21,7 +21,7 @@ asyncPipe(
   appComposition,
   map(guard(async (app: Cizn.Application) => {
     // Executing action handler for the given args
-    await app.Manager.Cli.Program.parseAsync(process.argv.slice(2))
+    await app.Manager.Cli.Program.parseAsync(Deno.args, { from: 'user' })
 
     /**
      * With {@link Commander}, there is no way to return something from an action handler.

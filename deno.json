@@ -1,4 +1,8 @@
 {
+    "tasks": {
+        "type-coverage": "deno run --allow-read --allow-env --allow-sys npm:type-coverage --detail",
+        "build": "deno compile -o build/cizn --allow-all src/app.ts"
+    },
     "imports": {
         "@cizn/": "./src/app/",
         "@eslint/js": "npm:@eslint/js@9.5.0",
@@ -8,7 +12,6 @@
         "@nothing628/chalk": "jsr:@nothing628/chalk@^1.0.1",
         "@types/node": "npm:@types/node@^22.10.2",
         "execa": "npm:execa@9.5.2",
-        "func-loc": "npm:func-loc@0.1.16",
         "commander": "npm:commander@12.1.0",
         "@commander-js/extra-typings": "npm:@commander-js/extra-typings@12.1.0",
 
@@ -24,5 +27,8 @@
         "@types/eslint__js": "npm:@types/eslint__js@8.42.3",
         "@stylistic/eslint-plugin-js": "npm:@stylistic/eslint-plugin-js@2.2.1",
         "@stylistic/eslint-plugin-migrate": "npm:@stylistic/eslint-plugin-migrate@2.2.1",
+    },
+    "compilerOptions": {
+        "types": ["./src/global.d.ts"]
     }
 }

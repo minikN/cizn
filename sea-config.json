@@ -1,7 +1,0 @@
-{
-  "main": "./dist/app.js",
-  "output": "./dist/app.blob",
-  "disableExperimentalSEAWarning": true,
-  "useSnapshot": false,
-  "useCodeCache": true
-}

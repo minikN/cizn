@@ -12,7 +12,7 @@ import { Serializer } from '@lib/serializers/index.ts'
  */
 const yamlSerializer: Serializer = async (existingContent, content) => {
   const combinedContent = {
-    ...existingContent ? parse(existingContent) : {},
+    ...existingContent ? parse(existingContent) as object : {},
     ...content,
   }
 

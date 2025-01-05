@@ -26,7 +26,6 @@ const make = (app: Cizn.Application): Cizn.Application.State.Generation.Api['mak
   const environment = <GenerationEnvironment>Environment
 
   try {
-    console.log('d', derivation)
     const {
       number: generationNumber, path, exists,
     } = await Generation.Api.path({ hash: derivation.hash })
