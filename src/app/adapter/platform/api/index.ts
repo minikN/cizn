@@ -1,5 +1,5 @@
-import init from '@cizn/adapter/platform/api/init'
-import { Result } from '@lib/composition/result'
+import init from '@cizn/adapter/platform/api/init.ts'
+import { Result } from '@lib/composition/result.ts'
 
 export type Api = {
     init: () => Promise<Result<never, Cizn.Application>>

@@ -1,7 +1,7 @@
-import api from "@cizn/adapter/platform/api"
-import { defineNamespace, setNamespace } from "@lib/composition/namespace"
-import { defineProp } from "@lib/composition/property"
-import { pipe } from "@lib/util"
+import api from "@cizn/adapter/platform/api/index.ts"
+import { defineNamespace, setNamespace } from "@lib/composition/namespace.ts"
+import { defineProp } from "@lib/composition/property.ts"
+import { pipe } from "@lib/util/index.ts"
 
 export type Platform = {
   Api: Cizn.Adapter.Platform.Api

@@ -1,7 +1,7 @@
-import { curry } from "@lib/util"
-import { sanitize, toCamelCase } from "@lib/util/string"
+import { curry } from "@lib/util/index.ts"
+import { sanitize, toCamelCase } from "@lib/util/string.ts"
 import { appendFileSync } from "node:fs"
-import { Props } from "../internal"
+import { Props } from "@cizn/adapter/file/api/internal.ts"
 
 const include = (App: Cizn.Application) => curry((
   source: Props['source'],

@@ -1,14 +1,14 @@
-import { GenerationEnvironment } from '@cizn/core/generation/api'
-import { Environment } from '@cizn/core/state'
-import { guard, map } from '@lib/composition/function'
-import { asyncPipe } from '@lib/composition/pipe'
+import { GenerationEnvironment } from '@cizn/core/generation/api/index.ts'
+import { Environment } from '@cizn/core/state.ts'
+import { guard, map } from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
 import {
   isFailure, Result, Success,
-} from '@lib/composition/result'
-import { ErrorAs } from '@lib/errors'
-import { def } from '@lib/util'
-import { CliCommandProps } from '.'
-import _setup from './command/setup'
+} from '@lib/composition/result.ts'
+import { ErrorAs } from '@lib/errors/index.ts'
+import { def } from '@lib/util/index.ts'
+import { CliCommandProps } from '@lib/managers/cli/api/index.ts'
+import _setup from '@lib/managers/cli/api/command/setup.ts'
 
 /**
  * If an environment is set, it will execute `callback` with the provided `options`.

@@ -1,5 +1,5 @@
-import crypto from 'crypto'
-import { getFileName, isStr } from '.'
+import crypto from 'node:crypto'
+import { getFileName, isStr } from '@lib/util/index.ts'
 
 /**
  * Will convert {@param str} to camel case.

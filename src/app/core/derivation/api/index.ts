@@ -1,14 +1,14 @@
-import builders from '@cizn/core/derivation/api/builders'
-import clean from '@cizn/core/derivation/api/clean'
-import file from '@cizn/core/derivation/api/file'
-import get from '@cizn/core/derivation/api/get'
-import make from '@cizn/core/derivation/api/make'
-import path from '@cizn/core/derivation/api/path'
+import builders from '@cizn/core/derivation/api/builders/index.ts'
+import clean from '@cizn/core/derivation/api/clean.ts'
+import file from '@cizn/core/derivation/api/file/index.ts'
+import get from '@cizn/core/derivation/api/get.ts'
+import make from '@cizn/core/derivation/api/make.ts'
+import path from '@cizn/core/derivation/api/path.ts'
 import {
   Derivation, DerivationData, FileDerivation,
-} from '@cizn/core/state'
-import { Result } from '@lib/composition/result'
-import { CiznError } from '@lib/errors'
+} from '@cizn/core/state.ts'
+import { Result } from '@lib/composition/result.ts'
+import { CiznError } from '@lib/errors/index.ts'
 
 export type DerivationPathProps = {
   name: string,

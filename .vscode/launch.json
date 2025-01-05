@@ -8,7 +8,14 @@
             "name": "help",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "runtimeExecutable": "/home/db/.deno/bin/deno",
+            "runtimeArgs": [
+                "run",
+                "--unstable",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229,
             "program": "${workspaceFolder}/src/app.ts",
             "args": ["--help"],
             "env": {
@@ -23,7 +30,14 @@
             "name": "build",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "runtimeExecutable": "/home/db/.deno/bin/deno",
+            "runtimeArgs": [
+                "run",
+                "--unstable",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229,
             "program": "${workspaceFolder}/src/app.ts",
             "args": ["--config", "test/cizn.json", "build", "--source", "test/config.js"],
             "env": {
@@ -38,7 +52,14 @@
             "name": "build home",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "runtimeExecutable": "/home/db/.deno/bin/deno",
+            "runtimeArgs": [
+                "run",
+                "--unstable",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229,
             "program": "${workspaceFolder}/src/app.ts",
             "args": ["--config", "test/cizn.json", "build", "home", "--source", "test/config.js"],
             "env": {
@@ -53,7 +74,14 @@
             "name": "build system",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "runtimeExecutable": "/home/db/.deno/bin/deno",
+            "runtimeArgs": [
+                "run",
+                "--unstable",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229,
             "program": "${workspaceFolder}/src/app.ts",
             "args": ["--config", "test/cizn.json", "build", "system", "--source", "test/config.js"],
             "env": {
@@ -68,7 +96,14 @@
             "name": "apply",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "runtimeExecutable": "/home/db/.deno/bin/deno",
+            "runtimeArgs": [
+                "run",
+                "--unstable",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229,
             "program": "${workspaceFolder}/src/app.ts",
             "args": ["--config", "test/cizn.json", "apply"],
             "env": {
@@ -83,7 +118,14 @@
             "name": "apply home",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "runtimeExecutable": "/home/db/.deno/bin/deno",
+            "runtimeArgs": [
+                "run",
+                "--unstable",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229,
             "program": "${workspaceFolder}/src/app.ts",
             "args": ["--config", "test/cizn.json", "apply", "home"],
             "env": {
@@ -98,7 +140,14 @@
             "name": "apply system",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
+            "runtimeExecutable": "/home/db/.deno/bin/deno",
+            "runtimeArgs": [
+                "run",
+                "--unstable",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229,
             "program": "${workspaceFolder}/src/app.ts",
             "args": ["--config", "test/cizn.json", "apply", "system"],
             "env": {

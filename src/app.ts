@@ -1,11 +1,12 @@
-import appComposition, { getApp } from '@cizn/index'
+import appComposition, { getApp } from '@cizn/index.ts'
 import {
   guard, map,
   tapError,
-} from '@lib/composition/function'
-import { asyncPipe } from '@lib/composition/pipe'
-import { Success } from '@lib/composition/result'
-import { logError as logE } from '@lib/util'
+} from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
+import { Success } from '@lib/composition/result.ts'
+import { logError as logE } from '@lib/util/index.ts'
+import process from 'node:process'
 
 // TODO: combine Error, ErrorAs, ErrorWith into one function
 
@@ -18,9 +19,9 @@ const logError = logE(appInstance)
 // Application lifecycle
 asyncPipe(
   appComposition,
-  map(guard(async (app) => {
+  map(guard(async (app: Cizn.Application) => {
     // Executing action handler for the given args
-    await app.Manager.Cli.Program.parseAsync(process.argv)
+    await app.Manager.Cli.Program.parseAsync(process.argv.slice(2))
 
     /**
      * With {@link Commander}, there is no way to return something from an action handler.

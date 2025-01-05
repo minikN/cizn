@@ -1,11 +1,11 @@
-import { Result } from "@lib/composition/result"
-import error from "@lib/managers/log/api/error.js"
-import indent from "@lib/managers/log/api/indent.js"
-import info from "@lib/managers/log/api/info.js"
-import init from "@lib/managers/log/api/init.js"
-import print from "@lib/managers/log/api/print.js"
-import success from "@lib/managers/log/api/success.js"
-import warn from "@lib/managers/log/api/warn.js"
+import { Result } from "@lib/composition/result.ts"
+import error from "@lib/managers/log/api/error.ts"
+import indent from "@lib/managers/log/api/indent.ts"
+import info from "@lib/managers/log/api/info.ts"
+import init from "@lib/managers/log/api/init.ts"
+import print from "@lib/managers/log/api/print.ts"
+import success from "@lib/managers/log/api/success.ts"
+import warn from "@lib/managers/log/api/warn.ts"
 
 export type Props = {
   message: string,

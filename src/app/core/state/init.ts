@@ -1,4 +1,4 @@
-import G from '@cizn/constants'
+import G from '@cizn/constants.ts'
 import {
   bind,
   map,
@@ -6,11 +6,11 @@ import {
   tap,
   tapWithError,
   withError,
-} from "@lib/composition/function"
-import { asyncPipe } from "@lib/composition/pipe"
-import { Result, Success } from "@lib/composition/result"
-import { ErrorAs } from '@lib/errors'
-import { isObj, logString } from '@lib/util'
+} from "@lib/composition/function.ts"
+import { asyncPipe } from "@lib/composition/pipe.ts"
+import { Result, Success } from "@lib/composition/result.ts"
+import { ErrorAs } from '@lib/errors/index.ts'
+import { isObj, logString } from '@lib/util/index.ts'
 import process from 'node:process'
 
 const noConfigPathOptions = {

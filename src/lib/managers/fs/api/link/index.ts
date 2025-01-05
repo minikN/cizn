@@ -1,9 +1,9 @@
-import { remove } from '@lib/managers/fs/api/link/remove'
-import { is } from '@lib/managers/fs/api/link/is'
-import { isOwn } from '@lib/managers/fs/api/link/isOwn'
-import { write } from '@lib/managers/fs/api/link/write'
-import { read } from '@lib/managers/fs/api/link/read'
-import { FSLinkApi } from '@lib/managers/fs/api'
+import { remove } from '@lib/managers/fs/api/link/remove.ts'
+import { is } from '@lib/managers/fs/api/link/is.ts'
+import { isOwn } from '@lib/managers/fs/api/link/isOwn.ts'
+import { write } from '@lib/managers/fs/api/link/write.ts'
+import { read } from '@lib/managers/fs/api/link/read.ts'
+import { FSLinkApi } from '@lib/managers/fs/api/index.ts'
 
 const fsLinkApi = (app: Cizn.Application): FSLinkApi => Object.create({}, {
   remove: {

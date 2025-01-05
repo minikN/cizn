@@ -1,5 +1,5 @@
-import { XMLParser, XMLBuilder } from 'fast-xml-parser'
-import { Serializer } from '@lib/serializers'
+import { Serializer } from '@lib/serializers/index.ts'
+import { parse, stringify } from '@libs/xml'
 
 /**
  * Serializes `content` to an xml format.
@@ -11,15 +11,12 @@ import { Serializer } from '@lib/serializers'
  * @returns {Promise<string>}
  */
 const xmlSerializer: Serializer = async (existingContent, content) => {
-  const parser = new XMLParser()
-  const builder = new XMLBuilder()
-
   const combinedContent = {
-    ...existingContent ? parser.parse(existingContent) : {},
+    ...existingContent ? parse(existingContent) : {},
     ...content,
   }
 
-  return builder.build(combinedContent)
+  return stringify(combinedContent)
 }
 
 export default xmlSerializer

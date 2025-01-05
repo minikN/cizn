@@ -1,5 +1,5 @@
-import { Serializer } from '@lib/serializers'
-import { parse, stringify } from 'yaml'
+import { Serializer } from '@lib/serializers/index.ts'
+import { parse, stringify } from '@std/toml'
 
 /**
  * Serializes `content` to an toml format.

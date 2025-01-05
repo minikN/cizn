@@ -1,9 +1,9 @@
-import G from '@cizn/constants'
-import { CiznError, DefaultErrorTypes } from '@lib/errors'
-import crypto from 'crypto'
+import G from '@cizn/constants.ts'
+import { CiznError, DefaultErrorTypes } from '@lib/errors/index.ts'
+import crypto from 'node:crypto'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'os'
-import path from 'path'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 
 export const def = (x: unknown): x is Object => !!x
 export const isFn = <T>(x: Function | T): x is Function => typeof x === 'function'

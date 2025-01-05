@@ -1,18 +1,18 @@
-import { Derivation, isDrv } from '@cizn/core/state'
+import { Derivation, isDrv } from '@cizn/core/state.ts'
 import {
   bind,
   map,
   mapEach,
   mapType,
-} from '@lib/composition/function'
-import { asyncPipe } from '@lib/composition/pipe'
+} from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
 import {
   Failure,
   Result, Success,
-} from '@lib/composition/result'
-import { CiznError, Error } from '@lib/errors'
-import { isStr } from '@lib/util'
-import { getHash } from '@lib/util/string'
+} from '@lib/composition/result.ts'
+import { CiznError, Error } from '@lib/errors/index.ts'
+import { isStr } from '@lib/util/index.ts'
+import { getHash } from '@lib/util/string.ts'
 
 /**
  * Finds the derivation that matches `hash` amongst the already built derivations.

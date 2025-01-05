@@ -1,6 +1,6 @@
-import { $ } from 'execa'
+import { $ } from 'npm:execa'
 
-import pacmanApi from '@cizn/adapter/package/pacman/api'
+import pacmanApi from '@cizn/adapter/package/pacman/api/index.ts'
 
 type ApiFunction = (App: Cizn.Application) => Cizn.Adapter.Package.Api
 

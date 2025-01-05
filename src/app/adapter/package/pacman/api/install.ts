@@ -1,4 +1,4 @@
-import { ExecaError, execa } from 'execa'
+import { ExecaError, execa } from 'npm:execa'
 
 /**
  * Installs {@code x} on the system if not already installed.

@@ -1,5 +1,5 @@
-import { Serializer } from '@lib/serializers'
-import { parse, stringify } from 'ini'
+import { Serializer } from '@lib/serializers/index.ts'
+import { parse, stringify } from '@std/ini'
 
 /**
  * Serializes `content` to an ini format.

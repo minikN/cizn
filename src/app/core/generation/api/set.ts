@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { GenerationEnvironment } from '@cizn/core/generation/api'
-import { bind, map } from '@lib/composition/function'
-import { asyncPipe } from '@lib/composition/pipe'
-import { Success } from '@lib/composition/result'
-import { concat, stripRight } from '@lib/util/string'
+import { GenerationEnvironment } from '@cizn/core/generation/api/index.ts'
+import { bind, map } from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
+import { Success } from '@lib/composition/result.ts'
+import { concat, stripRight } from '@lib/util/string.ts'
 
 /**
  * Sets the correct generation for the current environment and returns the path to the

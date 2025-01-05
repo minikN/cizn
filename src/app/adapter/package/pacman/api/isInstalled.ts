@@ -1,4 +1,3 @@
-
 /**
  * Checks whether {@code x} is installed on the system.
  *

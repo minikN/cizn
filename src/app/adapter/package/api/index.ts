@@ -1,4 +1,4 @@
-import init from '@cizn/adapter/package/api/init'
+import init from '@cizn/adapter/package/api/init.ts'
 
 export type Api = {
   init: () => Promise<void>

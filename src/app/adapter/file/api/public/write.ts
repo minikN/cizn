@@ -1,5 +1,5 @@
-import { curry } from "@lib/util"
-import { Props, fileType } from "../public"
+import { curry } from "@lib/util/index.ts"
+import { Props, fileType } from "@cizn/adapter/file/api/public.ts"
 import { appendFileSync } from "node:fs"
 
 const write = (App: Cizn.Application, type: fileType = 'plain') => curry((

@@ -1,8 +1,8 @@
-import { make } from '@lib/managers/fs/api/directory/make'
-import { read } from '@lib/managers/fs/api/directory/read'
-import { remove } from '@lib/managers/fs/api/directory/remove'
-import { is } from '@lib/managers/fs/api/directory/is'
-import { FSDirectoryApi } from '@lib/managers/fs/api'
+import { make } from '@lib/managers/fs/api/directory/make.ts'
+import { read } from '@lib/managers/fs/api/directory/read.ts'
+import { remove } from '@lib/managers/fs/api/directory/remove.ts'
+import { is } from '@lib/managers/fs/api/directory/is.ts'
+import { FSDirectoryApi } from '@lib/managers/fs/api/index.ts'
 
 const fsDirectoryApi = (app: Cizn.Application): FSDirectoryApi => Object.create({}, {
   make: {

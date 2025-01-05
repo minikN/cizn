@@ -1,6 +1,6 @@
-import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
-import { pipe } from "@lib/composition/pipe"
-import fsApi from './api'
+import { defineNamespace, setNamespace } from "@lib/composition/namespace.ts"
+import { pipe } from "@lib/composition/pipe.ts"
+import fsApi from '@lib/managers/fs/api/index.ts'
 
 export type FS = {
   Api: Cizn.Manager.FS.Api,

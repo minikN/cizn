@@ -1,6 +1,4 @@
-
-import { execa } from 'execa'
-// import { promisify } from 'util'
+import { execa } from 'npm:execa'
 
 const init = (app: Cizn.Application) => async () => {
   const { Platform: { Package } } = app.Adapter

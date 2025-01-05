@@ -1,10 +1,9 @@
 import {
   Derivation, DerivationData, DerivationEnvironment,
   FileDerivation,
-} from '@cizn/core/state'
-import { getFileName, mkTempFile } from '@lib/util/index.js'
-import { getHash, makeHash } from '@lib/util/string'
-import { locate } from 'func-loc'
+} from '@cizn/core/state.ts'
+import { getFileName, mkTempFile } from '@lib/util/index.ts'
+import { getHash, makeHash } from '@lib/util/string.ts'
 import {
   copyFile,
   writeFile,
@@ -53,7 +52,9 @@ const make = (App: Cizn.Application) => async (
    * file the function was exported from and thus get the file name from
    * there. This means the file name declare the module name.
    */
-    const fnPath = await locate(module)
+  // const bla = Deno.inspect(module, {showProxy: true})
+    const fnPath = 'default'
+    const test = module.constructor.name
 
     if (!fnPath) {
       Log.Api.error({ message: 'Could not locate module' })

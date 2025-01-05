@@ -1,7 +1,7 @@
-import init from "@lib/managers/cli/api/init"
-import build from "@lib/managers/cli/api/build"
-import apply from "@lib/managers/cli/api/apply"
-import { Result } from "@lib/composition/result"
+import init from "@lib/managers/cli/api/init.ts"
+import build from "@lib/managers/cli/api/build.ts"
+import apply from "@lib/managers/cli/api/apply.ts"
+import { Result } from "@lib/composition/result.ts"
 
 export type CliCommandProps = {
   source?: string

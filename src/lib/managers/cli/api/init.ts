@@ -1,7 +1,7 @@
-import { bind } from "@lib/composition/function"
-import { pipe } from "@lib/composition/pipe"
-import { Result, Success } from "@lib/composition/result"
-import { Command } from "commander"
+import { bind } from "@lib/composition/function.ts"
+import { pipe } from "@lib/composition/pipe.ts"
+import { Result, Success } from "@lib/composition/result.ts"
+import { Command } from "npm:commander"
 
 /**
  * Sets a global option.

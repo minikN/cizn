@@ -1,11 +1,11 @@
-import { _dual } from "@lib/composition/pipe"
+import { _dual } from "@lib/composition/pipe.ts"
 import {
   Failure,
   isFailure,
   Result, Success,
   SuccessType,
-} from "@lib/composition/result"
-import { CiznError } from "@lib/errors"
+} from "@lib/composition/result.ts"
+import { CiznError } from "@lib/errors/index.ts"
 
 
 /**

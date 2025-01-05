@@ -1,6 +1,6 @@
-import write from '@cizn/adapter/file/api/internal/write'
-import include from '@cizn/adapter/file/api/internal/include'
-import { CurriedFunction } from '@lib/util'
+import write from '@cizn/adapter/file/api/internal/write.ts'
+import include from '@cizn/adapter/file/api/internal/include.ts'
+import { CurriedFunction } from '@lib/util/index.ts'
 
 export type Props = {
     source: string,

@@ -1,4 +1,4 @@
-import { DerivationBuilderApi } from "@cizn/core/derivation/api"
+import { DerivationBuilderApi } from "@cizn/core/derivation/api/index.ts"
 
 /**
  * Build the derivation for a file.

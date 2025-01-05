@@ -1,7 +1,7 @@
-import { defineNamespace, setNamespace } from "@lib/composition/namespace"
-import { defineProp } from "@lib/composition/property"
-import { pipe } from "@lib/util"
-import { Result, ResultPromise } from "execa"
+import { defineNamespace, setNamespace } from "@lib/composition/namespace.ts"
+import { defineProp } from "@lib/composition/property.ts"
+import { pipe } from "@lib/util/index.ts"
+import { Result } from "npm:execa"
 
 export type Package = {
   Api: Cizn.Adapter.Package.Api

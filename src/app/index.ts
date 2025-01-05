@@ -1,20 +1,20 @@
-import platformAdapter from "@cizn/adapter/platform"
-import G from '@cizn/constants'
-import stateComposition from "@cizn/core/state.js"
+import platformAdapter from "@cizn/adapter/platform/index.ts"
+import G from '@cizn/constants.ts'
+import stateComposition from "@cizn/core/state.ts"
 import {
   bind, guard, map,
-} from '@lib/composition/function'
-import { defineNamespace, setNamespace } from '@lib/composition/namespace'
-import { asyncPipe, pipe } from "@lib/composition/pipe"
-import { defineImmutableProp } from "@lib/composition/property.js"
-import { Success, SuccessType } from "@lib/composition/result"
-import cliManager from "@lib/managers/cli/index.js"
-import fileSystemManager from "@lib/managers/fs"
-import logManager from "@lib/managers/log/index.js"
-import fileAdapter from "./adapter/file"
-import derivationApi from "./core/derivation/api"
-import generationApi from "./core/generation/api"
-import { initApplicationState } from "./core/state/init"
+} from '@lib/composition/function.ts'
+import { defineNamespace, setNamespace } from '@lib/composition/namespace.ts'
+import { asyncPipe, pipe } from "@lib/composition/pipe.ts"
+import { defineImmutableProp } from "@lib/composition/property.ts"
+import { Success, SuccessType } from "@lib/composition/result.ts"
+import cliManager from "@lib/managers/cli/index.ts"
+import fileSystemManager from "@lib/managers/fs/index.ts"
+import logManager from "@lib/managers/log/index.ts"
+import fileAdapter from "./adapter/file/index.ts"
+import derivationApi from "./core/derivation/api/index.ts"
+import generationApi from "./core/generation/api/index.ts"
+import { initApplicationState } from "./core/state/init.ts"
 
 type AdapterApiTypes =
  | Cizn.Adapter.File

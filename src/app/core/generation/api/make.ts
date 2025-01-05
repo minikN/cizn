@@ -1,7 +1,7 @@
 import {
   mkdir, readdir, rename, symlink,
-} from "fs/promises"
-import { GenerationEnvironment } from "."
+} from "node:fs/promises"
+import { GenerationEnvironment } from "@cizn/core/generation/api/index.ts"
 
 /**
  * Creates or reuses a generation based on `derivation`
@@ -26,6 +26,7 @@ const make = (app: Cizn.Application): Cizn.Application.State.Generation.Api['mak
   const environment = <GenerationEnvironment>Environment
 
   try {
+    console.log('d', derivation)
     const {
       number: generationNumber, path, exists,
     } = await Generation.Api.path({ hash: derivation.hash })

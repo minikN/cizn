@@ -6,7 +6,8 @@
  */
 
 // Test overwriting ability
-export default args => async (config, utils) => {
+// const sway = args => async (config, utils) => {
+  async function sway(config, args) {
   await utils.file.write('.config/test', `\
 hello
 world1 2 
@@ -29,6 +30,6 @@ world1 2
     systemPackages: [
       'chromium',
     ],
-    args,
+    // args,
   }
 }

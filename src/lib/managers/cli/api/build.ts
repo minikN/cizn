@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { Environment } from '@cizn/core/state'
-import { Success } from '@lib/composition/result'
-import { def, getFileName } from '@lib/util/index.js'
+import { Environment } from '@cizn/core/state.ts'
+import { Success } from '@lib/composition/result.ts'
+import { def, getFileName } from '@lib/util/index.ts'
 import {
   access, constants, lstat, realpath,
 } from 'node:fs/promises'
-import { CliCommandProps } from '.'
-import _setup from './command/setup'
+import { CliCommandProps } from '@lib/managers/cli/api/index.ts'
+import _setup from '@lib/managers/cli/api/command/setup.ts'
 
 /**
  * Building the configuration

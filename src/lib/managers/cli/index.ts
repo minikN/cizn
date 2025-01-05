@@ -1,10 +1,10 @@
-import G from '@cizn/constants'
-import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
-import { defineImmutableProp } from "@lib/composition/property.js"
-import { Result } from '@lib/composition/result'
-import cliApi from "@lib/managers/cli/api/index.js"
-import { pipe } from "@lib/util/index.js"
-import { Command } from "commander"
+import G from '@cizn/constants.ts'
+import { defineNamespace, setNamespace } from "@lib/composition/namespace.ts"
+import { defineImmutableProp } from "@lib/composition/property.ts"
+import { Result } from '@lib/composition/result.ts'
+import cliApi from "@lib/managers/cli/api/index.ts"
+import { pipe } from "@lib/util/index.ts"
+import { Command } from "npm:commander"
 
 export type Cli = {
   readonly _name: string,

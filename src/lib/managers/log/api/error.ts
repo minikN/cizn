@@ -1,6 +1,6 @@
 /* global process */
-import chalk from 'chalk'
-import { Props } from '.'
+import chalk from 'npm:chalk'
+import { Props } from '@lib/managers/log/api/index.ts'
 
 const info = (App: Cizn.Application) => ({
   message, options = [], error = {},

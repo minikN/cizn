@@ -1,11 +1,11 @@
-import { DerivationFileApi } from '@cizn/core/derivation/api'
-import write from '@cizn/core/derivation/api/file/write'
-import { Derivation } from '@cizn/core/state'
-import iniSerializer from '@lib/serializers/ini'
-import jsonSerializer from '@lib/serializers/json'
-import tomlSerializer from '@lib/serializers/toml'
-import xmlSerializer from '@lib/serializers/xml'
-import yamlSerializer from '@lib/serializers/yaml'
+import { DerivationFileApi } from '@cizn/core/derivation/api/index.ts'
+import write from '@cizn/core/derivation/api/file/write.ts'
+import { Derivation } from '@cizn/core/state.ts'
+import iniSerializer from '@lib/serializers/ini.ts'
+import jsonSerializer from '@lib/serializers/json.ts'
+import tomlSerializer from '@lib/serializers/toml.ts'
+import xmlSerializer from '@lib/serializers/xml.ts'
+import yamlSerializer from '@lib/serializers/yaml.ts'
 
 type writeProps = {
   path: string,

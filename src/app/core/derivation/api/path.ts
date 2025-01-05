@@ -1,7 +1,7 @@
-import G from '@cizn/constants'
-import { makeHash, sanitizeMultilineString } from '@lib/util/string'
+import G from '@cizn/constants.ts'
+import { makeHash, sanitizeMultilineString } from '@lib/util/string.ts'
 import { readdir } from 'node:fs/promises'
-import { DerivationPath } from '@cizn/core/derivation/api'
+import { DerivationPath } from '@cizn/core/derivation/api/index.ts'
 
 /**
  * Will return an object containing the `path` of a derivation as well as

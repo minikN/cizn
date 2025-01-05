@@ -1,5 +1,3 @@
-import { Derivation } from '@cizn/core/state'
-
 /**
  * Cleans up the derivation state.
  *

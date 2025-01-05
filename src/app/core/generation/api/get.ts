@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
-import { GenerationEnvironment } from '@cizn/core/generation/api'
-import { bind, map } from '@lib/composition/function'
-import { asyncPipe } from '@lib/composition/pipe'
-import { Failure, Success } from '@lib/composition/result'
-import { Error } from '@lib/errors'
-import { getGenerationNumber } from '@lib/util/string'
+import { GenerationEnvironment } from '@cizn/core/generation/api/index.ts'
+import { bind, map } from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
+import { Failure, Success } from '@lib/composition/result.ts'
+import { Error } from '@lib/errors/index.ts'
+import { getGenerationNumber } from '@lib/util/string.ts'
 
 /**
  * Returns all generation names that match `environment`.

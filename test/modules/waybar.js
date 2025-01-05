@@ -1,4 +1,4 @@
-export default args => async (config, utils) => {
+const waybar = args => async (config, utils) => {
   await utils.file.write('/etc/testfile', `\
 hello6
 world
@@ -53,3 +53,5 @@ world
     args,
   }
 }
+
+export default args => waybar(args)

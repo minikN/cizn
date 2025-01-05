@@ -1,0 +1,28 @@
+{
+    "imports": {
+        "@cizn/": "./src/app/",
+        "@eslint/js": "npm:@eslint/js@9.5.0",
+        "@lib/": "./src/lib/",
+        "@types/": "./src/types/",
+
+        "@nothing628/chalk": "jsr:@nothing628/chalk@^1.0.1",
+        "@types/node": "npm:@types/node@^22.10.2",
+        "execa": "npm:execa@9.5.2",
+        "func-loc": "npm:func-loc@0.1.16",
+        "commander": "npm:commander@12.1.0",
+        "@commander-js/extra-typings": "npm:@commander-js/extra-typings@12.1.0",
+
+        "@libs/xml": "jsr:@libs/xml@^6.0.4",
+        "@std/ini": "jsr:@std/ini@^0.225.2",
+        "@std/toml": "jsr:@std/toml@^1.0.2",
+        "@std/yaml": "jsr:@std/yaml@^1.0.5",
+
+        "globals": "npm:globals@15.6.0",
+        "eslint": "npm:eslint@8.56.0",
+        "eslint-plugin-jsdoc": "npm:eslint-plugin-jsdoc@48.2.12",
+        "typescript-eslint": "npm:typescript-eslint@7.16.1",
+        "@types/eslint__js": "npm:@types/eslint__js@8.42.3",
+        "@stylistic/eslint-plugin-js": "npm:@stylistic/eslint-plugin-js@2.2.1",
+        "@stylistic/eslint-plugin-migrate": "npm:@stylistic/eslint-plugin-migrate@2.2.1",
+    }
+}

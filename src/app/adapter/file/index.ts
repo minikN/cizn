@@ -1,7 +1,7 @@
-import { defineNamespace, setNamespace } from "@lib/composition/namespace"
-import { pipe } from "@lib/util"
-import publicApi from "@cizn/adapter/file/api/public"
-import internalApi from "@cizn/adapter/file/api/internal"
+import { defineNamespace, setNamespace } from "@lib/composition/namespace.ts"
+import { pipe } from "@lib/util/index.ts"
+import publicApi from "@cizn/adapter/file/api/public.ts"
+import internalApi from "@cizn/adapter/file/api/internal.ts"
 
 export type File = {
   Public: Cizn.Adapter.File.PublicApi

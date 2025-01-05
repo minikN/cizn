@@ -1,14 +1,14 @@
-import { curry } from "@lib/util"
-import { Props } from "@cizn/adapter/file/api/internal"
+import { curry } from "@lib/util/index.ts"
+import { Props } from "@cizn/adapter/file/api/internal.ts"
 import {
   appendFileSync, existsSync, mkdirSync, writeFileSync,
 } from "node:fs"
-import path from 'path'
-import serializers from '@lib/serializers'
+import path from 'node:path'
+import serializers from '@lib/serializers/index.ts'
 import { readFile } from "node:fs/promises"
-import { fileType } from "@cizn/adapter/file/api/public"
+import { fileType } from "@cizn/adapter/file/api/public.ts"
 
-const write = (App: Cizn.Application) => curry(async (
+const write = (app: Cizn.Application) => curry(async (
   source: Props['source'],
   target: Props['target'],
   content: Props['content'],

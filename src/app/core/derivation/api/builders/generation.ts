@@ -1,5 +1,5 @@
-import { DerivationBuilderApi } from "@cizn/core/derivation/api"
-import fileLinker from '@cizn/core/derivation/api/builders/linkers/file'
+import { DerivationBuilderApi } from "@cizn/core/derivation/api/index.ts"
+import fileLinker from '@cizn/core/derivation/api/builders/linkers/file.ts'
 
 /**
  * Build the derivation for a generation (meaning the root module).

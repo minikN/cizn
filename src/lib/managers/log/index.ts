@@ -1,7 +1,7 @@
-import { pipe } from "@lib/util/index.js"
-import { defineProp } from "@lib/composition/property.js"
-import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
-import logApi from "@lib/managers/log/api/index.js"
+import { pipe } from "@lib/util/index.ts"
+import { defineProp } from "@lib/composition/property.ts"
+import { defineNamespace, setNamespace } from "@lib/composition/namespace.ts"
+import logApi from "@lib/managers/log/api/index.ts"
 
 export type Log = {
   Program: Object

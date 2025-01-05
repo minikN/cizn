@@ -1,14 +1,14 @@
-import { guard, map } from "@lib/composition/function"
-import { asyncPipe } from "@lib/composition/pipe"
+import { guard, map } from "@lib/composition/function.ts"
+import { asyncPipe } from "@lib/composition/pipe.ts"
 import {
   Failure, Result, Success,
-} from "@lib/composition/result"
+} from "@lib/composition/result.ts"
 import {
   CiznError,
   Error,
   ErrorAs,
-} from "@lib/errors"
-import { FSFileApi } from "@lib/managers/fs/api"
+} from "@lib/errors/index.ts"
+import { FSFileApi } from "@lib/managers/fs/api/index.ts"
 import { lstat } from "node:fs/promises"
 
 /**

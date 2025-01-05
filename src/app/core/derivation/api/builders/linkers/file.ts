@@ -1,5 +1,5 @@
-import { Derivation, FileDerivationEnvironment } from "@cizn/core/state"
-import { isHomePath } from "@lib/util/string"
+import { Derivation, FileDerivationEnvironment } from "@cizn/core/state.ts"
+import { isHomePath } from "@lib/util/string.ts"
 import {
   mkdir, rename, symlink,
 } from "node:fs/promises"

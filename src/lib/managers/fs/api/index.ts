@@ -1,9 +1,9 @@
-import { Result } from "@lib/composition/result"
-import { CiznError } from "@lib/errors"
-import fsDirectoryApi from "@lib/managers/fs/api/directory"
-import fsFileApi from "@lib/managers/fs/api/file/index"
-import fsLinkApi from "@lib/managers/fs/api/link/index"
-import fsPathApi from "@lib/managers/fs/api/path/index"
+import { Result } from "@lib/composition/result.ts"
+import { CiznError } from "@lib/errors/index.ts"
+import fsDirectoryApi from "@lib/managers/fs/api/directory/index.ts"
+import fsFileApi from "@lib/managers/fs/api/file/index.ts"
+import fsLinkApi from "@lib/managers/fs/api/link/index.ts"
+import fsPathApi from "@lib/managers/fs/api/path/index.ts"
 
 export type Api = {
   File: FSFileApi,

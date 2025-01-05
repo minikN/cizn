@@ -4,18 +4,18 @@ import {
   bind, forEach, map, recover,
   tap,
   withError,
-} from "@lib/composition/function"
-import { asyncPipe } from "@lib/composition/pipe"
-import { Result, Success } from "@lib/composition/result"
-import { CiznError, ErrorAs } from "@lib/errors"
-import { isArr } from "@lib/util"
-import { prepend, strip } from "@lib/util/string"
+} from "@lib/composition/function.ts"
+import { asyncPipe } from "@lib/composition/pipe.ts"
+import { Result, Success } from "@lib/composition/result.ts"
+import { CiznError, ErrorAs } from "@lib/errors/index.ts"
+import { isArr } from "@lib/util/index.ts"
+import { prepend, strip } from "@lib/util/string.ts"
 import {
   readdir,
   stat,
 } from "node:fs/promises"
 import path from "node:path"
-import { GenerationEnvironment } from "."
+import { GenerationEnvironment } from "@cizn/core/generation/api/index.ts"
 
 /**
  * Recursively lists all files in `root`.

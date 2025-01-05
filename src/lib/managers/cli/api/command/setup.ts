@@ -1,12 +1,12 @@
-import { Environment } from "@cizn/core/state"
+import { Environment } from "@cizn/core/state.ts"
 import {
   bind, map, tap,
-} from "@lib/composition/function"
-import { pipe } from "@lib/composition/pipe"
-import { Failure, Success } from "@lib/composition/result"
-import { Error } from '@lib/errors'
-import { CliCommandProps } from "@lib/managers/cli/api"
-import { isStr } from "@lib/util"
+} from "@lib/composition/function.ts"
+import { pipe } from "@lib/composition/pipe.ts"
+import { Failure, Success } from "@lib/composition/result.ts"
+import { Error } from '@lib/errors/index.ts'
+import { CliCommandProps } from "@lib/managers/cli/api/index.ts"
+import { isStr } from "@lib/util/index.ts"
 import path from "node:path"
 
 /**

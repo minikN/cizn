@@ -1,10 +1,10 @@
-import apply from '@cizn/core/generation/api/apply'
-import get from '@cizn/core/generation/api/get'
-import make from '@cizn/core/generation/api/make'
-import path from '@cizn/core/generation/api/path'
-import set from '@cizn/core/generation/api/set'
-import { Result } from '@lib/composition/result'
-import { CiznError } from '@lib/errors'
+import apply from '@cizn/core/generation/api/apply.ts'
+import get from '@cizn/core/generation/api/get.ts'
+import make from '@cizn/core/generation/api/make.ts'
+import path from '@cizn/core/generation/api/path.ts'
+import set from '@cizn/core/generation/api/set.ts'
+import { Result } from '@lib/composition/result.ts'
+import { CiznError } from '@lib/errors/index.ts'
 
 export type GenerationEnvironment = Extract<Cizn.Application.State.Environment, 'home' | 'system'>
 

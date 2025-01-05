@@ -1,11 +1,11 @@
-import { guard, map } from "@lib/composition/function"
-import { asyncPipe } from "@lib/composition/pipe"
-import { Result, Success } from "@lib/composition/result"
+import { guard, map } from "@lib/composition/function.ts"
+import { asyncPipe } from "@lib/composition/pipe.ts"
+import { Result, Success } from "@lib/composition/result.ts"
 import {
   CiznError,
   ErrorAs,
-} from "@lib/errors"
-import { FSLinkApi } from "@lib/managers/fs/api"
+} from "@lib/errors/index.ts"
+import { FSLinkApi } from "@lib/managers/fs/api/index.ts"
 import { readlink } from "node:fs/promises"
 
 /**

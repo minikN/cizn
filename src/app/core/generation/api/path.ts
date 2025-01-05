@@ -1,5 +1,5 @@
 import { readdir } from 'node:fs/promises'
-import { GenerationEnvironment } from '.'
+import { GenerationEnvironment } from "@cizn/core/generation/api/index.ts"
 
 /**
  * Will return an object containing the `path` of a generation as well as

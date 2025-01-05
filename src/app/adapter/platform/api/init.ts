@@ -1,6 +1,6 @@
-import packageAdapter from "@cizn/adapter/package"
-import packageApi from "@cizn/adapter/package/api"
-import { Result, Success } from "@lib/composition/result"
+import packageAdapter from "@cizn/adapter/package/index.ts"
+import packageApi from "@cizn/adapter/package/api/index.ts"
+import { Result, Success } from "@lib/composition/result.ts"
 
 const init = (app: Cizn.Application) => async (): Promise<Result<never, Cizn.Application>> => {
   const { Platform } = app.Adapter

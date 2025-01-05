@@ -1,6 +1,5 @@
-import { parse, stringify } from 'smol-toml'
-import { Serializer } from '@lib/serializers'
-
+import { parse, stringify } from '@std/yaml'
+import { Serializer } from '@lib/serializers/index.ts'
 
 /**
  * Serializes `content` to an yaml format.

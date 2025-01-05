@@ -1,4 +1,4 @@
-import { Serializer } from '@lib/serializers'
+import { Serializer } from '@lib/serializers/index.ts'
 
 /**
  * Serializes `content` to an json format.

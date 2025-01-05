@@ -1,5 +1,5 @@
-import write from '@cizn/adapter/file/api/public/write'
-import { CurriedFunction } from '@lib/util'
+import write from '@cizn/adapter/file/api/public/write.ts'
+import { CurriedFunction } from '@lib/util/index.ts'
 
 export type Props = {
     source: string,

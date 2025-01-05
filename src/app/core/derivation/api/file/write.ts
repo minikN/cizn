@@ -1,6 +1,6 @@
-import { Serializer } from "@lib/serializers"
-import { getFileName } from "@lib/util"
-import { WriteType } from "."
+import { Serializer } from "@lib/serializers/index.ts"
+import { getFileName } from "@lib/util/index.ts"
+import { WriteType } from "@cizn/core/derivation/api/file/index.ts"
 
 /**
  *

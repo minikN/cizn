@@ -1,7 +1,7 @@
-import { defineNamespace, setNamespace } from "@lib/composition/namespace.js"
-import { pipe } from '@lib/composition/pipe'
-import { def } from "@lib/util"
-import { GenerationEnvironment } from "./generation/api"
+import { defineNamespace, setNamespace } from "@lib/composition/namespace.ts"
+import { pipe } from '@lib/composition/pipe.ts'
+import { def } from "@lib/util/index.ts"
+import { GenerationEnvironment } from "@cizn/core/generation/api/index.ts"
 
 export type Environment = 'home' | 'system' | null
 
