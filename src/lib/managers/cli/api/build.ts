@@ -37,7 +37,8 @@ const build = (app: Cizn.Application) => async (environment: Environment, option
     log.error({ message: `%d does not exist or is not readable`, options: [<string>source] })
   }
 
-  const { default: module }: { default: Cizn.Application.State.Derivation.Module } = await import(`${sourcePath}`)
+  const { default: module }: { default: Cizn.Application.State.Derivation.FileModule } = await import(`${sourcePath}`)
+  // const t = await import(`${sourcePath}`)
 
   if (!module) {
     // error no default export

@@ -23,6 +23,12 @@ declare namespace Cizn {
       namespace Derivation {
         export type Api = import('@cizn/core/derivation/api').Api
 
+        type FileModule = {
+          name: string,
+          args?: Object,
+          module: Module,
+        }
+
         type Module = (() => void) | ((
           config: object,
           utils: Cizn.Utils.Public

@@ -1,6 +1,6 @@
-export default args => async (config, utils) => {
+const waybar = args => async (config, utils) => {
   await utils.file.write('/etc/testfile', `\
-hello6
+hello1
 world
 `)
 
@@ -40,6 +40,7 @@ world
   })
 
   return {
+    name: 'waybar',
     config: {
       test: 2,
       waybar: { foo: 'bar2' },
@@ -50,6 +51,11 @@ world
     systemPackages: [
       'unzip',
     ],
-    args,
   }
 }
+
+export default args => ({
+  args,
+  name: 'waybar',
+  module: waybar(args)
+})

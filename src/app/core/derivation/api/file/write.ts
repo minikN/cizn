@@ -30,7 +30,7 @@ const write = (app: Cizn.Application, serializer: Serializer | null = null): Wri
 
   const name = getFileName(`${path}`)
 
-  const derivation = await Derivation.Api.make(() => {}, 'file', {
+  const derivation = await Derivation.Api.make({name, module: () => {}}, 'file', {
     content: fileContent, path, name,
   })
 

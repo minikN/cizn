@@ -1,9 +1,14 @@
-export default args => async (config, utils) => {
+const zsh = args => async (config, utils) => {
   return {
     config: { test: 561 },
     homePackages: [
       'zsh',
     ],
-    args,
   }
 }
+
+export default (args) => ({
+  args,
+  name: 'zsh',
+  module: zsh(args)
+})

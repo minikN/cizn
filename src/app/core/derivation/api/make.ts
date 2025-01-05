@@ -2,9 +2,8 @@ import {
   Derivation, DerivationData, DerivationEnvironment,
   FileDerivation,
 } from '@cizn/core/state'
-import { getFileName, mkTempFile } from '@lib/util/index.js'
+import { getFileName, isFn, isStr, mkTempFile } from '@lib/util/index.js'
 import { getHash, makeHash } from '@lib/util/string'
-import { locate } from 'func-loc'
 import {
   copyFile,
   writeFile,
@@ -29,7 +28,7 @@ import {
  * @returns {Cizn.Application.State.Generation}
  */
 const make = (App: Cizn.Application) => async (
-  module: Cizn.Application.State.Derivation.Module,
+  { args = {}, name, module }: Cizn.Application.State.Derivation.FileModule,
   builder: Derivation['builder'] = 'generation',
   data: DerivationData = {},
 ): Promise<Cizn.Application.State.Derivation | undefined> => {
@@ -46,29 +45,22 @@ const make = (App: Cizn.Application) => async (
 
   Log.Api.indent()
 
+  const isModule = builder === 'module' || builder === 'generation'
+  const isInvalid = isModule && (!module || !isFn(module) || !name || !isStr(name))
+
   try {
   /**
-   * We need to get the name of the module, but we only have the function
-   * expression at hand. Using {@link locate}, we can get the path of the
-   * file the function was exported from and thus get the file name from
-   * there. This means the file name declare the module name.
+   * In case the module we're trying to build a derivation for is not valid, cancel out
+   * here.
    */
-    const fnPath = await locate(module)
-
-    if (!fnPath) {
-      Log.Api.error({ message: 'Could not locate module' })
+    if (isInvalid) {
+      Log.Api.error({ message: '%d module not correctly exported: Got: name: %d, module: %d', options: [
+        name, name, module
+      ]})
     }
 
-    /**
-     * If we are creating a derivation for a file, using `utils.file.write`
-     * in a module, the `name` of this derivation is given as an environment
-     * prop. So use it if it's defined, if not, we'll derive the name by
-     * the path of the function that should produce this derivation.
-     */
-    const fnName = data.name || getFileName(`${fnPath.path}`)
-
     if (builder === 'module' || builder === 'generation') {
-      Log.Api.info({ message: 'Evaluating module %d ...', options: [fnName] })
+      Log.Api.info({ message: 'Evaluating module %d ...', options: [name] })
     }
 
     /**
@@ -106,7 +98,6 @@ const make = (App: Cizn.Application) => async (
       config: moduleConfig = {},
       homePackages: moduleHomePackages = [],
       systemPackages: moduleSystemPackages = [],
-      args = {},
     } = await module?.(derivationConfig || {}, <Cizn.Utils.Public>{ file: boundFileApi }) || {}
 
     // Getting the name of the root module (entry file to the configuration)
@@ -116,7 +107,7 @@ const make = (App: Cizn.Application) => async (
     // current module, we need to inform the user about it
     Object.keys(moduleConfig).forEach((x) => {
       if (derivationConfig[x]) {
-        Log.Api.warn({ message: 'Config option %d is overwritten by %d module', options: [x, fnName] })
+        Log.Api.warn({ message: 'Config option %d is overwritten by %d module', options: [x, name] })
       }
     })
 
@@ -126,7 +117,7 @@ const make = (App: Cizn.Application) => async (
      */
     Derivation.State.Config = {
       ...derivationConfig || {},
-      ...configName !== fnName && { [fnName]: true },
+      ...configName !== name && { [name]: true },
       ...moduleConfig,
     }
 
@@ -145,7 +136,7 @@ const make = (App: Cizn.Application) => async (
      */
     if (builder === 'generation') {
       for (let i = 0; i < modules.length; i++) {
-        const inputDerivation = await Derivation.Api.make(modules[i], 'module')
+        const inputDerivation = await Derivation.Api.make(modules[i] as unknown as Cizn.Application.State.Derivation.FileModule, 'module')
 
         inputDerivations.push(inputDerivation)
       }
@@ -159,7 +150,7 @@ const make = (App: Cizn.Application) => async (
     const { path, exists } = await Derivation.Api.path({
       hashParts: {
         module, env: data, args, config: Derivation.State.Config, inputs: inputDerivations,
-      }, name: fnName, builder,
+      }, name, builder,
     })
 
     const derivationHash = getHash(path)
@@ -193,11 +184,11 @@ const make = (App: Cizn.Application) => async (
       return derivation
     }
 
-    Log.Api.info({ message: 'Creating derivation for %d ...', options: [fnName] })
+    Log.Api.info({ message: 'Creating derivation for %d ...', options: [name] })
     Log.Api.unindent()
 
     const derivationEnv: DerivationEnvironment = {
-      name: data.name || fnName,
+      name: data.name || name,
       path: data.path,
       content: data.content,
       out: '', // This will get set properly further down
@@ -210,7 +201,7 @@ const make = (App: Cizn.Application) => async (
      * when we build it, while {@link path} denotes the path to the derivation itself.
      */
     const content = {
-      name: fnName,
+      name,
       path: derivationFilePath,
       inputs: inputDerivations,
       env: derivationEnv,
@@ -222,7 +213,7 @@ const make = (App: Cizn.Application) => async (
     const outputHash = makeHash(content)
 
     // Adding the output path to the derivation
-    content.env.out = `${Derivation.Root}/${outputHash}-${fnName}`
+    content.env.out = `${Derivation.Root}/${outputHash}-${name}`
 
     /**
      * At this point, {@link content}'s `inputs` will be a recursive list of all inputs
@@ -245,7 +236,7 @@ const make = (App: Cizn.Application) => async (
      * Creating a temp file for the new derivation with the appropriate hash
      * Will be named `<module-name>-<hash>.drv`
      */
-    const derivationTempFile = await mkTempFile({ name: fnName })
+    const derivationTempFile = await mkTempFile({ name })
 
     /**
      * Write the contents to {@link derivationTempFile} and copying it to its
