@@ -9,7 +9,13 @@ import { CiznError } from '@lib/errors/index.ts'
 export type GenerationEnvironment = Extract<Cizn.Application.State.Environment, 'home' | 'system'>
 
 export type Api = {
-  make: (props: Cizn.Application.State.Derivation) => Promise<Cizn.Application.State.Generation>
+  make: (props: Cizn.Application.State.Derivation) => Promise<
+  Result<
+  | CiznError<"NO_PATH_GIVEN">
+  | CiznError<"INCORRECT_PATH_GIVEN">
+  | CiznError<"NO_TARGET_GIVEN">
+  | CiznError<"EACCES">,
+  Cizn.Application.State.Generation>>
   path: ({ hash }: {hash: Cizn.Application.State.Derivation['hash']}) => Promise<
   Result<
     | CiznError<"NO_PATH_GIVEN">
