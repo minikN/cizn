@@ -1,3 +1,6 @@
 {
-    "deno.enable": true
+    "deno.enable": true,
+    "eslint.enable": false,
+    "eslint.format.enable": false,
+    "deno.lint": true,
 }
