@@ -24,6 +24,9 @@ export type DefaultErrorTypes =
     | 'DERIVATION_NOT_FOUND'
     | 'MALFORMED_DERIVATION_HASH'
 
+    | 'MODULE_ERROR'
+    | 'GENERIC_ERROR'
+
 export type CiznError<E extends DefaultErrorTypes> = {
     readonly name: E,
     readonly label: string,
@@ -59,6 +62,8 @@ const defaultErrorMessages = Object.freeze({
 
   DERIVATION_NOT_FOUND: 'Derivation %d doesn\'t exist',
   MALFORMED_DERIVATION_HASH: 'Derivation %d doesn\'t contain a valid hash',
+  MODULE_ERROR: 'Evaluating a module caused an error',
+  GENERIC_ERROR: 'Generic error'
 })
 
 type OptionalErrorProps = {
