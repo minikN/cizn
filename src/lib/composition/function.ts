@@ -1,12 +1,6 @@
-import { _dual } from "@lib/composition/pipe.ts"
-import {
-  Failure,
-  isFailure,
-  Result, Success,
-  SuccessType,
-} from "@lib/composition/result.ts"
-import { CiznError } from "@lib/errors/index.ts"
-
+import { _dual } from '@lib/composition/pipe.ts'
+import { Failure, FailureType, isFailure, Result, Success, SuccessType } from '@lib/composition/result.ts'
+import { CiznError, Error } from '@lib/errors/index.ts'
 
 /**
  * RESULT PATTERN MATCHING
@@ -43,7 +37,10 @@ const match = <E1, A, E2, B>(nextFunction: (a: A) => Result<E2, B>, input: Resul
  * @param input output of previous function
  * @returns nextValue | input
  */
-const matchError = <E1, A, E2, B, F extends (...args: any) => Result<E2, B> | void>(errors: {[key: string]: F}, input: Result<E1, A>): Result<E1, A> | Result<E2, B> => {
+const matchError = <E1, A, E2, B, F extends (...args: any) => Result<E2, B> | void>(
+  errors: { [key: string]: F },
+  input: Result<E1, A>,
+): Result<E1, A> | Result<E2, B> => {
   switch (input._tag) {
     case 'value':
       return input
@@ -52,7 +49,6 @@ const matchError = <E1, A, E2, B, F extends (...args: any) => Result<E2, B> | vo
       return errors?.[error.name]?.() || input
   }
 }
-
 
 /**
  * MAP ADAPTER FUNCTION
@@ -96,37 +92,77 @@ const matchError = <E1, A, E2, B, F extends (...args: any) => Result<E2, B> | vo
  * @exports
  */
 export const map: {
-  <A, E2, B>(nextFunction: (a: A) => Result<E2, B> | Promise<Result<E2, B>>): <E1>(input: Result<E1, A>) => Result<E1 | E2, B>
+  <A, E2, B>(
+    nextFunction: (a: A) => Result<E2, B> | Promise<Result<E2, B>>,
+  ): <E1>(input: Result<E1, A>) => Result<E1 | E2, B>
   <E1, A, E2, B>(input: Result<E1, A>, nextFunction: (a: A) => Result<E2, B>): Result<E1 | E2, B>
-} = _dual(2,
-  <E1, A, E2, B>(input: Result<E1, A>, nextFunction: (a: A) => Result<E2, B>): Result<E1 | E2, B> => match(
+} = _dual(2, <E1, A, E2, B>(input: Result<E1, A>, nextFunction: (a: A) => Result<E2, B>): Result<E1 | E2, B> =>
+  match(
     nextFunction,
     input,
   ))
 
 /**
-  * MAP IF ADAPTER FUNCTION
-  *
-  * This function is a special version of {@link map}. It takes a `predicate` function
-  * and a `nextFunction`. The predicate function is supposed to return a boolean. If the
-  * result is `true`, `nextFunction` will be executed with `input` and its output will be
-  * returned.
-  *
-  * The signature of `nextFunction` isn't changed. This means that the type of `input`'s
-  * value and the parameter of `nextFunction` need to be of the same type. If
-  * `nextFunction` should only be executed if `input`'s value is of a certain type, use
-  * {@link mapType}.
-  *
-  * @param {Function} predicateFn  function to return a boolean
-  * @param {Function} nextFunction next function to execute
-  * @exports
-  */
-export const mapIf = <A, E2, B>(
-  predicateFn: (a: A) => boolean, nextFunction: (a: A) => Result<E2, B> | Promise<Result<E2, B>>,
-) => <E1>(input: Result<E1, A>): Result<E1 | E2, A | B> =>
-    input._tag === 'value' && predicateFn(input.value)
-      ? map(nextFunction)(input)
-      : input
+ * MAP IF ADAPTER FUNCTION
+ *
+ * This function is a special version of {@link map}. It takes a `predicate` function
+ * and a `nextFunction`. The predicate function is supposed to return a boolean. If the
+ * result is `true`, `nextFunction` will be executed with `input` and its output will be
+ * returned.
+ *
+ * The signature of `nextFunction` isn't changed. This means that the type of `input`'s
+ * value and the parameter of `nextFunction` need to be of the same type. If
+ * `nextFunction` should only be executed if `input`'s value is of a certain type, use
+ * {@link mapType}.
+ * 
+ * @example
+ * const app = pipe(
+     ...,
+ *   mapIf((prev) => prev.foo === 'bar', doSomething)
+ * )
+ *
+ * @param {Function} predicateFn  function to return a boolean
+ * @param {Function} nextFunction next function to execute
+ * @exports
+ */
+export const mapIf = <E1, A, E2, B>(
+  predicateFn: (a: A) => boolean,
+  nextFunction: (a: A) => Result<E2, B> | Promise<Result<E2, B>>,
+) =>
+(input: Result<E1, A>): Result<E1 | E2, A | B> =>
+  input._tag === 'value' && predicateFn(input.value) ? map(nextFunction)(input) : input
+
+/**
+ * MAP IF ELSE ADAPTER FUNCTION
+ *
+ * This function is a special version of {@link map}. It takes a `predicate` function
+ * a `trueFn` and a `falseFn`. The predicate function is supposed to return a boolean.
+ * If the result is `true`, `trueFn` will be executed with `input`, if the result is
+ * `false`, `falseFn` will be executed with `input`.
+ * 
+ * @example
+ * const app = pipe(
+     ...,
+ *   mapIfElse((prev) => prev.foo === 'bar', doSomething, doSomethingElse)
+ * )
+ * 
+ * @param {Function} predicateFn  function to return a boolean
+ * @param {Function} trueFn next function to execute if `predicateFn` returned true
+ * @param {Function} falseFn next function to execute if `predicateFn` returned false
+ * @exports
+ */
+export const mapIfElse = <E1, A, E2, B, E3, C>(
+  predicateFn: (a: A) => boolean,
+  trueFn: (a: A) => Result<E2, B> | Promise<Result<E2, B>>,
+  falseFn: (a: A) => Result<E3, C> | Promise<Result<E3, C>>,
+) =>
+(input: Result<E1, A>): Result<E1 | E2 | E3, B | C> => {
+  if (isFailure(input)) {
+    return input
+  }
+
+  return predicateFn(input.value) ? map(trueFn)(input) : map(falseFn)(input)
+}
 
 /**
  * MAP TYPE ADAPTER FUNCTION
@@ -155,11 +191,13 @@ export const mapIf = <A, E2, B>(
  * @exports
  */
 export const mapType = <A, N, E2, B>(
-  predicate: (a: A) => boolean, nextFunction: (a: N) => Result<E2, B> | Promise<Result<E2, B>>,
-) => <E1>(input: Result<E1, A>): Result<E1 | E2, Exclude<A, N> | B> =>
-    input._tag === 'value' && predicate(input.value)
-      ? map(nextFunction)(input as unknown as SuccessType<N>)
-      : input as Result<E1, Exclude<A, N>>
+  predicate: (a: A) => boolean,
+  nextFunction: (a: N) => Result<E2, B> | Promise<Result<E2, B>>,
+) =>
+<E1>(input: Result<E1, A>): Result<E1 | E2, Exclude<A, N> | B> =>
+  input._tag === 'value' && predicate(input.value)
+    ? map(nextFunction)(input as unknown as SuccessType<N>)
+    : input as Result<E1, Exclude<A, N>>
 
 /**
  * BIND ADAPTER FUNCTION
@@ -177,10 +215,11 @@ export const mapType = <A, N, E2, B>(
 
  * @param {Function} singleFunction
  */
-export const bind = <E1, A, B>(singleFunction: (a: A) => B) => (previousValue: Result<E1, A>): Result<E1, B> => match(
-  value => Success(singleFunction(value)),
-  previousValue,
-)
+export const bind = <E1, A, B>(singleFunction: (a: A) => B) => (previousValue: Result<E1, A>): Result<E1, B> =>
+  match(
+    (value) => Success(singleFunction(value)),
+    previousValue,
+  )
 
 /**
  * ERROR MAPPING OVERRIDE
@@ -198,7 +237,11 @@ export const bind = <E1, A, B>(singleFunction: (a: A) => B) => (previousValue: R
  * @param {Function} switchFunction next function to call
  * @param {object} errors           overriding errors
  */
-export const withError = <A, E2, B, F extends (...args: any) => any>(switchFunction: (a: A, b?: {[key: string]: F}) => Result<E2, B>, errors: {[key: string]: F}) => (input: A): Result<E2, B> => {
+export const withError = <A, E2, B, F extends (...args: any) => any>(
+  switchFunction: (a: A, b?: { [key: string]: F }) => Result<E2, B>,
+  errors: { [key: string]: F },
+) =>
+(input: A): Result<E2, B> => {
   return switchFunction(input, errors)
 }
 
@@ -209,8 +252,6 @@ export const withError = <A, E2, B, F extends (...args: any) => any>(switchFunct
  * thrown, it will wrap it in a {@link Failure} and return it. Otherwise it
  * will return the result of the function.
  * If `errors` is given, it will return the errors defined in the mapping.
- *
- * TODO: Fix return types
  *
  * @example <caption>Without mapping</caption>
  * pipe(
@@ -235,21 +276,36 @@ export const withError = <A, E2, B, F extends (...args: any) => any>(switchFunct
  * @param {Object} [errors] Mapping between error types and thrown errors
  * @returns
  */
-export const guard = <L, R, G, F extends (...args: any) => any>(
+export function guard<L, R, G, F extends (...args: any) => unknown>(
   switchFunction: (a: R) => Result<L, G> | Promise<Result<L, G>>,
-  errors?: {[key: string]: F},
-) => async (previousValue: R) => {
+  errors: { [key: string]: F },
+): (p: R) => Promise<FailureType<ReturnType<F>> | Result<L, G>>
+export function guard<L, R, G, F extends (...args: any) => unknown>(
+  switchFunction: (a: R) => Result<L, G> | Promise<Result<L, G>>,
+): (p: R) => Promise<FailureType<CiznError<'GENERIC_ERROR'>> | Result<L, G>>
+export function guard<L, R, G, F extends (...args: any) => unknown>(
+  switchFunction: (a: R) => Result<L, G> | Promise<Result<L, G>>,
+  errors?: { [key: string]: F },
+) {
+  return async (previousValue: R): Promise<FailureType<ReturnType<F> | CiznError<'GENERIC_ERROR'>> | Result<L, G>> => {
     try {
       const r = await switchFunction(previousValue)
       if (isFailure(r)) throw r.error
 
       return r
     } catch (e: any) {
-      return Failure(errors?.[e.code || e.name]?.({
-        ...e, message: e.message, stack: e.stack,
-      }) as ReturnType<F> || e as L)
+      return errors
+        ? Failure(
+          errors[e.code]({
+            ...e,
+            message: e.message,
+            stack: e.stack,
+          }) as ReturnType<F>,
+        )
+        : Failure(Error('GENERIC_ERROR', e))
     }
   }
+}
 
 /**
  * RECOVER ADAPTER FUNCTION
@@ -275,20 +331,20 @@ export const guard = <L, R, G, F extends (...args: any) => any>(
  * @param errors Mapping between error types and callbacks
  * @returns {SuccessType} newValue
  */
-export const recover = <E1, A, F extends (...args: any) => any>(errors: {[key: string]: F}) => (input: Result<E1, A>): Result<E1, A | ReturnType<F>> => {
-  switch (input._tag) {
-    case 'error':
-      const error = input.error as CiznError<any>
-      return errors?.[error.name]
-        ? Success(errors?.[error.name]?.(input.error))
-        : input
-    case 'value':
-      return input
-    default:
-      const _exhaustive: never = input
-      return _exhaustive
+export const recover =
+  <E1, A, F extends (...args: any) => any>(errors: { [key: string]: F }) =>
+  (input: Result<E1, A>): Result<E1, A | ReturnType<F>> => {
+    switch (input._tag) {
+      case 'error':
+        const error = input.error as CiznError<any>
+        return errors?.[error.name] ? Success(errors?.[error.name]?.(input.error)) : input
+      case 'value':
+        return input
+      default:
+        const _exhaustive: never = input
+        return _exhaustive
+    }
   }
-}
 
 /**
  * TAP ADAPTER FUNCTION
@@ -306,12 +362,28 @@ export const recover = <E1, A, F extends (...args: any) => any>(errors: {[key: s
  * @param fn Void function to tap into
  * @returns previousValue
  */
-export const tap = <E, V>(fn: (a: E | V) => void) => (previousValue: Result<E, V>) => {
-  const content = previousValue._tag === 'value'
-    ? previousValue.value
-    : previousValue.error
+export const tap = <E, V>(fn: (a: V) => void) => (previousValue: Result<E, V>) => {
+  const content = previousValue._tag === 'value' && previousValue.value
 
-  fn(content)
+  content && fn(content)
+
+  return previousValue
+}
+
+/**
+ * TAP IF ADAPTER FUNCTION
+ *
+ * Works like {@link mapIf} but using {@link tap}.
+ * {@link mapType}.
+ *
+ * @param {Function} pred  function to return a boolean
+ * @param {Function} fn    next function to execute
+ * @exports
+ */
+export const tapIf = <E, V>(pred: (a: V) => boolean, fn: (a: E | V) => void) => (previousValue: Result<E, V>) => {
+  if (previousValue._tag === 'value' && pred(previousValue.value)) {
+    fn(previousValue.value)
+  }
 
   return previousValue
 }
@@ -341,7 +413,6 @@ export const tapError = <E, V>(tapFn: (a: E | V) => void) => (previousValue: Res
   return previousValue
 }
 
-
 /**
  * TAP WITH ERROR ADAPTER FUNCTION
  *
@@ -360,13 +431,15 @@ export const tapError = <E, V>(tapFn: (a: E | V) => void) => (previousValue: Res
  * @param errors Mapping between error types and callbacks
  * @returns previousValue
  */
-export const tapWithError = <E1, A, F extends (...args: any) => void>(errors: {[key: string]: F}) => (previousValue: Result<E1, A>): Result<E1, A> => {
-  if (isFailure(previousValue)) {
-    matchError(errors, previousValue)
-  }
+export const tapWithError =
+  <E1, A, F extends (...args: any) => void>(errors: { [key: string]: F }) =>
+  (previousValue: Result<E1, A>): Result<E1, A> => {
+    if (isFailure(previousValue)) {
+      matchError(errors, previousValue)
+    }
 
-  return previousValue
-}
+    return previousValue
+  }
 
 /**
  * Mimic `Array.forEach`, but works with {@link Result} in a pipe.
@@ -376,7 +449,8 @@ export const tapWithError = <E1, A, F extends (...args: any) => void>(errors: {[
  *
  * @param {Function} fn callback for each iteration
  */
-export const forEach = <E2, A, B>(fn: (a: A) => Promise<Result<E2, B>>) => async (previousValue: Array<A>): Promise<
+export const forEach = <E2, A, B>(fn: (a: A) => Promise<Result<E2, B>>) =>
+async (previousValue: Array<A>): Promise<
   Result<E2, undefined>
 > => {
   for (let i = 0; i < previousValue.length; i++) {
@@ -399,7 +473,8 @@ export const forEach = <E2, A, B>(fn: (a: A) => Promise<Result<E2, B>>) => async
  *
  * @param {Function} fn callback for each iteration
  */
-export const mapEach = <E2, A, B>(fn: (a: A) => Promise<Result<E2, B>>) => async (previousValue: Array<A>): Promise<
+export const mapEach = <E2, A, B>(fn: (a: A) => Promise<Result<E2, B>>) =>
+async (previousValue: Array<A>): Promise<
   Result<E2, Array<B>>
 > => {
   const acc = new Array(previousValue.length)
