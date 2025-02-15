@@ -1,85 +1,88 @@
-/* eslint-disable no-unused-vars */
-import { Environment } from '@cizn/core/state.ts'
-import { Success } from '@lib/composition/result.ts'
-import { def, getFileName } from '@lib/util/index.ts'
-import {
-  access, constants, lstat, realpath,
-} from 'node:fs/promises'
+// deno-lint-ignore-file require-await
+import { Derivation, Environment } from '@cizn/core/state.ts'
+import { bind, guard, map, tap, tapIf } from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
+import { Failure, isSuccess, Success } from '@lib/composition/result.ts'
 import { CliCommandProps } from '@lib/managers/cli/api/index.ts'
-import _setup from '@lib/managers/cli/api/command/setup.ts'
+import { getFileName } from '@lib/util/index.ts'
+import { setupEnvironment, withEnvironment } from '@lib/util/partials.ts'
 
 /**
- * Building the configuration
+ * Builds or reuses the generation denoted by the incoming `derivation`.
+ * 
+ * @param {Cizn.Application} app the main application
+ */
+const makeGeneration = (app: Cizn.Application) => async ({ derivation }: { derivation: Derivation }) =>
+  asyncPipe(
+    Success(derivation),
+    map(async (derivation) => {
+      const generation = await app.State.Generation.Api.make(derivation)
+      return isSuccess(generation) ? Success(undefined) : Failure(generation.error)
+    }),
+  )
+
+/**
+ * Builds or reuses a derivation and generation from the current configuration.
+ * 
+ * Does so only for `environment`, if specified, or for all environments. 
  *
  * @param {Cizn.Application} app the main application
- * @returns {Cizn.Adapter.Cli.Api['build']}
  */
-const build = (app: Cizn.Application) => async (environment: Environment, options: CliCommandProps) => {
-  const log = app.Manager.Log.Api
-
-  const { Derivation, Generation } = app.State
-  const { source } = options
-
-  _setup(app)({ environment, options })
-
-  let sourcePath: string = ''
-
-  try {
-    // Reading the source file
-    sourcePath = await realpath(`${app.State.Source.Current}`)
-    log.info({ message: `Reading source file %d ...`, options: [sourcePath] })
-    await access(sourcePath, constants.F_OK)
-
-    if (!(await lstat(sourcePath)).isFile()) {
-      throw new Error()
-    }
-  } catch(e) {
-    log.error({ message: `%d does not exist or is not readable`, options: [<string>source] })
-  }
-
-  const { default: module }: { default: Cizn.Application.State.Derivation.FileModule } = await import(`${sourcePath}`)
-  // const t = await import(`${sourcePath}`)
-
-  if (!module) {
-    // error no default export
-    log.error({ message: `%d does not have a default export`, options: sourcePath ? [sourcePath] : [] })
-  }
-
-  // Creating (or reusing) a derivation from the current config
-  const derivation = await Derivation.Api.make(module, 'generation', { name: getFileName(<string>source) })
-
-  // TODO: Once converted to functional style, implement setEnvironment and withEnvironment wrappers
-  // setEnvironment simply sets App.State.Environment to the input value
-  // const withEnvironment = (app) => callback => previousValue => {
-  //   if (!app.State.Environment) {
-  //     return callback(previousValue)
-  //   }
-
-  //   const result = {}
-  //   for (const environment of ['system', 'home']) {
-  //     app.State.Environment = <Environment>environment
-  //     result[environment] = callback(previousValue)
-  //   }
-
-  //   // should be {home: <result of cb for home>, system: <result of cb for sytem>}
-  //   return result
-  // }
-
-  if (!def(environment)) {
-    // Building both system and home environments
-    for (const currentEnvironment of ['system', 'home']) {
-      // Setting current environment
-      app.State.Environment = <Environment>currentEnvironment
-
-      // Creating (or reusing) a generation from the current derivation
-      const generation = await Generation.Api.make(derivation)
-    }
-  } else {
-    // Creating (or reusing) a generation from the current derivation
-    const generation = await Generation.Api.make(derivation)
-  }
-
-  app.Manager.Cli.Result = Success(undefined)
-}
+const build = (app: Cizn.Application): Cizn.Manager.Cli.Api['build'] => async (environment: Environment, options: CliCommandProps) =>
+  asyncPipe(
+    Success({ environment, options }),
+    map(setupEnvironment(app)),
+    bind((x) => ({ ...x, sourcePath: app.State.Source.Current })),
+    map(async (x) => {
+      const sourcePath = await app.Manager.FS.Api.Path.getReal(`${app.State.Source.Current}`)
+      return isSuccess(sourcePath)
+        ? Success(Object.assign(x, { sourcePath: sourcePath.value }))
+        : Failure(sourcePath.error)
+    }),
+    tap(({ sourcePath }) => app.Manager.Log.Api.info({ message: `Reading source file %d ...`, options: [sourcePath] })),
+    map(async (x) => {
+      const readable = await app.Manager.FS.Api.Path.isReadable(x.sourcePath)
+      return isSuccess(readable) ? Success(x) : Failure(readable.error)
+    }),
+    map(async (x) => {
+      const isFile = await app.Manager.FS.Api.File.is(x.sourcePath)
+      return isSuccess(isFile) ? Success(Object.assign(x, { isFile: isFile.value })) : Failure(isFile.error)
+    }),
+    tapIf(
+      ({ isFile }) => !isFile,
+      () =>
+        app.Manager.Log.Api.error({
+          message: `%d does not exist or is not readable`,
+          options: [`${app.State.Source.Current}`],
+        }),
+    ),
+    map(guard(async (x) => {
+      const { default: module }: { default: Cizn.Application.State.Derivation.FileModule } = await import(
+        `${x.sourcePath}`
+      )
+      return Success(Object.assign(x, { module }))
+    })),
+    tapIf(
+      ({ module }) => !module,
+      () =>
+        app.Manager.Log.Api.error({
+          message: `%d does not have a default export`,
+          options: [app.State.Source.Current],
+        }),
+    ),
+    map(guard(async (x) => {
+      const derivation = await app.State.Derivation.Api.make({
+        module: x.module,
+        builder: 'generation',
+        data: { name: getFileName(app.State.Source.Current) },
+      })
+      return isSuccess(derivation)
+        ? Success(Object.assign(x, { derivation: derivation.value }))
+        : Failure(derivation.error)
+    })),
+    map(withEnvironment(app, makeGeneration)),
+    (result) => app.Manager.Cli.Result = result,
+    () => undefined
+  )
 
 export default build

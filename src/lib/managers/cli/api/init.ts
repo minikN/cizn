@@ -1,7 +1,7 @@
-import { bind } from "@lib/composition/function.ts"
-import { pipe } from "@lib/composition/pipe.ts"
-import { Result, Success } from "@lib/composition/result.ts"
-import { Command } from "npm:commander"
+import { bind } from '@lib/composition/function.ts'
+import { pipe } from '@lib/composition/pipe.ts'
+import { Result, Success } from '@lib/composition/result.ts'
+import { Command } from 'npm:commander'
 
 /**
  * Sets a global option.
@@ -37,7 +37,8 @@ const setArgument = (flag: string, desc: string) => (cmd: Command): Command => c
  * Sets a comman action
  * @param {Function} handler handler for the action
  */
-const setAction = (handler: (...args: any) => void) => (cmd: Command): Command => cmd.action(handler)
+const setAction = <T extends (...args: any) => Promise<void> | void>(handler: T) => (cmd: Command): Command =>
+  cmd.action(handler)
 
 /**
  * Sets a command option.
@@ -46,8 +47,8 @@ const setAction = (handler: (...args: any) => void) => (cmd: Command): Command =
  * @param {string} desc     description of the option
  * @param {*} defaultValue  default value for the option
  */
-const setCommandOption = (flags: string, desc: string, defaultValue: any) => (cmd: Command): Command => cmd.option(flags, desc, defaultValue)
-
+const setCommandOption = (flags: string, desc: string, defaultValue: any) => (cmd: Command): Command =>
+  cmd.option(flags, desc, defaultValue)
 
 /**
  * Initializes a command.
@@ -83,56 +84,69 @@ const setProgramSettings = setSettings((Cli) => {
  *
  * @param {Cizn.Application} app the application
  */
-const setBuildCommand = (app: Cizn.Application) => pipe(
-  Success(app.Manager.Cli.Program.command('build')),
-  bind(setDescription('Build a given configuration')),
-  bind(setArgument('[environment]', 'Environment to build. Can be "home" or "system". If ommitted, both will be built.')),
-  bind(setCommandOption('-s, --source <string>', 'path to the source file', './config.js')),
-  bind(setAction(app.Manager.Cli.Api.build)),
-  () => app,
-)
+const setBuildCommand = (app: Cizn.Application) =>
+  pipe(
+    Success(app.Manager.Cli.Program.command('build')),
+    bind(setDescription('Build a given configuration')),
+    bind(
+      setArgument('[environment]', 'Environment to build. Can be "home" or "system". If ommitted, both will be built.'),
+    ),
+    bind(setCommandOption('-s, --source <string>', 'path to the source file', './config.js')),
+    bind(setAction(app.Manager.Cli.Api.build)),
+    () => app,
+  )
 
 /**
  * Sets up the `build` command.
  *
  * @param {Cizn.Application} app the application
  */
-const setReconfigureCommand = (app: Cizn.Application) => pipe(
-  Success(app.Manager.Cli.Program.command('reconfigure')),
-  bind(setDescription('Build and apply a given configuration')),
-  bind(setArgument('[environment]', 'Environment to build. Can be "home" or "system". If ommitted, both will be built.')),
-  bind(setCommandOption('-s, --source <string>', 'path to the source file', './config.js')),
-  bind(setAction(app.Manager.Cli.Api.reconfigure)),
-  () => app,
-)
+const setReconfigureCommand = (app: Cizn.Application) =>
+  pipe(
+    Success(app.Manager.Cli.Program.command('reconfigure')),
+    bind(setDescription('Build and apply a given configuration')),
+    bind(
+      setArgument('[environment]', 'Environment to build. Can be "home" or "system". If ommitted, both will be built.'),
+    ),
+    bind(setCommandOption('-s, --source <string>', 'path to the source file', './config.js')),
+    bind(setAction(app.Manager.Cli.Api.reconfigure)),
+    () => app,
+  )
 
 /**
  * Sets up the `build` command.
  *
  * @param {Cizn.Application} app the application
  */
-const setApplyCommand = (app: Cizn.Application) => pipe(
-  Success(app.Manager.Cli.Program.command('apply')),
-  bind(setDescription('Applies a given configuration')),
-  bind(setArgument('[environment]', 'Environment to be applied. Can be "home" or "system". If ommitted, both will be applied.')),
-  bind(setCommandOption('-g, --generation <number>', 'specific generation to apply', undefined)),
-  bind(setAction(app.Manager.Cli.Api.apply)),
-  () => app,
-)
+const setApplyCommand = (app: Cizn.Application) =>
+  pipe(
+    Success(app.Manager.Cli.Program.command('apply')),
+    bind(setDescription('Applies a given configuration')),
+    bind(
+      setArgument(
+        '[environment]',
+        'Environment to be applied. Can be "home" or "system". If ommitted, both will be applied.',
+      ),
+    ),
+    bind(setCommandOption('-g, --generation <number>', 'specific generation to apply', undefined)),
+    bind(setAction(app.Manager.Cli.Api.apply)),
+    () => app,
+  )
 
 /**
  * Initializes the CLI adapter.
  *
  * @param {Cizn.Application} app the application
  */
-const init = (app: Cizn.Application) => (): Result<never, Cizn.Application> => pipe(
-  Success(app),
-  bind(setGlobalSettings),
-  bind(setProgramSettings),
-  bind(setOption('-c, --config [path]', 'Path to the configuration file', undefined)),
-  bind(setBuildCommand),
-  bind(setApplyCommand),
-  bind(setReconfigureCommand),
-)
+const init = (app: Cizn.Application) => (): Result<never, Cizn.Application> =>
+  pipe(
+    Success(app),
+    bind(setGlobalSettings),
+    bind(setProgramSettings),
+    bind(setOption('-c, --config [path]', 'Path to the configuration file', undefined)),
+    bind(setBuildCommand),
+    bind(setApplyCommand),
+    bind(setReconfigureCommand),
+  )
 
 export default init

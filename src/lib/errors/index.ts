@@ -25,6 +25,7 @@ export type DefaultErrorTypes =
     | 'MALFORMED_DERIVATION_HASH'
 
     | 'MODULE_ERROR'
+    | 'TEMP_FILE_ERROR'
     | 'GENERIC_ERROR'
 
 export type CiznError<E extends DefaultErrorTypes> = {
@@ -63,6 +64,7 @@ const defaultErrorMessages = Object.freeze({
   DERIVATION_NOT_FOUND: 'Derivation %d doesn\'t exist',
   MALFORMED_DERIVATION_HASH: 'Derivation %d doesn\'t contain a valid hash',
   MODULE_ERROR: 'Evaluating a module caused an error',
+  TEMP_FILE_ERROR: 'Creating a temporary file caused an error',
   GENERIC_ERROR: 'Generic error'
 })
 

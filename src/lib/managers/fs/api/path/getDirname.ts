@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-unused-vars require-await
 import { guard, map } from "@lib/composition/function.ts"
 import { asyncPipe } from "@lib/composition/pipe.ts"
 import {
@@ -30,7 +31,7 @@ const _dirname = (path: string): Result<CiznError<'NO_PATH_GIVEN'>, string> => {
  *
  * @param {Cizn.Application} app the application
  */
-export const getDirname = (app: Cizn.Application): FSPathApi['getDirname'] => (path, errors) => asyncPipe(
+export const getDirname = (app: Cizn.Application): FSPathApi['getDirname'] => async (path, errors) => asyncPipe(
   Success(path),
   map(guard(_dirname, {
     ERR_INVALID_ARG_TYPE: errors?.ERR_INVALID_ARG_TYPE ?? ErrorAs('NO_PATH_GIVEN'),

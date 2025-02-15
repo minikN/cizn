@@ -16,12 +16,12 @@ export type Cli = {
 }
 
 /**
- * The CLI adapter
+ * The CLI manager
  *
  * @param {Cizn.Application} app
  * @returns {Cizn.Adapter.Cli}
  */
-const cliAdapter = (app: Cizn.Application): Cizn.Manager.Cli => {
+const cliManager = (app: Cizn.Application): Cizn.Manager.Cli => {
   const adapterComposition = pipe<Cizn.Manager.Cli>(
     defineImmutableProp('_name', G.APP_NAME),
     defineImmutableProp('_version', G.APP_VERSION),
@@ -34,4 +34,4 @@ const cliAdapter = (app: Cizn.Application): Cizn.Manager.Cli => {
   return adapterComposition
 }
 
-export default cliAdapter
+export default cliManager

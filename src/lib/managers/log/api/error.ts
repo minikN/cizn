@@ -1,10 +1,9 @@
 /* global process */
 import chalk from 'npm:chalk'
 import { Props } from '@lib/managers/log/api/index.ts'
+import process from 'node:process'
 
-const info = (App: Cizn.Application) => ({
-  message, options = [], error = {},
-}: Props) => {
+const error = (App: Cizn.Application) => ({ message, options = [], error = {} }: Props) => {
   const { Log } = App.Manager
 
   const reasons = error.reasons?.length
@@ -15,4 +14,4 @@ const info = (App: Cizn.Application) => ({
   process.exit(1)
 }
 
-export default info
+export default error

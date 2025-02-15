@@ -19,7 +19,7 @@ export type Props = {
 
 export type Api = {
   init: () => Promise<Result<never, Cizn.Application>>
-  error: ({ message, options }: Props) => void
+  error: ({ message, options }: Props) => never
   indent: () => void
   unindent: () => void
   info: ({ message, options }: Props) => void

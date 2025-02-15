@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-unused-vars require-await
 import G from '@cizn/constants.ts'
 import { DerivationPath, DerivationPathProps } from '@cizn/core/derivation/api/index.ts'
 import { bind, guard, map } from '@lib/composition/function.ts'

@@ -1,5 +1,5 @@
 import file from '@cizn/core/derivation/api/builders/file.ts'
-import module from '@cizn/core/derivation/api/builders/module.ts'
+import builder from '@cizn/core/derivation/api/builders/module.ts'
 import generation from '@cizn/core/derivation/api/builders/generation.ts'
 import { DerivationBuilderApi } from '@cizn/core/derivation/api/index.ts'
 
@@ -9,7 +9,7 @@ const derivationBuilderApi = (app: Cizn.Application): DerivationBuilderApi => Ob
     enumerable: true,
   },
   module: {
-    value: module(app),
+    value: builder(app),
     enumerable: true,
   },
   generation: {

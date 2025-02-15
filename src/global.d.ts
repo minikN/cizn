@@ -1,7 +1,7 @@
 declare namespace Cizn {
   namespace Utils {
     export type Public = {
-      file: Cizn.Adapter.File.PublicApi
+      file: Cizn.Application.State.Derivation.Api['file']
     }
   }
   namespace Application {
@@ -29,13 +29,13 @@ declare namespace Cizn {
           module: Module,
         }
 
-        type Module = (() => void) | ((
+        type Module = ((
           config: object,
           utils: Cizn.Utils.Public
         ) => ModuleOptions)
 
         type ModuleOptions = {
-          modules: Module[],
+          modules: FileModule[],
           homePackages: string[],
           systemPackages: string[],
           config: object,

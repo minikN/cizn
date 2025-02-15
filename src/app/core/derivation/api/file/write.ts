@@ -1,43 +1,98 @@
-import { Serializer } from "@lib/serializers/index.ts"
-import { getFileName } from "@lib/util/index.ts"
-import { WriteType } from "@cizn/core/derivation/api/file/index.ts"
+// deno-lint-ignore-file require-await
+import { WriteProps, WriteState, WriteType } from '@cizn/core/derivation/api/file/index.ts'
+import { Derivation } from '@cizn/core/state.ts'
+import { bind, map, tap, tapError } from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
+import { Failure, isSuccess, Success } from '@lib/composition/result.ts'
+import { Error } from '@lib/errors/index.ts'
+import { Serializer } from '@lib/serializers/index.ts'
+import { getFileName } from '@lib/util/index.ts'
 
 /**
- *
- * @param app
- * @param serializer
+ * @param {cizn.application} app          the main application
+ * @param {serializer | null} serializer  the serializer to use
+ * @param {Derivation[]} inputs           input derivations
+ * @param {WriteProps} args               user-provided args
  * @returns
  */
-const write = (app: Cizn.Application, serializer: Serializer | null = null): WriteType => inputs => async (path, content, props = {}) => {
-  const { Derivation } = app.State
-  const { override = false } = props
+const buildDerivation =
+  (app: Cizn.Application, serializer: Serializer | null, inputs: Derivation[], { content, path, props }: WriteProps) =>
+  async (data: WriteState) =>
+    asyncPipe(
+      Success(data),
+      bind((x) =>
+        Object.assign(x, {
+          previousContent: x.derivation
+            // deno-fmt-ignore
+            ? !props.override
+              ? x.derivation.env.content || null
+              : null
+            : null,
+        })
+      ),
+      map(async (x) => {
+        const fileContent = serializer
+          ? await serializer(x.previousContent, <object> content)
+          : `${x.previousContent || ''}${content}`
 
-  const alreadyBuiltDerivation = Derivation.State.Built.find(x => x.env.path === path)
+        // condition should be isSuccess(fileContent) ? ... : Error(fileContent.error)
+        return true ? Success(Object.assign(x, { fileContent })) : Failure(Error('INVALID_CONTENT_GIVEN'))
+      }),
+      map(async (x) => {
+        const derivation = await app.State.Derivation.Api.make({
+          module: { module: () => <Cizn.Application.State.Derivation.ModuleOptions> {}, name: x.name },
+          data: { content: x.fileContent, path, name: x.name },
+          builder: 'file',
+        })
 
-  const previousContent = alreadyBuiltDerivation
-    ? !override
-      ? <string>alreadyBuiltDerivation.env.content
-      : null
-    : null
+        return isSuccess(derivation) ? Success({ derivation: derivation.value }) : Failure(derivation.error)
+      }),
+      tap((x) => inputs.push(x.derivation)),
+      bind((x) => Object.assign(x, { outPath: x.derivation.env.out })),
+    )
 
-  /**
-   * Appends {@link content} to the content of the previously built derivation
-   * (of the same file) if {@link override} is `true`.
-   */
-  const fileContent = serializer
-    ? await serializer(previousContent, <object>content)
-    : `${previousContent || ''}${content}`
-
-  const name = getFileName(`${path}`)
-
-  const derivation = await Derivation.Api.make({name, module: () => {}}, 'file', {
-    content: fileContent, path, name,
-  })
-
-  inputs.push(derivation)
-  const out = derivation.env?.out
-
-  return `${Derivation.Root}/${out}`
-}
+/**
+ * Builds a derivation, optionally with the given `serializer` and returns
+ * the derivations `outPath`. This function is called from a user-provided
+ * module.
+ *
+ * In case and error occures, the execution will be stopped immediately.
+ * Upon success, the function needs to return the output path for the
+ * build derivation (a string), so the user can use it in the module
+ * (e.g. use it in another file they want to create)
+ *
+ * @example <caption>Writing an ini file</caption>
+ * await utils.file.writeIni('.config/test-ini.ini', {
+ *   test: {
+ *     num: 2,
+ *     another: 'test',
+ *   },
+ * })
+ *
+ * @param {cizn.application} app          the main application
+ * @param {serializer | null} serializer  the serializer to use
+ */
+const write =
+  (app: Cizn.Application, serializer: Serializer | null = null): WriteType =>
+  (inputs) =>
+  async (path, content, props = {}) =>
+    asyncPipe(
+      Success(undefined),
+      bind(() => {
+        const buildDerivation = app.State.Derivation.State.Built.find((d) => d.env.path === path)
+        return { derivation: buildDerivation }
+      }),
+      bind((x) => Object.assign(x, { name: getFileName(`${path}`) })),
+      map(
+        async (x) =>
+          await buildDerivation(app, serializer, inputs, {
+            content,
+            path,
+            props: { override: props.override },
+          })(x),
+      ),
+      tapError((e) => app.Manager.Log.Api.error({ message: e.label })),
+      (x) => isSuccess(x) ? x.value.outPath : '',
+    )
 
 export default write

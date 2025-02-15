@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-unused-vars require-await
 import { guard, map } from "@lib/composition/function.ts"
 import { asyncPipe } from "@lib/composition/pipe.ts"
 import {
@@ -37,7 +38,7 @@ Promise<Result<CiznError<'NO_PATH_GIVEN'> | CiznError<'NO_TARGET_GIVEN'>, string
  *
  * @param {Cizn.Application} app the application
  */
-export const write = (app: Cizn.Application): FSLinkApi['write'] => (target, type = 'file') => (path, errors) =>
+export const write = (app: Cizn.Application): FSLinkApi['write'] => (target, type = 'file') => async (path, errors) =>
   asyncPipe(
     Success(path),
     map(guard(_symlink(target, type), {
