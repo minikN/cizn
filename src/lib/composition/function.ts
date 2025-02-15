@@ -285,7 +285,7 @@ export function guard<L, R, G, F extends (...args: any) => unknown>(
     } catch (e: any) {
       return errors
         ? Failure(
-          errors[e.code || '*']({
+          errors[e.code || e.name || '*']({
             ...e,
             message: e.message,
             stack: e.stack,
