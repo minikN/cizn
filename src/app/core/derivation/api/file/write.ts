@@ -32,11 +32,12 @@ const buildDerivation =
       ),
       map(async (x) => {
         const fileContent = serializer
-          ? await serializer(x.previousContent, <object> content)
-          : `${x.previousContent || ''}${content}`
+          ? await serializer(app)(x.previousContent, <object> content)
+          : Success(`${x.previousContent || ''}${content}`)
 
-        // condition should be isSuccess(fileContent) ? ... : Error(fileContent.error)
-        return true ? Success(Object.assign(x, { fileContent })) : Failure(Error('INVALID_CONTENT_GIVEN'))
+        return isSuccess(fileContent)
+          ? Success(Object.assign(x, { fileContent: fileContent.value }))
+          : Failure(fileContent.error)
       }),
       map(async (x) => {
         const derivation = await app.State.Derivation.Api.make({

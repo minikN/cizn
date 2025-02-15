@@ -1,5 +1,10 @@
-import { parse, stringify } from '@std/yaml'
+// deno-lint-ignore-file no-unused-vars require-await
+import { guard, map } from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
+import { Success } from '@lib/composition/result.ts'
+import { ErrorAs } from '@lib/errors/index.ts'
 import { Serializer } from '@lib/serializers/index.ts'
+import { parse, stringify } from '@std/yaml'
 
 /**
  * Serializes `content` to an yaml format.
@@ -10,13 +15,14 @@ import { Serializer } from '@lib/serializers/index.ts'
  * @param {object} content new file content
  * @returns {Promise<string>}
  */
-const yamlSerializer: Serializer = async (existingContent, content) => {
-  const combinedContent = {
-    ...existingContent ? parse(existingContent) as object : {},
-    ...content,
-  }
-
-  return stringify(combinedContent)
-}
+const yamlSerializer: Serializer = (app: Cizn.Application) => async (existingContent, content) =>
+  asyncPipe(
+    Success({ existingContent, content }),
+    map(guard((x) => {
+      const existingContent = x.existingContent ? parse(x.existingContent) : {}
+      return Success({ ...<object> existingContent, ...content })
+    }, { 'GENERIC_ERROR': ErrorAs('SERIALIZE_ERROR') })),
+    map((x) => Success(stringify(x))),
+  )
 
 export default yamlSerializer

@@ -27,6 +27,7 @@ export type DefaultErrorTypes =
     | 'MODULE_ERROR'
     | 'TEMP_FILE_ERROR'
     | 'GENERIC_ERROR'
+    | 'SERIALIZE_ERROR'
 
 export type CiznError<E extends DefaultErrorTypes> = {
     readonly name: E,
@@ -65,7 +66,8 @@ const defaultErrorMessages = Object.freeze({
   MALFORMED_DERIVATION_HASH: 'Derivation %d doesn\'t contain a valid hash',
   MODULE_ERROR: 'Evaluating a module caused an error',
   TEMP_FILE_ERROR: 'Creating a temporary file caused an error',
-  GENERIC_ERROR: 'Generic error'
+  GENERIC_ERROR: 'Generic error',
+  SERIALIZE_ERROR: 'Could not properly serialize file content. Got: %d'
 })
 
 type OptionalErrorProps = {
