@@ -92,7 +92,7 @@ const write =
             props: { override: props.override },
           })(x),
       ),
-      tapError((e) => app.Manager.Log.Api.error({ message: e.label })),
+      tapError((e) => app.Manager.Log.Api.error({ message: e.label, options: e.options })),
       (x) => isSuccess(x) ? x.value.outPath : '',
     )
 

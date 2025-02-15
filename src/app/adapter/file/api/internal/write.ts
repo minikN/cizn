@@ -22,7 +22,7 @@ const write = (app: Cizn.Application) => curry(async (
     : null
 
   const combinedContent = type !== 'plain'
-    ? await serializers[type](existingContent, <object>content)
+    ? await serializers[type](app)(existingContent, <object>content)
     : content
 
   if (fileExists) {

@@ -283,9 +283,10 @@ export function guard<L, R, G, F extends (...args: any) => unknown>(
 
       return r
     } catch (e: any) {
-      return errors
+      const foundError = errors ? errors?.[e.code] || errors?.[e.name] || errors['*'] : null
+      return foundError
         ? Failure(
-          errors[e.code || e.name || '*']({
+          foundError({
             ...e,
             message: e.message,
             stack: e.stack,

@@ -5,6 +5,7 @@ import { Success } from '@lib/composition/result.ts'
 import { ErrorAs } from '@lib/errors/index.ts'
 import { Serializer } from '@lib/serializers/index.ts'
 import { parse, stringify } from '@std/toml'
+import { isStr } from '@lib/util/index.ts'
 
 /**
  * Serializes `content` to an toml format.
@@ -19,9 +20,9 @@ const tomlSerializer: Serializer = (app: Cizn.Application) => async (existingCon
     Success({ existingContent, content }),
     map(guard((x) => {
       const existingContent = x.existingContent ? parse(x.existingContent) : {}
-      return Success({ ...existingContent, ...content })
-    }, { 'GENERIC_ERROR': ErrorAs('SERIALIZE_ERROR') })),
-    map((x) => Success(stringify(x))),
+      const stringifiedContent = stringify({ ...existingContent, ...x.content })
+      return Success(stringifiedContent)
+    }, { '*': ErrorAs('SERIALIZE_ERROR', { options: [isStr(content) ? content : content?.toString?.()] }) })),
   )
 
 export default tomlSerializer
