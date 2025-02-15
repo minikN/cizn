@@ -1,12 +1,7 @@
 import appComposition, { getApp } from '@cizn/index.ts'
-import {
-  guard, map,
-  tapError,
-} from '@lib/composition/function.ts'
+import { guard, map, tapError } from '@lib/composition/function.ts'
 import { asyncPipe } from '@lib/composition/pipe.ts'
-import { Success } from '@lib/composition/result.ts'
 import { logError as logE } from '@lib/util/index.ts'
-import process from 'node:process'
 
 // TODO: combine Error, ErrorAs, ErrorWith into one function
 
@@ -29,7 +24,7 @@ asyncPipe(
      * the operation here to log possible errors. Therefore, each action handler will save
      * its result in {@link app.Manager.Cli.Result} so that we can access it here.
      */
-    return app.Manager.Cli.Result ?? Success(undefined)
+    return app.Manager.Cli.Result
   })),
   // We reached the end of the application's lifecycle. If we
   // have an error here, lets tap into it and log it.

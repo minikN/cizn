@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars,@stylistic/js/object-curly-newline */
-
+// deno-lint-ignore-file require-await
 import {
   bind, forEach, map, recover,
   tap,
@@ -16,6 +15,7 @@ import {
 } from "node:fs/promises"
 import path from "node:path"
 import { GenerationEnvironment } from "@cizn/core/generation/api/index.ts"
+import process from "node:process";
 
 /**
  * Recursively lists all files in `root`.

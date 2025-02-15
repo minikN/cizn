@@ -1,11 +1,9 @@
-import { guard, map } from "@lib/composition/function.ts"
-import { asyncPipe } from "@lib/composition/pipe.ts"
-import {
-  Failure, Result, Success,
-} from "@lib/composition/result.ts"
-import { CiznError, Error } from "@lib/errors/index.ts"
-import process from "node:process"
-import { FSPathApi } from "@lib/managers/fs/api/index.ts"
+import { guard, map } from '@lib/composition/function.ts'
+import { asyncPipe } from '@lib/composition/pipe.ts'
+import { Failure, Result, Success } from '@lib/composition/result.ts'
+import { CiznError, Error, ErrorAs } from '@lib/errors/index.ts'
+import process from 'node:process'
+import { FSPathApi } from '@lib/managers/fs/api/index.ts'
 
 /**
  * Gets the `cwd`.
@@ -26,7 +24,11 @@ const _getCwd = async (): Promise<Result<CiznError<'NO_CWD_GIVEN'>, string>> => 
  *
  * @param {string} path the path to check
  */
-export const getCwd = (app: Cizn.Application): FSPathApi['getCwd'] => () => asyncPipe(
-  Success(true),
-  map(guard(_getCwd)),
-)
+export const getCwd = (app: Cizn.Application): FSPathApi['getCwd'] => () =>
+  asyncPipe(
+    Success(true),
+    map(guard(_getCwd, {
+      'NO_CWD_GIVEN': ErrorAs('NO_CWD_GIVEN'),
+      '*': ErrorAs('GENERIC_ERROR'),
+    })),
+  )

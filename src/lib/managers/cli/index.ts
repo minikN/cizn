@@ -5,6 +5,7 @@ import { Result } from '@lib/composition/result.ts'
 import cliApi from "@lib/managers/cli/api/index.ts"
 import { pipe } from "@lib/util/index.ts"
 import { Command } from "npm:commander"
+import { CiznError, DefaultErrorTypes } from '@lib/errors/index.ts'
 
 export type Cli = {
   readonly _name: string,
@@ -12,7 +13,7 @@ export type Cli = {
   Program: Command
   Global: Command
   Api: Cizn.Manager.Cli.Api
-  Result: Result<unknown, unknown>
+  Result: Result<CiznError<any>, unknown>
 }
 
 /**

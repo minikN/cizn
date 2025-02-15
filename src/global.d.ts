@@ -1,7 +1,7 @@
 declare namespace Cizn {
   namespace Utils {
     export type Public = {
-      file: Cizn.Application.State.Derivation.Api['file']
+      file: import('@cizn/core/derivation/api/index.ts').DerivationPublicFileApi
     }
   }
   namespace Application {

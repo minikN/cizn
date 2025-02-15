@@ -388,7 +388,7 @@ export const tapIf = <E, V>(pred: (a: V) => boolean, fn: (a: V) => void) => (pre
  *
  * @param tapFn Void function to tap into
  */
-export const tapError = <E, V>(tapFn: (a: E) => void) => (previousValue: Result<E, V>) => {
+export const tapError = <E, V>(tapFn: (a: E) => void | never) => (previousValue: Result<E, V>) => {
   if (isFailure(previousValue)) {
     tapFn(previousValue.error)
   }
