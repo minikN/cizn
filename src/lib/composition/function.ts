@@ -1,6 +1,7 @@
+// deno-lint-ignore-file no-case-declarations
 import { _dual } from '@lib/composition/pipe.ts'
 import { Failure, FailureType, isFailure, Result, Success, SuccessType } from '@lib/composition/result.ts'
-import { CiznError, Error } from '@lib/errors/index.ts'
+import { CiznError, DefaultErrorTypes, Error } from '@lib/errors/index.ts'
 
 /**
  * RESULT PATTERN MATCHING
@@ -320,12 +321,14 @@ export function guard<L, R, G, F extends (...args: any) => unknown>(
  * @param errors Mapping between error types and callbacks
  */
 export const recover =
-  <E1, A, F extends (...args: any) => any>(errors: { [key: string]: F }) =>
-  (input: Result<E1, A>): Result<E1, A | ReturnType<F>> => {
+  <E1, K extends N, N extends DefaultErrorTypes, A, F extends (...args: any) => any>(errors: { [Property in N]: F }) =>
+  (input: Result<E1, A>): Result<Exclude<E1, CiznError<K>>, A | ReturnType<F>> => {
     switch (input._tag) {
       case 'error':
-        const error = input.error as CiznError<any>
-        return errors?.[error.name] ? Success(errors?.[error.name]?.(input.error)) : input
+        const error = input.error as CiznError<K>
+        return errors?.[error.name]
+          ? Success((errors?.[error.name]?.(input.error)) as ReturnType<F>)
+          : input as FailureType<Exclude<E1, typeof error>>
       case 'value':
         return input
       default:
