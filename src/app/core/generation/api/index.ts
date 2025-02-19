@@ -10,64 +10,81 @@ export type GenerationEnvironment = Extract<Cizn.Application.State.Environment, 
 
 export type Api = {
   make: (props: Cizn.Application.State.Derivation) => Promise<
-  Result<
-  | CiznError<"NO_PATH_GIVEN">
-  | CiznError<"INCORRECT_PATH_GIVEN">
-  | CiznError<"NO_TARGET_GIVEN">
-  | CiznError<"EACCES">,
-  Cizn.Application.State.Generation>>
-  path: ({ hash }: {hash: Cizn.Application.State.Derivation['hash']}) => Promise<
-  Result<
-    | CiznError<"NO_PATH_GIVEN">
-    | CiznError<"INCORRECT_PATH_GIVEN">,
-    Cizn.Application.State.Generation>>
+    Result<
+      | CiznError<'NO_PATH_GIVEN'>
+      | CiznError<'INCORRECT_PATH_GIVEN'>
+      | CiznError<'NO_TARGET_GIVEN'>
+      | CiznError<'NOT_A_FILE'>
+      | CiznError<'NO_CONTENT_GIVEN'>
+      | CiznError<'INVALID_CONTENT_GIVEN'>
+      | CiznError<'EACCES'>,
+      Cizn.Application.State.Generation
+    >
+  >
+  path: ({ hash }: { hash: Cizn.Application.State.Derivation['hash'] }) => Promise<
+    Result<
+      | CiznError<'NO_PATH_GIVEN'>
+      | CiznError<'INCORRECT_PATH_GIVEN'>,
+      Cizn.Application.State.Generation
+    >
+  >
   set: (generation: Cizn.Application.State.Generation) => Promise<
-  Result<
-    | CiznError<"NOT_A_SYMLINK">
-    | NonNullable<CiznError<"NO_PATH_GIVEN">
-    | CiznError<"INCORRECT_PATH_GIVEN">
-    | CiznError<"NO_TARGET_GIVEN">
-    | CiznError<"EACCES">>,
-    string>
+    Result<
+      | CiznError<'NOT_A_SYMLINK'>
+      | NonNullable<
+        | CiznError<'NO_PATH_GIVEN'>
+        | CiznError<'INCORRECT_PATH_GIVEN'>
+        | CiznError<'NO_TARGET_GIVEN'>
+        | CiznError<'EACCES'>
+      >,
+      string
+    >
   >
   get: (generationNumber?: string) => Result<
-    | NonNullable<CiznError<"NO_PATH_GIVEN"> | CiznError<"INCORRECT_PATH_GIVEN">>
+    | NonNullable<CiznError<'NO_PATH_GIVEN'> | CiznError<'INCORRECT_PATH_GIVEN'>>
     | CiznError<'GENERATION_NOT_FOUND'>
     | CiznError<'NO_GENERATIONS'>,
     Cizn.Application.State.Generation
   >
-  apply: () => Promise<Result<
-  | CiznError<"NO_PATH_GIVEN">
-  | CiznError<"INCORRECT_PATH_GIVEN">
-  | CiznError<"NOT_A_SYMLINK">
-  | CiznError<"NO_TARGET_GIVEN">
-  | CiznError<"EACCES">
-  | CiznError<"NOT_A_DIR">
-  | CiznError<"NOT_OWN_FILE">,
-  undefined>>
+  apply: () => Promise<
+    Result<
+      | CiznError<'NO_PATH_GIVEN'>
+      | CiznError<'INCORRECT_PATH_GIVEN'>
+      | CiznError<'NO_CONTENT_GIVEN'>
+      | CiznError<'INVALID_CONTENT_GIVEN'>
+      | CiznError<'NOT_A_SYMLINK'>
+      | CiznError<'NO_TARGET_GIVEN'>
+      | CiznError<'EACCES'>
+      | CiznError<'NOT_A_DIR'>
+      | CiznError<'NOT_A_FILE'>
+      | CiznError<'NOT_OWN_FILE'>,
+      undefined
+    >
+  >
 }
 
-const generationApi = (App: Cizn.Application): Cizn.Application.State.Generation.Api => Object.create({}, {
-  make: {
-    value: make(App),
-    enumerable: true,
-  },
-  path: {
-    value: path(App),
-    enumerable: true,
-  },
-  set: {
-    value: set(App),
-    enumerable: true,
-  },
-  get: {
-    value: get(App),
-    enumerable: true,
-  },
-  apply: {
-    value: apply(App),
-    enumerable: true,
-  },
-})
+const generationApi = (App: Cizn.Application): Cizn.Application.State.Generation.Api =>
+  Object.create({}, {
+    make: {
+      value: make(App),
+      enumerable: true,
+    },
+    path: {
+      value: path(App),
+      enumerable: true,
+    },
+    set: {
+      value: set(App),
+      enumerable: true,
+    },
+    get: {
+      value: get(App),
+      enumerable: true,
+    },
+    apply: {
+      value: apply(App),
+      enumerable: true,
+    },
+  })
 
 export default generationApi

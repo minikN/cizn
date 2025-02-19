@@ -67,7 +67,6 @@ async (
  * Reuses the incoming `generation` by logging a message to the user and returning it.
  *
  * @param {Cizn.Application} app the application
- * @returns {Cizn.Application.State.Generation}
  */
 const reuseGeneration = (app: Cizn.Application) => async (generation: Cizn.Application.State.Generation) =>
   asyncPipe(

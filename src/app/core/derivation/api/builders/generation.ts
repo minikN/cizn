@@ -19,7 +19,7 @@ const processInputDerivation = (app: Cizn.Application, parent: Derivation) => as
   )
 
 /**
- * Build the derivation for a generation (meaning the root module).
+ * Build the generation for a derivation (meaning the root module).
  *
  * @param {Cizn.Application} app the application
  */

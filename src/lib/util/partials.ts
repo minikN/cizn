@@ -1,11 +1,11 @@
 import { GenerationEnvironment } from '@cizn/core/generation/api/index.ts'
 import { Environment } from '@cizn/core/state.ts'
-import { bind, map, tap } from '@lib/composition/function.ts'
-import { pipe } from '@lib/composition/pipe.ts'
+import { bind, map, recover, tap } from '@lib/composition/function.ts'
+import { asyncPipe, pipe } from '@lib/composition/pipe.ts'
 import { Failure, isFailure, Result, Success } from '@lib/composition/result.ts'
 import { Error } from '@lib/errors/index.ts'
 import { CliCommandProps } from '@lib/managers/cli/api/index.ts'
-import { def, isStr } from '@lib/util/index.ts'
+import { def, isObj, isStr } from '@lib/util/index.ts'
 import path from 'node:path'
 
 /**
@@ -103,3 +103,22 @@ async (props: T & { environment: Environment }) => {
   return Success(undefined)
 }
 
+/**
+ * Sets the current timestamp as `name` in `file`.
+ *
+ * @param {Cizn.Application} app the application
+ */
+export const setTimestamp = (app: Cizn.Application) => async (name: string, path: string) =>
+  asyncPipe(
+    Success(path),
+    map(async (path) => await app.Manager.FS.Api.File.read(path)),
+    recover({ INCORRECT_PATH_GIVEN: () => ('{}') }),
+    map((previousContent) => app.Manager.FS.Api.File.parseAsJSON(isObj)(previousContent)),
+    map(async (previousContent) =>
+      await app.Manager.FS.Api.File.write({
+        file: path,
+        content: JSON.stringify({ ...previousContent, [name]: new Date().toISOString() }),
+      })
+    ),
+    map(() => Success(path)),
+  )
